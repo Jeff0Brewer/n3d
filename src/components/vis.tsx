@@ -2,9 +2,7 @@ import { useState, useRef, useEffect, FC } from 'react'
 import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 
-type VisProps = { }
-
-const Vis: FC<VisProps> = props => {
+const Vis: FC = () => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
     const visRef = useRef<VisRenderer | null>(null)
