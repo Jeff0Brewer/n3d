@@ -1,0 +1,12 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    background: linear-gradient(0deg, #666 0%, #fff 100%);
+    background-size: 100vw 100vh;
+    color: #000;
+    font-family: Arial, Helvetica, sans-serif;
+}
