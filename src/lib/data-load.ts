@@ -16,9 +16,9 @@ const getPositions = (data: Array<Array<string>>): Float32Array => {
     // get indices of required fields for easy access in loop
     const headers = data[0]
     const objTypeInd = headers.indexOf('Object Type')
-    const raInd = headers.indexOf('RA')
-    const dcInd = headers.indexOf('Dec')
-    const rsInd = headers.indexOf('Redshift')
+    const lngInd = headers.indexOf('LON')
+    const latInd = headers.indexOf('LAT')
+    const redInd = headers.indexOf('Redshift')
 
     const DEG_TO_RAD = Math.PI / 180
     const POS_SCALE = 0.012
@@ -27,16 +27,16 @@ const getPositions = (data: Array<Array<string>>): Float32Array => {
     for (const row of data) {
         if (row[objTypeInd] !== 'G') { continue }
 
-        const ra = parseFloat(row[raInd]) * DEG_TO_RAD // right ascension
-        const dc = parseFloat(row[dcInd]) * DEG_TO_RAD // declination
-        const rs = parseFloat(row[rsInd]) // red shift
+        const lng = parseFloat(row[lngInd]) * DEG_TO_RAD
+        const lat = parseFloat(row[latInd]) * DEG_TO_RAD
+        const red = parseFloat(row[redInd])
 
-        const dist = POS_SCALE * rs * 4222 // magic number from legacy source, investigate
+        const dist = POS_SCALE * red * 4222 // magic number from legacy source, investigate
 
         positions.push(
-            dist * Math.sin(ra) * Math.cos(dc),
-            dist * Math.cos(ra) * Math.cos(dc),
-            dist * Math.sin(dc)
+            dist * Math.sin(lng) * Math.cos(lat),
+            dist * Math.cos(lng) * Math.cos(lat),
+            dist * Math.sin(lat)
         )
     }
 
