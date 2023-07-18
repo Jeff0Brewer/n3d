@@ -33,7 +33,7 @@ class VisRenderer {
         const aspect = canvas.width / canvas.height
         this.proj = mat4.perspective(mat4.create(), FOV, aspect, NEAR, FAR)
 
-        this.camera = new Camera(this.model, eye, focus, up)
+        this.camera = new Camera(this.model, this.view, eye, focus, up)
 
         this.points = new Points(
             this.gl,
@@ -45,20 +45,13 @@ class VisRenderer {
     }
 
     setupHandlers (canvas: HTMLCanvasElement): (() => void) {
-        const rotate = (e: MouseEvent): void => {
-            this.camera.mouseRotate(e.movementX, e.movementY)
-        }
-        canvas.addEventListener('mousemove', rotate)
-        const removeCameraHandlers = this.camera.setupEventHandlers(canvas)
-        return (): void => {
-            removeCameraHandlers()
-            canvas.removeEventListener('mousemove', rotate)
-        }
+        const removeCameraHandlers = this.camera.setupHandlers(canvas)
+        return removeCameraHandlers
     }
 
     draw (): void {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
-        this.points.draw(this.gl, this.model)
+        this.points.draw(this.gl, this.model, this.view)
     }
 }
 

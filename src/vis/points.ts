@@ -42,11 +42,12 @@ class Points {
         this.setProjMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uProjMatrix, false, mat) }
     }
 
-    draw (gl: WebGLRenderingContext, modelMatrix: mat4): void {
+    draw (gl: WebGLRenderingContext, modelMatrix: mat4, viewMatrix: mat4): void {
         gl.useProgram(this.program)
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
         this.bindAttrib()
         this.setModelMatrix(modelMatrix)
+        this.setViewMatrix(viewMatrix)
         gl.drawArrays(gl.POINTS, 0, this.numVertex)
     }
 }
