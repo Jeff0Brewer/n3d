@@ -9,11 +9,10 @@ type VisProps = {
 const Vis: FC<VisProps> = ({ positions }) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
-    const visRef = useRef<VisRenderer | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const frameIdRef = useRef<number>(-1)
+    const visRef = useRef<VisRenderer | null>(null)
 
-    // setup handler
     useEffect(() => {
         const onResize = (): void => {
             setWidth(window.innerWidth)
@@ -25,7 +24,6 @@ const Vis: FC<VisProps> = ({ positions }) => {
         }
     }, [])
 
-    // init vis renderer
     useEffect(() => {
         if (canvasRef.current) {
             visRef.current = new VisRenderer(canvasRef.current, positions)
@@ -34,7 +32,6 @@ const Vis: FC<VisProps> = ({ positions }) => {
         }
     }, [positions])
 
-    // setup draw loop
     useEffect(() => {
         const draw = (): void => {
             if (!visRef.current) { return }

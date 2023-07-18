@@ -12,6 +12,7 @@ class Points {
     setModelMatrix: (mat: mat4) => void
     setViewMatrix: (mat: mat4) => void
     setProjMatrix: (mat: mat4) => void
+    setDevicePixelRatio: (ratio: number) => void
     numVertex: number
 
     constructor (
@@ -32,14 +33,17 @@ class Points {
         const uModelMatrix = gl.getUniformLocation(this.program, 'modelMatrix')
         const uViewMatrix = gl.getUniformLocation(this.program, 'viewMatrix')
         const uProjMatrix = gl.getUniformLocation(this.program, 'projMatrix')
+        const uDevicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio')
 
         gl.uniformMatrix4fv(uModelMatrix, false, model)
         gl.uniformMatrix4fv(uViewMatrix, false, view)
         gl.uniformMatrix4fv(uProjMatrix, false, proj)
+        gl.uniform1f(uDevicePixelRatio, window.devicePixelRatio)
 
         this.setModelMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uModelMatrix, false, mat) }
         this.setViewMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uViewMatrix, false, mat) }
         this.setProjMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uProjMatrix, false, mat) }
+        this.setDevicePixelRatio = (ratio: number): void => { gl.uniform1f(uDevicePixelRatio, ratio) }
     }
 
     draw (gl: WebGLRenderingContext, modelMatrix: mat4, viewMatrix: mat4): void {

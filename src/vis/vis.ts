@@ -46,7 +46,21 @@ class VisRenderer {
 
     setupHandlers (canvas: HTMLCanvasElement): (() => void) {
         const removeCameraHandlers = this.camera.setupHandlers(canvas)
-        return removeCameraHandlers
+        const resize = (): void => {
+            const width = window.innerWidth * window.devicePixelRatio
+            const height = window.innerHeight * window.devicePixelRatio
+            mat4.perspective(this.proj, FOV, width / height, NEAR, FAR)
+            this.gl.viewport(0, 0, width, height)
+
+            this.gl.useProgram(this.points.program)
+            this.points.setProjMatrix(this.proj)
+            this.points.setDevicePixelRatio(window.devicePixelRatio)
+        }
+        window.addEventListener('resize', resize)
+        return (): void => {
+            removeCameraHandlers()
+            window.removeEventListener('resize', resize)
+        }
     }
 
     draw (): void {
