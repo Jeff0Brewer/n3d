@@ -5,11 +5,11 @@ import styles from '../styles/vis.module.css'
 
 type VisProps = {
     data: GalaxyData,
-    setSelected: (fields: Array<string>) => void
-
+    setSelected: (fields: Array<string>) => void,
+    colorField: string | null
 }
 
-const Vis: FC<VisProps> = ({ data, setSelected }) => {
+const Vis: FC<VisProps> = ({ data, setSelected, colorField }) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
     const [selecting, setSelecting] = useState<boolean>(false)
@@ -55,6 +55,12 @@ const Vis: FC<VisProps> = ({ data, setSelected }) => {
             )
         }
     }, [selecting, data, setSelected])
+
+    useEffect(() => {
+        if (visRef.current) {
+            visRef.current.colorMapField(data, colorField)
+        }
+    }, [data, colorField])
 
     useEffect(() => {
         const draw = (): void => {

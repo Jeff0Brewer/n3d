@@ -1,0 +1,31 @@
+.wrap {
+    position: absolute;
+    z-index: 10;
+    left: 0;
+    bottom: 0;
+    background-color: #111;
+    padding: 10px;
+    font-size: 12px;
+}
+
+.label {
+    text-transform: uppercase;
+    border-bottom: 1px solid #888;
+    font-size: 16px;
+    color: #888;
+    text-align: center;
+}
+
+.scroll {
+    max-height: 400px;
+    max-width: 150px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.field {
+    text-wrap: nowrap;
+    margin: 5px;
+}

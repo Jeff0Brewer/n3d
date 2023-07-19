@@ -40,6 +40,14 @@ class VisRenderer {
         this.points.colorMapField(this.gl, data, '2MASS  K_s_total')
     }
 
+    colorMapField (data: GalaxyData, field: string | null): void {
+        if (field) {
+            this.points.colorMapField(this.gl, data, field)
+        } else {
+            this.points.resetColors(this.gl)
+        }
+    }
+
     setupSelectHandlers (
         canvas: HTMLCanvasElement,
         data: GalaxyData,
