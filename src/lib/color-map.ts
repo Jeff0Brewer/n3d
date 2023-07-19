@@ -11,7 +11,7 @@ class ColorMap {
         if (percentage <= 0) { return this.colors[0] }
         if (percentage >= 1) { return this.colors[this.colors.length - 1] }
 
-        const ind = this.colors.length * percentage
+        const ind = (this.colors.length - 1) * percentage
         const lowInd = Math.floor(ind)
         const highInd = Math.ceil(ind)
         const indPer = (ind - lowInd) / (highInd - lowInd)
