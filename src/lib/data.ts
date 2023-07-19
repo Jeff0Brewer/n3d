@@ -7,7 +7,7 @@ type GalaxyData = {
 }
 
 type SelectMap = {
-    [color: string]: string
+    [color: string]: number
 }
 
 type SelectColors = {
@@ -32,8 +32,7 @@ const loadData = async (path: string): Promise<GalaxyData> => {
 }
 
 const getSelectColors = (data: GalaxyData): SelectColors => {
-    const { headers, entries } = data
-    const nameInd = headers.indexOf('Object Name')
+    const { entries } = data
     const minBrightness = Math.floor(255 - Math.pow(entries.length, 0.333))
 
     const buffer = new Uint8Array(entries.length * 3)
@@ -47,7 +46,7 @@ const getSelectColors = (data: GalaxyData): SelectColors => {
                 buffer[bufInd++] = g
                 buffer[bufInd++] = b
                 const hex = r.toString(16) + g.toString(16) + b.toString(16)
-                map[hex] = entries[entryInd][nameInd]
+                map[hex] = entryInd
             }
         }
     }
