@@ -1,8 +1,12 @@
 import Papa from 'papaparse'
 import type { ParseConfig } from 'papaparse'
 
+type DataHeaders = {
+    [name: string]: number
+}
+
 type GalaxyData = {
-    headers: Array<string>,
+    headers: DataHeaders,
     entries: Array<Array<string>>
 }
 
@@ -24,8 +28,12 @@ const loadData = async (path: string): Promise<GalaxyData> => {
     const csvString = await res.text()
     const { data } = Papa.parse(csvString, csvParseConfig)
 
-    const headers = data[0]
-    const objTypeInd = headers.indexOf('Object Type')
+    const headerRow = data[0]
+    const headers: DataHeaders = {}
+    for (let i = 0; i < headerRow.length; i++) {
+        headers[headerRow[i]] = i
+    }
+    const objTypeInd = headers['Object Type']
     const entries = data.filter(row => row[objTypeInd] === 'G')
 
     return { headers, entries }
@@ -57,10 +65,10 @@ const getSelectColors = (data: GalaxyData): SelectColors => {
 const getPositions = (data: GalaxyData): Float32Array => {
     const { headers, entries } = data
     // get indices of required fields for easy access in loop
-    const objTypeInd = headers.indexOf('Object Type')
-    const lngInd = headers.indexOf('LON')
-    const latInd = headers.indexOf('LAT')
-    const redInd = headers.indexOf('Redshift')
+    const objTypeInd = headers['Object Type']
+    const lngInd = headers.LON
+    const latInd = headers.LAT
+    const redInd = headers.Redshift
 
     const DEG_TO_RAD = Math.PI / 180
     const POS_SCALE = 0.012
@@ -92,5 +100,6 @@ export {
 
 export type {
     GalaxyData,
-    SelectMap
+    SelectMap,
+    DataHeaders
 }
