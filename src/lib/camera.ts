@@ -2,11 +2,13 @@ import { mat4, vec3 } from 'gl-matrix'
 
 const ROTATE_SPEED = 0.007
 const ZOOM_SPEED = 0.0005
+const FOCUS_SPEED = 0.2
 
 class Camera {
     view: mat4
     eye: vec3
     focus: vec3
+    focusTarget: vec3
     up: vec3
     dragging: boolean
 
@@ -14,8 +16,15 @@ class Camera {
         this.view = view
         this.eye = eye
         this.focus = focus
+        this.focusTarget = focus
         this.up = up
         this.dragging = false
+    }
+
+    update (): void {
+        vec3.scale(this.focus, this.focus, 1 - FOCUS_SPEED)
+        vec3.scaleAndAdd(this.focus, this.focus, this.focusTarget, FOCUS_SPEED)
+        mat4.lookAt(this.view, this.eye, this.focus, this.up)
     }
 
     setupHandlers (element: HTMLElement): (() => void) {
@@ -47,8 +56,7 @@ class Camera {
     }
 
     setFocus (pos: vec3): void {
-        this.focus = pos
-        mat4.lookAt(this.view, this.eye, this.focus, this.up)
+        this.focusTarget = pos
     }
 
     scrollZoom (delta: number): void {
@@ -56,7 +64,6 @@ class Camera {
         const viewVec = vec3.create()
         vec3.subtract(viewVec, this.eye, this.focus)
         vec3.scaleAndAdd(this.eye, this.focus, viewVec, scale)
-        mat4.lookAt(this.view, this.eye, this.focus, this.up)
     }
 
     mouseRotate (dx: number, dy: number): void {
@@ -75,8 +82,6 @@ class Camera {
 
         vec3.transformMat4(camVec, camVec, rotation)
         vec3.add(this.eye, this.focus, camVec)
-
-        mat4.lookAt(this.view, this.eye, this.focus, this.up)
     }
 }
 
