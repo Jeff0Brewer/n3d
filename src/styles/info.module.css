@@ -4,8 +4,7 @@
     right: 0;
     bottom: 0;
     background-color: #111;
-    padding: 10px;
-    font-size: 12px;
+    padding: 10px; font-size: 12px;
 }
 
 .info .wrap {
@@ -15,4 +14,8 @@
 .info .label {
     text-transform: uppercase;
     color: #888;
+}
+
+.hidden {
+    display: none;
 }
