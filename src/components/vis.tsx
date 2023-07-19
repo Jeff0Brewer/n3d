@@ -28,7 +28,7 @@ const Vis: FC<VisProps> = ({ data }) => {
     useEffect(() => {
         if (canvasRef.current) {
             visRef.current = new VisRenderer(canvasRef.current, data)
-            const removeHandlers = visRef.current.setupHandlers(canvasRef.current)
+            const removeHandlers = visRef.current.setupHandlers(canvasRef.current, data)
             return removeHandlers
         }
     }, [data])

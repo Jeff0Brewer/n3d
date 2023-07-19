@@ -20,8 +20,8 @@ class Points {
     setInvMatrix: (mat: mat4) => void
     setDevicePixelRatio: (ratio: number) => void
     setMousePos: (x: number, y: number) => void
-    selectMap: SelectMap
     numVertex: number
+    selectMap: SelectMap
 
     constructor (
         gl: WebGLRenderingContext,
@@ -68,15 +68,29 @@ class Points {
         }
     }
 
-    setupHandlers (element: HTMLElement): (() => void) {
+    setupHandlers (gl: WebGLRenderingContext, data: GalaxyData, canvas: HTMLCanvasElement): (() => void) {
         const mouseMove = (e: MouseEvent): void => {
             const x = e.clientX / window.innerWidth * 2 - 1
             const y = -(e.clientY / window.innerHeight * 2 - 1)
             this.setMousePos(x, y)
         }
-        element.addEventListener('mousemove', mouseMove)
+        const mouseDown = (e: MouseEvent): void => {
+            // wrap in request frame to wait for current render to finish before getting pixel data
+            window.requestAnimationFrame(() => {
+                const x = e.clientX * window.devicePixelRatio
+                const y = (window.innerHeight - e.clientY) * window.devicePixelRatio
+                const pixel = new Uint8Array(4)
+                gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel)
+                const hex = pixel[0].toString(16) + pixel[1].toString(16) + pixel[2].toString(16)
+                const ind = this.selectMap[hex]
+                console.log(data.entries[ind])
+            })
+        }
+        canvas.addEventListener('mousemove', mouseMove)
+        canvas.addEventListener('mousedown', mouseDown)
         return (): void => {
-            element.removeEventListener('mousemove', mouseMove)
+            canvas.removeEventListener('mousemove', mouseMove)
+            canvas.removeEventListener('mousedown', mouseDown)
         }
     }
 
