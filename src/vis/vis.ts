@@ -1,5 +1,6 @@
 import { mat4, vec3 } from 'gl-matrix'
 import { initGl } from '../lib/gl-wrap'
+import { getInvMatrix } from '../lib/unproject'
 import type { GalaxyData } from '../lib/data'
 import Camera from '../lib/camera'
 import Points from '../vis/points'
@@ -33,11 +34,14 @@ class VisRenderer {
         this.proj = mat4.perspective(mat4.create(), FOV, aspect, NEAR, FAR)
 
         this.camera = new Camera(this.model, this.view, eye, focus, up)
-        this.points = new Points(this.gl, this.model, this.view, this.proj, data)
+
+        const inv = getInvMatrix([this.proj, this.view, this.model])
+        this.points = new Points(this.gl, this.model, this.view, this.proj, inv, data)
     }
 
     setupHandlers (canvas: HTMLCanvasElement): (() => void) {
         const removeCameraHandlers = this.camera.setupHandlers(canvas)
+        const removePointHandlers = this.points.setupHandlers(canvas)
         const resize = (): void => {
             const width = window.innerWidth * window.devicePixelRatio
             const height = window.innerHeight * window.devicePixelRatio
@@ -51,13 +55,15 @@ class VisRenderer {
         window.addEventListener('resize', resize)
         return (): void => {
             removeCameraHandlers()
+            removePointHandlers()
             window.removeEventListener('resize', resize)
         }
     }
 
     draw (): void {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
-        this.points.draw(this.gl, this.model, this.view)
+        const inv = getInvMatrix([this.proj, this.view, this.model])
+        this.points.draw(this.gl, this.model, this.view, inv)
     }
 }
 

@@ -65,11 +65,18 @@ const initAttribute = (
     size: number,
     stride: number,
     offset: number,
-    byteSize: number
+    type: number
 ): (() => void) => {
     const location = gl.getAttribLocation(program, name)
     if (location === -1) {
         throw new Error(`Attribute ${name} not found in program`)
+    }
+
+    let byteSize = 0
+    if (type === gl.FLOAT) {
+        byteSize = Float32Array.BYTES_PER_ELEMENT
+    } else if (type === gl.BYTE) {
+        byteSize = Uint8Array.BYTES_PER_ELEMENT
     }
 
     // store vertex attrib pointer call in closure for future binding
@@ -77,7 +84,7 @@ const initAttribute = (
         gl.vertexAttribPointer(
             location,
             size,
-            gl.FLOAT,
+            type,
             false,
             stride * byteSize,
             offset * byteSize
