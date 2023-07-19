@@ -1,10 +1,10 @@
 import { FC, useEffect, useState } from 'react'
 import { loadData } from '../lib/data'
-import type { CsvData } from '../lib/data'
+import type { GalaxyData } from '../lib/data'
 import Vis from '../components/vis'
 
 const App: FC = () => {
-    const [data, setData] = useState<CsvData | null>(null)
+    const [data, setData] = useState<GalaxyData | null>(null)
 
     const getPositions = async (): Promise<void> => {
         const data = await loadData('./data/data.csv')

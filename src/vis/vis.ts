@@ -1,6 +1,6 @@
 import { mat4, vec3 } from 'gl-matrix'
 import { initGl } from '../lib/gl-wrap'
-import type { CsvData } from '../lib/data'
+import type { GalaxyData } from '../lib/data'
 import Camera from '../lib/camera'
 import Points from '../vis/points'
 
@@ -17,7 +17,7 @@ class VisRenderer {
     points: Points
     camera: Camera
 
-    constructor (canvas: HTMLCanvasElement, data: CsvData) {
+    constructor (canvas: HTMLCanvasElement, data: GalaxyData) {
         this.gl = initGl(canvas)
         this.gl.enable(this.gl.DEPTH_TEST)
         this.canvas = canvas

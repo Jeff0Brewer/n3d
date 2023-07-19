@@ -1,7 +1,7 @@
 import { mat4 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getPositions } from '../lib/data'
-import type { CsvData } from '../lib/data'
+import type { GalaxyData } from '../lib/data'
 import vertSource from '../shaders/vert.glsl?raw'
 import fragSource from '../shaders/frag.glsl?raw'
 
@@ -22,7 +22,7 @@ class Points {
         model: mat4,
         view: mat4,
         proj: mat4,
-        data: CsvData
+        data: GalaxyData
     ) {
         this.program = initProgram(gl, vertSource, fragSource)
 

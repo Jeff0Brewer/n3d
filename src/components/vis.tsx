@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, FC } from 'react'
-import type { CsvData } from '../lib/data'
+import type { GalaxyData } from '../lib/data'
 import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 
 type VisProps = {
-    data: CsvData
+    data: GalaxyData
 }
 
 const Vis: FC<VisProps> = ({ data }) => {
