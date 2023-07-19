@@ -7,6 +7,7 @@ uniform mat4 projMatrix;
 uniform mat4 invMatrix;
 uniform float devicePixelRatio;
 uniform vec2 mousePos;
+uniform int selecting;
 
 varying vec3 vColor;
 
@@ -18,6 +19,8 @@ void main() {
     gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
     gl_PointSize = (2.0 * devicePixelRatio) / gl_Position.w;
     vColor = vec3(1.0, 1.0, 1.0);
+
+    if (selecting == 0) { return; }
 
     vec4 mouseNear = invMatrix * vec4(mousePos, 0.0, 1.0);
     vec4 mouseFar = invMatrix * vec4(mousePos, 1.0, 1.0);

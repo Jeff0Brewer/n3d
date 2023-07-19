@@ -20,6 +20,7 @@ class Points {
     setProjMatrix: (mat: mat4) => void
     setInvMatrix: (mat: mat4) => void
     setDevicePixelRatio: (ratio: number) => void
+    setSelecting: (selecting: boolean) => void
     setMousePos: (x: number, y: number) => void
     numVertex: number
     positions: Float32Array
@@ -53,35 +54,47 @@ class Points {
         const uInvMatrix = gl.getUniformLocation(this.program, 'invMatrix')
         const uDevicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio')
         const uMousePos = gl.getUniformLocation(this.program, 'mousePos')
+        const uSelecting = gl.getUniformLocation(this.program, 'selecting')
 
         gl.uniformMatrix4fv(uModelMatrix, false, model)
         gl.uniformMatrix4fv(uViewMatrix, false, view)
         gl.uniformMatrix4fv(uProjMatrix, false, proj)
         gl.uniformMatrix4fv(uInvMatrix, false, inv)
         gl.uniform1f(uDevicePixelRatio, window.devicePixelRatio)
+        gl.uniform1i(uSelecting, 0)
 
         this.setModelMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uModelMatrix, false, mat) }
         this.setViewMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uViewMatrix, false, mat) }
         this.setProjMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uProjMatrix, false, mat) }
         this.setInvMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uInvMatrix, false, mat) }
         this.setDevicePixelRatio = (ratio: number): void => { gl.uniform1f(uDevicePixelRatio, ratio) }
+        this.setSelecting = (selecting: boolean): void => {
+            gl.uniform1i(uSelecting, selecting ? 1 : 0)
+        }
         this.setMousePos = (x: number, y: number): void => {
             gl.uniform2f(uMousePos, x, y)
         }
     }
 
-    setupHandlers (
+    setupHandlers (canvas: HTMLCanvasElement): (() => void) {
+        const mouseMove = (e: MouseEvent): void => {
+            const x = e.clientX / window.innerWidth * 2 - 1
+            const y = -(e.clientY / window.innerHeight * 2 - 1)
+            this.setMousePos(x, y)
+        }
+        canvas.addEventListener('mousemove', mouseMove)
+        return (): void => {
+            canvas.removeEventListener('mousemove', mouseMove)
+        }
+    }
+
+    setupSelectHandlers (
         gl: WebGLRenderingContext,
         data: GalaxyData,
         canvas: HTMLCanvasElement,
         camera: Camera,
         setSelected: (fields: Array<string>) => void
     ): (() => void) {
-        const mouseMove = (e: MouseEvent): void => {
-            const x = e.clientX / window.innerWidth * 2 - 1
-            const y = -(e.clientY / window.innerHeight * 2 - 1)
-            this.setMousePos(x, y)
-        }
         const mouseDown = (e: MouseEvent): void => {
             // wrap in request frame to wait for current render to finish before getting pixel data
             window.requestAnimationFrame(() => {
@@ -97,10 +110,8 @@ class Points {
                 }
             })
         }
-        canvas.addEventListener('mousemove', mouseMove)
         canvas.addEventListener('mousedown', mouseDown)
         return (): void => {
-            canvas.removeEventListener('mousemove', mouseMove)
             canvas.removeEventListener('mousedown', mouseDown)
         }
     }

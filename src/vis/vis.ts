@@ -39,19 +39,28 @@ class VisRenderer {
         this.points = new Points(this.gl, this.model, this.view, this.proj, inv, data)
     }
 
-    setupHandlers (
+    setupSelectHandlers (
         canvas: HTMLCanvasElement,
         data: GalaxyData,
         setSelected: (fields: Array<string>) => void
     ): (() => void) {
-        const removeCameraHandlers = this.camera.setupHandlers(canvas)
-        const removePointHandlers = this.points.setupHandlers(
+        const removePointHandlers = this.points.setupSelectHandlers(
             this.gl,
             data,
             canvas,
             this.camera,
             setSelected
         )
+        return removePointHandlers
+    }
+
+    setSelectMode (selecting: boolean): void {
+        this.points.setSelecting(selecting)
+    }
+
+    setupHandlers (canvas: HTMLCanvasElement): (() => void) {
+        const removeCameraHandlers = this.camera.setupHandlers(canvas)
+        const removePointHandlers = this.points.setupHandlers(canvas)
         const resize = (): void => {
             const width = window.innerWidth * window.devicePixelRatio
             const height = window.innerHeight * window.devicePixelRatio
