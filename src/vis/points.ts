@@ -1,7 +1,7 @@
 import { mat4 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
-import { getPositions } from '../lib/data-load'
-import type { CsvData } from '../lib/data-load'
+import { getPositions } from '../lib/data'
+import type { CsvData } from '../lib/data'
 import vertSource from '../shaders/vert.glsl?raw'
 import fragSource from '../shaders/frag.glsl?raw'
 

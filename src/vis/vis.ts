@@ -1,6 +1,6 @@
 import { mat4, vec3 } from 'gl-matrix'
 import { initGl } from '../lib/gl-wrap'
-import type { CsvData } from '../lib/data-load'
+import type { CsvData } from '../lib/data'
 import Camera from '../lib/camera'
 import Points from '../vis/points'
 

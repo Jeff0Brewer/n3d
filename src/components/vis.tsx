@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, FC } from 'react'
-import type { CsvData } from '../lib/data-load'
+import type { CsvData } from '../lib/data'
 import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 

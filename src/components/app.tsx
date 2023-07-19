@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react'
-import { loadData } from '../lib/data-load'
-import type { CsvData } from '../lib/data-load'
+import { loadData } from '../lib/data'
+import type { CsvData } from '../lib/data'
 import Vis from '../components/vis'
 
 const App: FC = () => {
