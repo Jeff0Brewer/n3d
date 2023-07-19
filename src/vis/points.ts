@@ -42,7 +42,7 @@ class Points {
         const { map, buffer } = getSelectColors(data)
         this.selBuffer = initBuffer(gl)
         gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW)
-        this.bindSelect = initAttribute(gl, this.program, 'selectColor', SEL_FPV, SEL_FPV, 0, gl.BYTE)
+        this.bindSelect = initAttribute(gl, this.program, 'selectColor', SEL_FPV, SEL_FPV, 0, gl.UNSIGNED_BYTE)
         this.selectMap = map
 
         const uModelMatrix = gl.getUniformLocation(this.program, 'modelMatrix')

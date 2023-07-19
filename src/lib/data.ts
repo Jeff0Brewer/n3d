@@ -34,14 +34,15 @@ const loadData = async (path: string): Promise<GalaxyData> => {
 const getSelectColors = (data: GalaxyData): SelectColors => {
     const { headers, entries } = data
     const nameInd = headers.indexOf('Object Name')
+    const minBrightness = Math.floor(255 - Math.pow(entries.length, 0.333))
 
     const buffer = new Uint8Array(entries.length * 3)
     const map: SelectMap = {}
     let entryInd = 0
     let bufInd = 0
-    for (let r = 0; r < 256 && bufInd < buffer.length; r++) {
-        for (let g = 0; g < 256 && bufInd < buffer.length; g++) {
-            for (let b = 0; b < 256 && bufInd < buffer.length; b++, entryInd++) {
+    for (let r = minBrightness; r < 256 && bufInd < buffer.length; r++) {
+        for (let g = minBrightness; g < 256 && bufInd < buffer.length; g++) {
+            for (let b = minBrightness; b < 256 && bufInd < buffer.length; b++, entryInd++) {
                 buffer[bufInd++] = r
                 buffer[bufInd++] = g
                 buffer[bufInd++] = b

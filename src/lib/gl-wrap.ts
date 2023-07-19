@@ -75,7 +75,7 @@ const initAttribute = (
     let byteSize = 0
     if (type === gl.FLOAT) {
         byteSize = Float32Array.BYTES_PER_ELEMENT
-    } else if (type === gl.BYTE) {
+    } else if (type === gl.UNSIGNED_BYTE) {
         byteSize = Uint8Array.BYTES_PER_ELEMENT
     }
 
