@@ -4,10 +4,12 @@ import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 
 type VisProps = {
-    data: GalaxyData
+    data: GalaxyData,
+    setSelected: (fields: Array<string>) => void
+
 }
 
-const Vis: FC<VisProps> = ({ data }) => {
+const Vis: FC<VisProps> = ({ data, setSelected }) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -28,10 +30,10 @@ const Vis: FC<VisProps> = ({ data }) => {
     useEffect(() => {
         if (canvasRef.current) {
             visRef.current = new VisRenderer(canvasRef.current, data)
-            const removeHandlers = visRef.current.setupHandlers(canvasRef.current, data)
+            const removeHandlers = visRef.current.setupHandlers(canvasRef.current, data, setSelected)
             return removeHandlers
         }
-    }, [data])
+    }, [data, setSelected])
 
     useEffect(() => {
         const draw = (): void => {

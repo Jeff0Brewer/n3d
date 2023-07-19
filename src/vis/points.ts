@@ -74,7 +74,8 @@ class Points {
         gl: WebGLRenderingContext,
         data: GalaxyData,
         canvas: HTMLCanvasElement,
-        camera: Camera
+        camera: Camera,
+        setSelected: (fields: Array<string>) => void
     ): (() => void) {
         const mouseMove = (e: MouseEvent): void => {
             const x = e.clientX / window.innerWidth * 2 - 1
@@ -92,7 +93,7 @@ class Points {
                 const ind = this.selectMap[hex]
                 if (ind) {
                     camera.setFocus(this.positions.slice(ind * POS_FPV, ind * POS_FPV + POS_FPV))
-                    console.log(data.entries[ind])
+                    setSelected(data.entries[ind])
                 }
             })
         }
