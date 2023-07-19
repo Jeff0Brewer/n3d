@@ -4,15 +4,13 @@ const ROTATE_SPEED = 0.007
 const ZOOM_SPEED = 0.0005
 
 class Camera {
-    model: mat4
     view: mat4
     eye: vec3
     focus: vec3
     up: vec3
     dragging: boolean
 
-    constructor (model: mat4, view: mat4, eye: vec3, focus: vec3, up: vec3) {
-        this.model = model
+    constructor (view: mat4, eye: vec3, focus: vec3, up: vec3) {
         this.view = view
         this.eye = eye
         this.focus = focus
@@ -48,6 +46,11 @@ class Camera {
         }
     }
 
+    setFocus (pos: vec3): void {
+        this.focus = pos
+        mat4.lookAt(this.view, this.eye, this.focus, this.up)
+    }
+
     scrollZoom (delta: number): void {
         const scale = 1.0 - delta * ZOOM_SPEED
         const viewVec = vec3.create()
@@ -57,19 +60,23 @@ class Camera {
     }
 
     mouseRotate (dx: number, dy: number): void {
-        // get axis perpendicular to current screen horizontally
-        const invModel = mat4.create()
-        mat4.invert(invModel, this.model)
+        const camVec = vec3.create()
+        vec3.subtract(camVec, this.eye, this.focus)
+
         const axis = vec3.create()
-        vec3.subtract(axis, this.focus, this.eye)
-        vec3.cross(axis, axis, this.up)
-        vec3.transformMat4(axis, axis, invModel)
+        vec3.cross(axis, camVec, this.up)
         vec3.normalize(axis, axis)
 
         const rotationX = dy * ROTATE_SPEED
-        const rotationZ = dx * ROTATE_SPEED
-        mat4.rotate(this.model, this.model, rotationX, axis)
-        mat4.rotate(this.model, this.model, rotationZ, this.up)
+        const rotationZ = -dx * ROTATE_SPEED
+        const rotation = mat4.create()
+        mat4.rotate(rotation, rotation, rotationX, axis)
+        mat4.rotate(rotation, rotation, rotationZ, this.up)
+
+        vec3.transformMat4(camVec, camVec, rotation)
+        vec3.add(this.eye, this.focus, camVec)
+
+        mat4.lookAt(this.view, this.eye, this.focus, this.up)
     }
 }
 

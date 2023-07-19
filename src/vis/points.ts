@@ -2,6 +2,7 @@ import { mat4 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getPositions, getSelectColors } from '../lib/data'
 import type { GalaxyData, SelectMap } from '../lib/data'
+import Camera from '../lib/camera'
 import vertSource from '../shaders/vert.glsl?raw'
 import fragSource from '../shaders/frag.glsl?raw'
 
@@ -21,6 +22,7 @@ class Points {
     setDevicePixelRatio: (ratio: number) => void
     setMousePos: (x: number, y: number) => void
     numVertex: number
+    positions: Float32Array
     selectMap: SelectMap
 
     constructor (
@@ -33,11 +35,11 @@ class Points {
     ) {
         this.program = initProgram(gl, vertSource, fragSource)
 
-        const positions = getPositions(data)
+        this.positions = getPositions(data)
         this.posBuffer = initBuffer(gl)
-        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW)
+        gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW)
         this.bindPosition = initAttribute(gl, this.program, 'position', POS_FPV, POS_FPV, 0, gl.FLOAT)
-        this.numVertex = positions.length / POS_FPV
+        this.numVertex = this.positions.length / POS_FPV
 
         const { map, buffer } = getSelectColors(data)
         this.selBuffer = initBuffer(gl)
@@ -68,7 +70,12 @@ class Points {
         }
     }
 
-    setupHandlers (gl: WebGLRenderingContext, data: GalaxyData, canvas: HTMLCanvasElement): (() => void) {
+    setupHandlers (
+        gl: WebGLRenderingContext,
+        data: GalaxyData,
+        canvas: HTMLCanvasElement,
+        camera: Camera
+    ): (() => void) {
         const mouseMove = (e: MouseEvent): void => {
             const x = e.clientX / window.innerWidth * 2 - 1
             const y = -(e.clientY / window.innerHeight * 2 - 1)
@@ -83,7 +90,10 @@ class Points {
                 gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel)
                 const hex = pixel[0].toString(16) + pixel[1].toString(16) + pixel[2].toString(16)
                 const ind = this.selectMap[hex]
-                console.log(data.entries[ind])
+                if (ind) {
+                    camera.setFocus(this.positions.slice(ind * POS_FPV, ind * POS_FPV + POS_FPV))
+                    console.log(data.entries[ind])
+                }
             })
         }
         canvas.addEventListener('mousemove', mouseMove)

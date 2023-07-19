@@ -33,7 +33,7 @@ class VisRenderer {
         const aspect = canvas.width / canvas.height
         this.proj = mat4.perspective(mat4.create(), FOV, aspect, NEAR, FAR)
 
-        this.camera = new Camera(this.model, this.view, eye, focus, up)
+        this.camera = new Camera(this.view, eye, focus, up)
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
         this.points = new Points(this.gl, this.model, this.view, this.proj, inv, data)
@@ -41,7 +41,7 @@ class VisRenderer {
 
     setupHandlers (canvas: HTMLCanvasElement, data: GalaxyData): (() => void) {
         const removeCameraHandlers = this.camera.setupHandlers(canvas)
-        const removePointHandlers = this.points.setupHandlers(this.gl, data, canvas)
+        const removePointHandlers = this.points.setupHandlers(this.gl, data, canvas, this.camera)
         const resize = (): void => {
             const width = window.innerWidth * window.devicePixelRatio
             const height = window.innerHeight * window.devicePixelRatio
