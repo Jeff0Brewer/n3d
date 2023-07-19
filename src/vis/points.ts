@@ -3,11 +3,13 @@ import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getPositions, getSelectColors } from '../lib/data'
 import type { GalaxyData, SelectMap } from '../lib/data'
 import Camera from '../lib/camera'
+import ColorMap from '../lib/color-map'
 import vertSource from '../shaders/vert.glsl?raw'
 import fragSource from '../shaders/frag.glsl?raw'
 
 const POS_FPV = 3
 const SEL_FPV = 3
+const COL_FPV = 3
 
 class Points {
     program: WebGLProgram
@@ -15,6 +17,8 @@ class Points {
     bindPosition: () => void
     selBuffer: WebGLBuffer
     bindSelect: () => void
+    colBuffer: WebGLBuffer
+    bindColor: () => void
     setModelMatrix: (mat: mat4) => void
     setViewMatrix: (mat: mat4) => void
     setProjMatrix: (mat: mat4) => void
@@ -25,6 +29,7 @@ class Points {
     numVertex: number
     positions: Float32Array
     selectMap: SelectMap
+    colorMap: ColorMap
 
     constructor (
         gl: WebGLRenderingContext,
@@ -47,6 +52,12 @@ class Points {
         gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW)
         this.bindSelect = initAttribute(gl, this.program, 'selectColor', SEL_FPV, SEL_FPV, 0, gl.UNSIGNED_BYTE)
         this.selectMap = map
+
+        const colors = new Uint8Array(this.numVertex * COL_FPV)
+        colors.fill(255)
+        this.colBuffer = initBuffer(gl)
+        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
+        this.bindColor = initAttribute(gl, this.program, 'color', COL_FPV, COL_FPV, 0, gl.UNSIGNED_BYTE)
 
         const uModelMatrix = gl.getUniformLocation(this.program, 'modelMatrix')
         const uViewMatrix = gl.getUniformLocation(this.program, 'viewMatrix')
@@ -74,6 +85,8 @@ class Points {
         this.setMousePos = (x: number, y: number): void => {
             gl.uniform2f(uMousePos, x, y)
         }
+
+        this.colorMap = new ColorMap(['F06857', 'ECA653', 'E8CD52', '4CD15E', '5561E7', '3E39AC', 'C447E0'])
     }
 
     setupHandlers (canvas: HTMLCanvasElement): (() => void) {
@@ -116,6 +129,42 @@ class Points {
         }
     }
 
+    colorMapField (gl: WebGLRenderingContext, data: GalaxyData, field: string): void {
+        const { headers, entries } = data
+        const fieldInd = headers[field]
+
+        let min = Number.MAX_VALUE
+        let max = Number.MIN_VALUE
+        const values = new Float32Array(entries.length)
+        for (let i = 0; i < values.length; i++) {
+            values[i] = parseFloat(entries[i][fieldInd])
+            if (Number.isNaN(values[i])) {
+                continue
+            }
+            min = Math.min(min, values[i])
+            max = Math.max(max, values[i])
+        }
+
+        const colors = new Uint8Array(entries.length * COL_FPV)
+        let colInd = 0
+        for (let i = 0; i < values.length; i++) {
+            if (Number.isNaN(values[i])) {
+                colors[colInd++] = 255
+                colors[colInd++] = 255
+                colors[colInd++] = 255
+                continue
+            }
+            const per = (values[i] - min) / (max - min)
+            const color = this.colorMap.map(per)
+            colors[colInd++] = color[0] * 255
+            colors[colInd++] = color[1] * 255
+            colors[colInd++] = color[2] * 255
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.colBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
+    }
+
     draw (gl: WebGLRenderingContext, model: mat4, view: mat4, inv: mat4): void {
         gl.useProgram(this.program)
 
@@ -128,6 +177,9 @@ class Points {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.selBuffer)
         this.bindSelect()
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.colBuffer)
+        this.bindColor()
 
         gl.drawArrays(gl.POINTS, 0, this.numVertex)
     }

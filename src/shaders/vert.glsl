@@ -1,4 +1,5 @@
 attribute vec3 position;
+attribute vec3 color;
 attribute vec3 selectColor;
 
 uniform mat4 modelMatrix;
@@ -18,7 +19,7 @@ float distLinePoint(vec3 line0, vec3 line1, vec3 point) {
 void main() {
     gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
     gl_PointSize = (2.0 * devicePixelRatio) / gl_Position.w;
-    vColor = vec3(1.0, 1.0, 1.0);
+    vColor = color / 255.0;
 
     if (selecting == 0) { return; }
 

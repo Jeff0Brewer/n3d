@@ -37,6 +37,7 @@ class VisRenderer {
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
         this.points = new Points(this.gl, this.model, this.view, this.proj, inv, data)
+        this.points.colorMapField(this.gl, data, '2MASS  K_s_total')
     }
 
     setupSelectHandlers (
