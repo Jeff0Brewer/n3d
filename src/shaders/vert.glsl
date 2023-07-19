@@ -27,9 +27,10 @@ void main() {
         position
     );
 
-    float mouseRange = 0.02 * gl_Position.w;
+    float mouseRange = 0.01 * gl_Position.w;
 
     if (mouseDist < mouseRange) {
         vColor = selectColor / 255.0;
+        gl_PointSize = gl_PointSize + 5.0 * (1.0 - (mouseDist / mouseRange));
     }
 }
