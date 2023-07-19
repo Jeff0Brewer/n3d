@@ -64,7 +64,8 @@ const initAttribute = (
     name: string,
     size: number,
     stride: number,
-    offset: number
+    offset: number,
+    byteSize: number
 ): (() => void) => {
     const location = gl.getAttribLocation(program, name)
     if (location === -1) {
@@ -78,8 +79,8 @@ const initAttribute = (
             size,
             gl.FLOAT,
             false,
-            stride * Float32Array.BYTES_PER_ELEMENT,
-            offset * Float32Array.BYTES_PER_ELEMENT
+            stride * byteSize,
+            offset * byteSize
         )
     }
     bindAttrib()

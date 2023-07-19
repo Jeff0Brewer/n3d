@@ -6,6 +6,15 @@ type GalaxyData = {
     entries: Array<Array<string>>
 }
 
+type SelectMap = {
+    [color: string]: string
+}
+
+type SelectColors = {
+    map: SelectMap,
+    buffer: Uint8Array
+}
+
 const csvParseConfig: ParseConfig = {
     transform: (value: string): string => value.trim()
 }
@@ -22,6 +31,29 @@ const loadData = async (path: string): Promise<GalaxyData> => {
     return { headers, entries }
 }
 
+const getSelectColors = (data: GalaxyData): SelectColors => {
+    const { headers, entries } = data
+    const nameInd = headers.indexOf('Object Name')
+
+    const buffer = new Uint8Array(entries.length * 3)
+    const map: SelectMap = {}
+    let entryInd = 0
+    let bufInd = 0
+    for (let r = 0; r < 256 && bufInd < buffer.length; r++) {
+        for (let g = 0; g < 256 && bufInd < buffer.length; g++) {
+            for (let b = 0; b < 256 && bufInd < buffer.length; b++, entryInd++) {
+                buffer[bufInd++] = r
+                buffer[bufInd++] = g
+                buffer[bufInd++] = b
+                const hex = r.toString(16) + g.toString(16) + b.toString(16)
+                map[hex] = entries[entryInd][nameInd]
+            }
+        }
+    }
+
+    return { map, buffer }
+}
+
 const getPositions = (data: GalaxyData): Float32Array => {
     const { headers, entries } = data
     // get indices of required fields for easy access in loop
@@ -33,7 +65,8 @@ const getPositions = (data: GalaxyData): Float32Array => {
     const DEG_TO_RAD = Math.PI / 180
     const POS_SCALE = 0.012
 
-    const positions = []
+    let ind = 0
+    const positions = new Float32Array(entries.length * 3)
     for (const row of entries) {
         if (row[objTypeInd] !== 'G') { continue }
 
@@ -43,21 +76,21 @@ const getPositions = (data: GalaxyData): Float32Array => {
 
         const dist = POS_SCALE * red * 4222 // magic number from legacy source, investigate
 
-        positions.push(
-            dist * Math.sin(lng) * Math.cos(lat),
-            dist * Math.cos(lng) * Math.cos(lat),
-            dist * Math.sin(lat)
-        )
+        positions[ind++] = dist * Math.sin(lng) * Math.cos(lat)
+        positions[ind++] = dist * Math.cos(lng) * Math.cos(lat)
+        positions[ind++] = dist * Math.sin(lat)
     }
 
-    return new Float32Array(positions)
+    return positions
 }
 
 export {
     loadData,
-    getPositions
+    getPositions,
+    getSelectColors
 }
 
 export type {
-    GalaxyData
+    GalaxyData,
+    SelectMap
 }
