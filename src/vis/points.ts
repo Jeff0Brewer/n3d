@@ -1,5 +1,7 @@
 import { mat4 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
+import { getPositions } from '../lib/data-load'
+import type { CsvData } from '../lib/data-load'
 import vertSource from '../shaders/vert.glsl?raw'
 import fragSource from '../shaders/frag.glsl?raw'
 
@@ -20,10 +22,11 @@ class Points {
         model: mat4,
         view: mat4,
         proj: mat4,
-        positions: Float32Array
+        data: CsvData
     ) {
         this.program = initProgram(gl, vertSource, fragSource)
 
+        const positions = getPositions(data)
         this.buffer = initBuffer(gl)
         gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW)
         this.numVertex = positions.length / POS_FPV

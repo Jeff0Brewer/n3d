@@ -1,5 +1,6 @@
 import { mat4, vec3 } from 'gl-matrix'
 import { initGl } from '../lib/gl-wrap'
+import type { CsvData } from '../lib/data-load'
 import Camera from '../lib/camera'
 import Points from '../vis/points'
 
@@ -16,11 +17,9 @@ class VisRenderer {
     points: Points
     camera: Camera
 
-    constructor (canvas: HTMLCanvasElement, positions: Float32Array) {
+    constructor (canvas: HTMLCanvasElement, data: CsvData) {
         this.gl = initGl(canvas)
         this.gl.enable(this.gl.DEPTH_TEST)
-        this.gl.enable(this.gl.BLEND)
-        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA)
         this.canvas = canvas
 
         this.model = mat4.create()
@@ -34,14 +33,7 @@ class VisRenderer {
         this.proj = mat4.perspective(mat4.create(), FOV, aspect, NEAR, FAR)
 
         this.camera = new Camera(this.model, this.view, eye, focus, up)
-
-        this.points = new Points(
-            this.gl,
-            this.model,
-            this.view,
-            this.proj,
-            positions
-        )
+        this.points = new Points(this.gl, this.model, this.view, this.proj, data)
     }
 
     setupHandlers (canvas: HTMLCanvasElement): (() => void) {

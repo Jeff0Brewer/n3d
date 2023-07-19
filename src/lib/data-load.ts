@@ -1,18 +1,20 @@
 import Papa from 'papaparse'
 import type { ParseConfig } from 'papaparse'
 
+type CsvData = Array<Array<string>>
+
 const csvParseConfig: ParseConfig = {
     transform: (value: string): string => value.trim()
 }
 
-const loadData = async (path: string): Promise<Float32Array> => {
+const loadData = async (path: string): Promise<CsvData> => {
     const res = await fetch(path)
     const csvString = await res.text()
     const { data } = Papa.parse(csvString, csvParseConfig)
-    return getPositions(data)
+    return data
 }
 
-const getPositions = (data: Array<Array<string>>): Float32Array => {
+const getPositions = (data: CsvData): Float32Array => {
     // get indices of required fields for easy access in loop
     const headers = data[0]
     const objTypeInd = headers.indexOf('Object Type')
@@ -44,5 +46,10 @@ const getPositions = (data: Array<Array<string>>): Float32Array => {
 }
 
 export {
-    loadData
+    loadData,
+    getPositions
+}
+
+export type {
+    CsvData
 }

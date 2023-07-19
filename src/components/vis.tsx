@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect, FC } from 'react'
+import type { CsvData } from '../lib/data-load'
 import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 
 type VisProps = {
-    positions: Float32Array
+    data: CsvData
 }
 
-const Vis: FC<VisProps> = ({ positions }) => {
+const Vis: FC<VisProps> = ({ data }) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -26,11 +27,11 @@ const Vis: FC<VisProps> = ({ positions }) => {
 
     useEffect(() => {
         if (canvasRef.current) {
-            visRef.current = new VisRenderer(canvasRef.current, positions)
+            visRef.current = new VisRenderer(canvasRef.current, data)
             const removeHandlers = visRef.current.setupHandlers(canvasRef.current)
             return removeHandlers
         }
-    }, [positions])
+    }, [data])
 
     useEffect(() => {
         const draw = (): void => {

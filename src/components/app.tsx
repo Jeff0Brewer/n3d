@@ -1,13 +1,14 @@
 import { FC, useEffect, useState } from 'react'
 import { loadData } from '../lib/data-load'
+import type { CsvData } from '../lib/data-load'
 import Vis from '../components/vis'
 
 const App: FC = () => {
-    const [positions, setPositions] = useState<Float32Array | null>(null)
+    const [data, setData] = useState<CsvData | null>(null)
 
     const getPositions = async (): Promise<void> => {
-        const positions = await loadData('./data/data.csv')
-        setPositions(positions)
+        const data = await loadData('./data/data.csv')
+        setData(data)
     }
 
     useEffect(() => {
@@ -16,7 +17,7 @@ const App: FC = () => {
 
     return (
         <main>
-            { positions && <Vis positions={positions} /> }
+            { data && <Vis data={data} /> }
         </main>
     )
 }
