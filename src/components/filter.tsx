@@ -3,15 +3,27 @@ import { getFieldSet } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
 import styles from '../styles/filter.module.css'
 
-type FilterProps = {
-    data: GalaxyData
+type FilterOptions = {
+    [field: string]: null | string
 }
 
-const Filter: FC<FilterProps> = ({ data }) => {
+type FilterProps = {
+    data: GalaxyData,
+    options: FilterOptions,
+    setOptions: (options: FilterOptions) => void
+}
+
+const Filter: FC<FilterProps> = ({ data, options, setOptions }) => {
     return (
         <div className={styles.wrap}>
             { FILTER_FIELDS.map((field, i) =>
-                <FilterOption data={data} field={field} key={i} />
+                <FilterOption
+                    data={data}
+                    field={field}
+                    options={options}
+                    setOptions={setOptions}
+                    key={i}
+                />
             )}
         </div>
     )
@@ -19,41 +31,50 @@ const Filter: FC<FilterProps> = ({ data }) => {
 
 type FilterOptionProps = {
     data: GalaxyData,
-    field: string
+    field: string,
+    options: FilterOptions,
+    setOptions: (options: FilterOptions) => void
 }
 
-const FilterOption: FC<FilterOptionProps> = ({ data, field }) => {
-    const [options, setOptions] = useState<Array<string>>([])
-    const [selected, setSelected] = useState<string | null>(null)
+const FilterOption: FC<FilterOptionProps> = ({ data, field, options, setOptions }) => {
+    const [values, setValues] = useState<Array<string>>([])
     const [open, setOpen] = useState<boolean>(false)
 
     useEffect(() => {
-        setOptions(getFieldSet(data, field))
+        setValues(getFieldSet(data, field))
     }, [data, field])
 
     return (
         <div className={styles.dropdown}>
             <span>
                 <a onClick={(): void => setOpen(!open)}>{field}</a>
-                { selected &&
-                    <a className={styles.reset} onClick={(): void => setSelected(null)}>x</a> }
+                { options[field] &&
+                    <a
+                        className={styles.reset}
+                        onClick={(): void => {
+                            options[field] = null
+                            setOptions({ ...options })
+                        }}
+                    >x</a>
+                }
             </span>
             { open
                 ? <div className={styles.options}>
-                    { options.map((option, i) =>
+                    { values.map((value, i) =>
                         <a
                             className={styles.option}
                             onClick={(): void => {
-                                setSelected(option)
+                                options[field] = value
+                                setOptions({ ...options })
                                 setOpen(false)
                             }}
                             key={i}
                         >
-                            {option}
+                            {value}
                         </a>
                     )}
                 </div>
-                : <p className={styles.selected}>{selected || 'all'}</p> }
+                : <p className={styles.selected}>{options[field] || 'all'}</p> }
         </div>
     )
 }
@@ -66,3 +87,7 @@ const FILTER_FIELDS = [
 ]
 
 export default Filter
+
+export type {
+    FilterOptions
+}

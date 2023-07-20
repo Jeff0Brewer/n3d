@@ -3,6 +3,7 @@ import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getPositions, getSelectColors } from '../lib/data'
 import { COLOR_MAP_COLORS } from '../components/color-select'
 import type { GalaxyData, SelectMap } from '../lib/data'
+import type { FilterOptions } from '../components/filter'
 import Camera from '../lib/camera'
 import ColorMap from '../lib/color-map'
 import vertSource from '../shaders/vert.glsl?raw'
@@ -11,15 +12,20 @@ import fragSource from '../shaders/frag.glsl?raw'
 const POS_FPV = 3
 const SEL_FPV = 3
 const COL_FPV = 3
+const VIS_FPV = 1
 
 class Points {
     program: WebGLProgram
+
     posBuffer: WebGLBuffer
     bindPosition: () => void
     selBuffer: WebGLBuffer
     bindSelect: () => void
     colBuffer: WebGLBuffer
     bindColor: () => void
+    visBuffer: WebGLBuffer
+    bindVisibility: () => void
+
     setModelMatrix: (mat: mat4) => void
     setViewMatrix: (mat: mat4) => void
     setProjMatrix: (mat: mat4) => void
@@ -27,6 +33,7 @@ class Points {
     setDevicePixelRatio: (ratio: number) => void
     setSelecting: (selecting: boolean) => void
     setMousePos: (x: number, y: number) => void
+
     numVertex: number
     positions: Float32Array
     selectMap: SelectMap
@@ -59,6 +66,12 @@ class Points {
         this.colBuffer = initBuffer(gl)
         gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
         this.bindColor = initAttribute(gl, this.program, 'color', COL_FPV, COL_FPV, 0, gl.UNSIGNED_BYTE)
+
+        const visiblity = new Uint8Array(this.numVertex * VIS_FPV)
+        visiblity.fill(1)
+        this.visBuffer = initBuffer(gl)
+        gl.bufferData(gl.ARRAY_BUFFER, visiblity, gl.STATIC_DRAW)
+        this.bindVisibility = initAttribute(gl, this.program, 'visibility', VIS_FPV, VIS_FPV, 0, gl.UNSIGNED_BYTE)
 
         const uModelMatrix = gl.getUniformLocation(this.program, 'modelMatrix')
         const uViewMatrix = gl.getUniformLocation(this.program, 'viewMatrix')
@@ -171,6 +184,26 @@ class Points {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.colBuffer)
         gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
+    }
+
+    filter (gl: WebGLRenderingContext, data: GalaxyData, options: FilterOptions): void {
+        const visibility = new Uint8Array(this.numVertex * VIS_FPV)
+        visibility.fill(1)
+
+        const { headers, entries } = data
+        for (const [field, value] of Object.entries(options)) {
+            if (!value) { continue } // don't filter if value null
+
+            const fieldInd = headers[field]
+            for (let i = 0; i < entries.length; i++) {
+                if (entries[i][fieldInd] !== value) {
+                    visibility[i] = 0
+                }
+            }
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.visBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, visibility, gl.STATIC_DRAW)
     }
 
     draw (gl: WebGLRenderingContext, model: mat4, view: mat4, inv: mat4): void {

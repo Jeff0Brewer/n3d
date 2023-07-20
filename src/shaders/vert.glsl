@@ -1,6 +1,7 @@
 attribute vec3 position;
 attribute vec3 color;
 attribute vec3 selectColor;
+attribute float visibility;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -11,6 +12,7 @@ uniform vec2 mousePos;
 uniform int selecting;
 
 varying vec3 vColor;
+varying float vVisibility;
 
 float distLinePoint(vec3 line0, vec3 line1, vec3 point) {
     return length(cross(point - line0, point - line1)) / length(line1 - line0);
@@ -19,6 +21,7 @@ float distLinePoint(vec3 line0, vec3 line1, vec3 point) {
 void main() {
     gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
     gl_PointSize = (5.0 * devicePixelRatio) / gl_Position.w;
+    vVisibility = visibility;
     vColor = color / 255.0;
 
     if (selecting == 0) { return; }
