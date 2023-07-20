@@ -9,9 +9,9 @@
 }
 
 .label {
+    display: block;
     text-transform: uppercase;
     border-bottom: 1px solid #888;
-    font-size: 16px;
     color: #888;
     text-align: center;
 }
@@ -25,7 +25,11 @@
     flex-direction: column;
 }
 
-.field {
+.field, .selected {
     text-wrap: nowrap;
-    margin: 5px;
+    padding: 5px;
+}
+
+.selected {
+    background-color: #333;
 }
