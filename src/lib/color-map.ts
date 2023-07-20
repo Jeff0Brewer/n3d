@@ -4,7 +4,7 @@ class ColorMap {
     colors: Array<vec3>
 
     constructor (colors: Array<string>) {
-        this.colors = colors.map(hex => colorHexToByte(hex))
+        this.colors = colors.map(hex => colorHexToFloat(hex))
     }
 
     map (percentage: number): vec3 {
@@ -22,10 +22,10 @@ class ColorMap {
     }
 }
 
-const colorHexToByte = (hex: string): vec3 => {
+const colorHexToFloat = (hex: string): vec3 => {
     const color = vec3.create()
     for (let i = 0; i < 3; i++) {
-        color[i] = parseInt(hex.substr(i * 2, 2), 16)
+        color[i] = parseInt(hex.substr(i * 2, 2), 16) / 255
     }
     return color
 }
