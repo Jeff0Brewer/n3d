@@ -39,6 +39,23 @@ const loadData = async (path: string): Promise<GalaxyData> => {
     return { headers, entries }
 }
 
+const getFieldSet = (data: GalaxyData, field: string): Array<string> => {
+    const { headers, entries } = data
+    const fieldInd = headers[field]
+    if (!fieldInd) {
+        throw new Error(`Field ${field} does not exit in dataset headers`)
+    }
+
+    const values = new Set<string>()
+    for (const entry of entries) {
+        const value = entry[fieldInd]
+        if (value) {
+            values.add(value)
+        }
+    }
+    return Array.from(values)
+}
+
 const getSelectColors = (data: GalaxyData): SelectColors => {
     const { entries } = data
     const minBrightness = Math.floor(255 - Math.pow(entries.length, 0.333))
@@ -95,7 +112,8 @@ const getPositions = (data: GalaxyData): Float32Array => {
 export {
     loadData,
     getPositions,
-    getSelectColors
+    getSelectColors,
+    getFieldSet
 }
 
 export type {
