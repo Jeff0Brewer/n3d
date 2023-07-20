@@ -3,6 +3,7 @@ import { loadData } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
 import GalaxyInfo from '../components/info'
 import ColorFieldSelect from '../components/color-select'
+import Filter from '../components/filter'
 import Vis from '../components/vis'
 
 const App: FC = () => {
@@ -23,6 +24,7 @@ const App: FC = () => {
     return (
         <main>
             <ColorFieldSelect colorField={colorField} setColorField={setColorField} />
+            <Filter data={data} />
             { selected && <GalaxyInfo headers={data.headers} fields={selected} /> }
             <Vis data={data} setSelected={setSelected} colorField={colorField} />
         </main>
