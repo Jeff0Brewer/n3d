@@ -1,6 +1,7 @@
 import { mat4 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getPositions, getSelectColors } from '../lib/data'
+import { COLOR_MAP_COLORS } from '../components/color-select'
 import type { GalaxyData, SelectMap } from '../lib/data'
 import Camera from '../lib/camera'
 import ColorMap from '../lib/color-map'
@@ -86,7 +87,7 @@ class Points {
             gl.uniform2f(uMousePos, x, y)
         }
 
-        this.colorMap = new ColorMap(['F06857', 'ECA653', 'E8CD52', '4CD15E', '5561E7', '3E39AC', 'C447E0'])
+        this.colorMap = new ColorMap(COLOR_MAP_COLORS)
     }
 
     setupHandlers (canvas: HTMLCanvasElement): (() => void) {

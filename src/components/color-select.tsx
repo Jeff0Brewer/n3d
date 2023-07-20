@@ -12,10 +12,15 @@ const ColorFieldSelect: FC<ColorFieldSelectProps> = ({ colorField, setColorField
     return (
         <div className={styles.wrap}>
             <a className={styles.label} onClick={(): void => setOpen(!open)}>
-                select field
+                <p>color map</p>
+                <div className={styles.swatches}>
+                    { COLOR_MAP_COLORS.map((color, i) =>
+                        <div style={{ backgroundColor: `#${color}` }} key={i}></div>
+                    )}
+                </div>
             </a>
-            <div className={styles.scroll}>
-                { open && COLOR_MAP_FIELDS.map((field, i) =>
+            { open && <div className={styles.scroll}>
+                { COLOR_MAP_FIELDS.map((field, i) =>
                     <a
                         className={colorField === field ? styles.selected : styles.field}
                         onClick={(): void => setColorField(field)}
@@ -24,10 +29,12 @@ const ColorFieldSelect: FC<ColorFieldSelectProps> = ({ colorField, setColorField
                         {field}
                     </a>
                 )}
-            </div>
+            </div> }
         </div>
     )
 }
+
+const COLOR_MAP_COLORS = ['F06857', 'ECA653', 'E8CD52', '4CD15E', '5561E7', '3E39AC', 'C447E0']
 
 const COLOR_MAP_FIELDS = [
     'Redshift',
@@ -77,3 +84,7 @@ const COLOR_MAP_FIELDS = [
 ]
 
 export default ColorFieldSelect
+
+export {
+    COLOR_MAP_COLORS
+}
