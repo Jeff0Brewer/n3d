@@ -82,14 +82,25 @@ const Vis: FC<VisProps> = ({ data, setSelected, colorField, filterOptions }) => 
         }
     }, [])
 
+    const resetCamera = (): void => {
+        if (visRef.current) {
+            visRef.current.camera.reset()
+        }
+    }
+
     return (
-        <canvas
-            className={styles.canvas}
-            ref={canvasRef}
-            width={width * window.devicePixelRatio}
-            height={height * window.devicePixelRatio}
-            style={{ width: `${width}px`, height: `${height}px` }}
-        />
+        <div>
+            <canvas
+                className={styles.canvas}
+                ref={canvasRef}
+                width={width * window.devicePixelRatio}
+                height={height * window.devicePixelRatio}
+                style={{ width: `${width}px`, height: `${height}px` }}
+            />
+            <a className={styles.resetCamera} onClick={resetCamera}>
+                reset camera
+            </a>
+        </div>
     )
 }
 

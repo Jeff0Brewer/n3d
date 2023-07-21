@@ -5,3 +5,12 @@
     bottom: 0;
     right: 0;
 }
+
+.resetCamera {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 12px;
+    padding: 10px;
+    background-color: #111;
+}

@@ -11,6 +11,8 @@ class Camera {
     focusTarget: vec3
     up: vec3
     dragging: boolean
+    defaultEye: vec3
+    defaultFocus: vec3
 
     constructor (view: mat4, eye: vec3, focus: vec3, up: vec3) {
         this.view = view
@@ -19,11 +21,20 @@ class Camera {
         this.focusTarget = focus
         this.up = up
         this.dragging = false
+        this.defaultEye = vec3.clone(eye)
+        this.defaultFocus = vec3.clone(focus)
     }
 
     update (): void {
         vec3.scale(this.focus, this.focus, 1 - FOCUS_SPEED)
         vec3.scaleAndAdd(this.focus, this.focus, this.focusTarget, FOCUS_SPEED)
+        mat4.lookAt(this.view, this.eye, this.focus, this.up)
+    }
+
+    reset (): void {
+        this.eye = vec3.clone(this.defaultEye)
+        this.focus = vec3.clone(this.defaultFocus)
+        this.focusTarget = vec3.clone(this.defaultFocus)
         mat4.lookAt(this.view, this.eye, this.focus, this.up)
     }
 
