@@ -79,9 +79,14 @@ class Camera {
         const rotation = mat4.create()
         mat4.rotate(rotation, rotation, rotationX, axis)
         mat4.rotate(rotation, rotation, rotationZ, this.up)
-
         vec3.transformMat4(camVec, camVec, rotation)
-        vec3.add(this.eye, this.focus, camVec)
+
+        // prevent rotations over (+/-)180deg vertically
+        // only rotate if large enough angle between up vec and new cam vec
+        const negUp = vec3.scale(vec3.create(), this.up, -1)
+        if (vec3.angle(camVec, this.up) > 0.1 && vec3.angle(camVec, negUp) > 0.1) {
+            vec3.add(this.eye, this.focus, camVec)
+        }
     }
 }
 
