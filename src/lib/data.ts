@@ -57,16 +57,17 @@ const getFieldSet = (data: GalaxyData, field: string): Array<string> => {
 }
 
 const getSelectColors = (data: GalaxyData): SelectColors => {
+    const COLOR_INC = 2
     const { entries } = data
-    const minBrightness = Math.floor(255 - Math.pow(entries.length, 0.333))
+    const minBrightness = Math.floor(255 - COLOR_INC * Math.pow(entries.length, 0.333))
 
     const buffer = new Uint8Array(entries.length * 3)
     const map: SelectMap = {}
     let entryInd = 0
     let bufInd = 0
-    for (let r = minBrightness; r < 256 && bufInd < buffer.length; r++) {
-        for (let g = minBrightness; g < 256 && bufInd < buffer.length; g++) {
-            for (let b = minBrightness; b < 256 && bufInd < buffer.length; b++, entryInd++) {
+    for (let r = minBrightness; r < 256 && bufInd < buffer.length; r += COLOR_INC) {
+        for (let g = minBrightness; g < 256 && bufInd < buffer.length; g += COLOR_INC) {
+            for (let b = minBrightness; b < 256 && bufInd < buffer.length; b += COLOR_INC, entryInd++) {
                 buffer[bufInd++] = r
                 buffer[bufInd++] = g
                 buffer[bufInd++] = b
