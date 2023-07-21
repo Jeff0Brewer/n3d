@@ -60,15 +60,15 @@ const Vis: FC<VisProps> = ({ data, setSelected, colorField, filterOptions }) => 
 
     useEffect(() => {
         if (visRef.current) {
-            visRef.current.colorMapField(data, colorField)
-        }
-    }, [data, colorField])
-
-    useEffect(() => {
-        if (visRef.current) {
             visRef.current.filter(data, filterOptions)
         }
     }, [data, filterOptions])
+
+    useEffect(() => {
+        if (visRef.current) {
+            visRef.current.colorMapField(data, colorField)
+        }
+    }, [data, colorField])
 
     useEffect(() => {
         const draw = (): void => {
