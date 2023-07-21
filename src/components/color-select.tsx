@@ -2,8 +2,8 @@ import { FC, useState } from 'react'
 import styles from '../styles/color-field.module.css'
 
 type ColorFieldSelectProps = {
-    colorField: string | null,
-    setColorField: (field: string | null) => void
+    colorField: string,
+    setColorField: (field: string) => void
 }
 
 const ColorFieldSelect: FC<ColorFieldSelectProps> = ({ colorField, setColorField }) => {

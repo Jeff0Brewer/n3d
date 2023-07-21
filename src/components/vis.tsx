@@ -7,7 +7,7 @@ import styles from '../styles/vis.module.css'
 type VisProps = {
     data: GalaxyData,
     setSelected: (fields: Array<string>) => void,
-    colorField: string | null,
+    colorField: string,
     filterOptions: FilterOptions
 }
 

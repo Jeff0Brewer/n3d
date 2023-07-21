@@ -10,7 +10,7 @@ import Vis from '../components/vis'
 const App: FC = () => {
     const [data, setData] = useState<GalaxyData | null>(null)
     const [selected, setSelected] = useState <Array<string> | null>(null)
-    const [colorField, setColorField] = useState<string | null>(null)
+    const [colorField, setColorField] = useState<string>('2MASS  J_total')
     const [filterOptions, setFilterOptions] = useState<FilterOptions>({})
 
     const getPositions = async (): Promise<void> => {
