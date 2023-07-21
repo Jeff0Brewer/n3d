@@ -170,9 +170,9 @@ class Points {
         let colInd = 0
         for (let i = 0; i < values.length; i++) {
             if (Number.isNaN(values[i])) {
-                colors[colInd++] = 255
-                colors[colInd++] = 255
-                colors[colInd++] = 255
+                colors[colInd++] = 80
+                colors[colInd++] = 80
+                colors[colInd++] = 80
                 continue
             }
             const per = (values[i] - min) / (max - min)
