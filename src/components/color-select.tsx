@@ -25,9 +25,7 @@ const ColorFieldSelect: FC<ColorFieldSelectProps> = ({ colorField, setColorField
                         className={colorField === field ? styles.selected : styles.field}
                         onClick={(): void => setColorField(field)}
                         key={i}
-                    >
-                        {field}
-                    </a>
+                    > {field} </a>
                 )}
             </div> }
         </div>

@@ -40,6 +40,18 @@ const FilterOption: FC<FilterOptionProps> = ({ data, field, options, setOptions 
     const [values, setValues] = useState<Array<string>>([])
     const [open, setOpen] = useState<boolean>(false)
 
+    const clearField = (): void => {
+        options[field] = null
+        setOptions({ ...options })
+        setOpen(false)
+    }
+
+    const setField = (value: string): void => {
+        options[field] = value
+        setOptions({ ...options })
+        setOpen(false)
+    }
+
     useEffect(() => {
         setValues(getFieldSet(data, field))
     }, [data, field])
@@ -49,29 +61,16 @@ const FilterOption: FC<FilterOptionProps> = ({ data, field, options, setOptions 
             <span>
                 <a onClick={(): void => setOpen(!open)}>{field}</a>
                 { options[field] &&
-                    <a
-                        className={styles.reset}
-                        onClick={(): void => {
-                            options[field] = null
-                            setOptions({ ...options })
-                        }}
-                    >x</a>
-                }
+                    <a className={styles.reset} onClick={clearField}>x</a> }
             </span>
             { open
                 ? <div className={styles.options}>
                     { values.map((value, i) =>
                         <a
                             className={styles.option}
-                            onClick={(): void => {
-                                options[field] = value
-                                setOptions({ ...options })
-                                setOpen(false)
-                            }}
+                            onClick={(): void => setField(value)}
                             key={i}
-                        >
-                            {value}
-                        </a>
+                        > {value} </a>
                     )}
                 </div>
                 : <p className={styles.selected}>{options[field] || 'all'}</p> }

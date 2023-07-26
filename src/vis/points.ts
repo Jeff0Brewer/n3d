@@ -143,13 +143,6 @@ class Points {
         }
     }
 
-    resetColors (gl: WebGLRenderingContext): void {
-        const colors = new Uint8Array(this.numVertex * COL_FPV)
-        colors.fill(255)
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.colBuffer)
-        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
-    }
-
     colorMapField (gl: WebGLRenderingContext, data: GalaxyData, field: string): void {
         const { headers, entries } = data
         const fieldInd = headers[field]

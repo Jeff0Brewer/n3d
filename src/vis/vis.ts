@@ -12,7 +12,6 @@ const FAR = 50
 
 class VisRenderer {
     gl: WebGLRenderingContext
-    canvas: HTMLCanvasElement
     model: mat4
     view: mat4
     proj: mat4
@@ -22,7 +21,6 @@ class VisRenderer {
     constructor (canvas: HTMLCanvasElement, data: GalaxyData) {
         this.gl = initGl(canvas)
         this.gl.enable(this.gl.DEPTH_TEST)
-        this.canvas = canvas
 
         this.model = mat4.create()
 
@@ -53,6 +51,10 @@ class VisRenderer {
         this.points.filter(this.gl, data, options)
     }
 
+    setSelectMode (selecting: boolean): void {
+        this.points.setSelecting(selecting)
+    }
+
     setupSelectHandlers (
         canvas: HTMLCanvasElement,
         data: GalaxyData,
@@ -66,10 +68,6 @@ class VisRenderer {
             setSelected
         )
         return removePointHandlers
-    }
-
-    setSelectMode (selecting: boolean): void {
-        this.points.setSelecting(selecting)
     }
 
     setupHandlers (canvas: HTMLCanvasElement): (() => void) {

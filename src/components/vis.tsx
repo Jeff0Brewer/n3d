@@ -19,6 +19,22 @@ const Vis: FC<VisProps> = ({ data, setSelected, colorField, filterOptions }) => 
     const frameIdRef = useRef<number>(-1)
     const visRef = useRef<VisRenderer | null>(null)
 
+    const resetCamera = (): void => {
+        if (visRef.current) {
+            visRef.current.camera.reset()
+        }
+    }
+
+    // init vis renderer
+    useEffect(() => {
+        if (canvasRef.current) {
+            visRef.current = new VisRenderer(canvasRef.current, data)
+            const removeHandlers = visRef.current.setupHandlers(canvasRef.current)
+            return removeHandlers
+        }
+    }, [data])
+
+    // setup event handlers
     useEffect(() => {
         const onResize = (): void => {
             setWidth(window.innerWidth)
@@ -37,18 +53,11 @@ const Vis: FC<VisProps> = ({ data, setSelected, colorField, filterOptions }) => 
         }
     }, [])
 
-    useEffect(() => {
-        if (canvasRef.current) {
-            visRef.current = new VisRenderer(canvasRef.current, data)
-            const removeHandlers = visRef.current.setupHandlers(canvasRef.current)
-            return removeHandlers
-        }
-    }, [data])
-
+    // setup selection
     useEffect(() => {
         if (!canvasRef.current || !visRef.current) { return }
-        visRef.current.setSelectMode(selecting)
 
+        visRef.current.setSelectMode(selecting)
         if (selecting) {
             return visRef.current.setupSelectHandlers(
                 canvasRef.current,
@@ -58,18 +67,21 @@ const Vis: FC<VisProps> = ({ data, setSelected, colorField, filterOptions }) => 
         }
     }, [selecting, data, setSelected])
 
+    // filter on filter option
     useEffect(() => {
         if (visRef.current) {
             visRef.current.filter(data, filterOptions)
         }
     }, [data, filterOptions])
 
+    // color map on field change
     useEffect(() => {
         if (visRef.current) {
             visRef.current.colorMapField(data, colorField)
         }
     }, [data, colorField])
 
+    // start draw loop
     useEffect(() => {
         const draw = (): void => {
             if (!visRef.current) { return }
@@ -81,12 +93,6 @@ const Vis: FC<VisProps> = ({ data, setSelected, colorField, filterOptions }) => 
             window.cancelAnimationFrame(frameIdRef.current)
         }
     }, [])
-
-    const resetCamera = (): void => {
-        if (visRef.current) {
-            visRef.current.camera.reset()
-        }
-    }
 
     return (
         <div>
