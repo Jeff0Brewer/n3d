@@ -6,7 +6,7 @@ import styles from '../styles/vis.module.css'
 
 type VisProps = {
     data: GalaxyData,
-    selected: number,
+    selected: number | null,
     setSelected: (ind: number | null) => void,
     colorField: string,
     filterOptions: FilterOptions
@@ -22,7 +22,7 @@ const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField, filterOpti
 
     const resetCamera = (): void => {
         if (visRef.current) {
-            visRef.current.camera.reset()
+            visRef.current.resetCamera()
         }
     }
 
