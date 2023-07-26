@@ -7,5 +7,5 @@ uniform float devicePixelRatio;
 
 void main() {
     gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-    gl_PointSize = (10.0 * devicePixelRatio) / gl_Position.w;
+    gl_PointSize = (15.0 * devicePixelRatio) / gl_Position.w;
 }
