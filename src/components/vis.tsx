@@ -6,12 +6,13 @@ import styles from '../styles/vis.module.css'
 
 type VisProps = {
     data: GalaxyData,
+    selected: number,
     setSelected: (ind: number | null) => void,
     colorField: string,
     filterOptions: FilterOptions
 }
 
-const Vis: FC<VisProps> = ({ data, setSelected, colorField, filterOptions }) => {
+const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField, filterOptions }) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
     const [selecting, setSelecting] = useState<boolean>(false)
@@ -62,6 +63,12 @@ const Vis: FC<VisProps> = ({ data, setSelected, colorField, filterOptions }) => 
             return visRef.current.setupSelectHandlers(canvasRef.current, setSelected)
         }
     }, [selecting, data, setSelected])
+
+    useEffect(() => {
+        if (visRef.current) {
+            visRef.current.setSelected(selected)
+        }
+    }, [selected])
 
     // filter on filter option
     useEffect(() => {

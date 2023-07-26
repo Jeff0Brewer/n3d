@@ -52,6 +52,11 @@ class VisRenderer {
         this.points.filter(this.gl, data, options)
     }
 
+    setSelected (ind: number): void {
+        const pos = this.points.positions.slice(ind * 3, ind * 3 + 3)
+        this.highlight.setPositions(this.gl, pos)
+    }
+
     setSelectMode (selecting: boolean): void {
         this.points.setSelecting(selecting)
     }
@@ -98,10 +103,9 @@ class VisRenderer {
         this.camera.update()
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
 
-        this.highlight.draw(this.gl, this.view)
-
         const inv = getInvMatrix([this.proj, this.view, this.model])
         this.points.draw(this.gl, this.view, inv)
+        this.highlight.draw(this.gl, this.view)
     }
 }
 

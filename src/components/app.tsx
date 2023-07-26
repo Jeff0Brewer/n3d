@@ -30,6 +30,7 @@ const App: FC = () => {
             { selected && <GalaxyInfo headers={data.headers} fields={data.entries[selected]} /> }
             <Vis
                 data={data}
+                selected={selected}
                 setSelected={setSelected}
                 colorField={colorField}
                 filterOptions={filterOptions}
