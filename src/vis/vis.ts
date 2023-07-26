@@ -42,8 +42,6 @@ class VisRenderer {
     colorMapField (data: GalaxyData, field: string | null): void {
         if (field) {
             this.points.colorMapField(this.gl, data, field)
-        } else {
-            this.points.resetColors(this.gl)
         }
     }
 
@@ -95,7 +93,7 @@ class VisRenderer {
         this.camera.update()
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
         const inv = getInvMatrix([this.proj, this.view, this.model])
-        this.points.draw(this.gl, this.model, this.view, inv)
+        this.points.draw(this.gl, this.view, inv)
     }
 }
 

@@ -199,10 +199,9 @@ class Points {
         gl.bufferData(gl.ARRAY_BUFFER, visibility, gl.STATIC_DRAW)
     }
 
-    draw (gl: WebGLRenderingContext, model: mat4, view: mat4, inv: mat4): void {
+    draw (gl: WebGLRenderingContext, view: mat4, inv: mat4): void {
         gl.useProgram(this.program)
 
-        this.setModelMatrix(model)
         this.setViewMatrix(view)
         this.setInvMatrix(inv)
 
