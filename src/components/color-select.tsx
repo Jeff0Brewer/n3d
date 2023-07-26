@@ -1,4 +1,5 @@
 import { FC, useState } from 'react'
+import { colorArrToGradient } from '../lib/color-map'
 import styles from '../styles/color-field.module.css'
 
 type ColorFieldSelectProps = {
@@ -13,11 +14,10 @@ const ColorFieldSelect: FC<ColorFieldSelectProps> = ({ colorField, setColorField
         <div className={styles.wrap}>
             <a className={styles.label} onClick={(): void => setOpen(!open)}>
                 <p>color map</p>
-                <div className={styles.swatches}>
-                    { COLOR_MAP_COLORS.map((color, i) =>
-                        <div style={{ backgroundColor: `#${color}` }} key={i}></div>
-                    )}
-                </div>
+                <div
+                    className={styles.gradient}
+                    style={{ background: colorArrToGradient(COLOR_MAP_COLORS) }}
+                ></div>
             </a>
             { open && <div className={styles.scroll}>
                 { COLOR_MAP_FIELDS.map((field, i) =>
