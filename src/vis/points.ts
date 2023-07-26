@@ -6,8 +6,8 @@ import type { GalaxyData, SelectMap } from '../lib/data'
 import type { FilterOptions } from '../components/filter'
 import Camera from '../lib/camera'
 import ColorMap from '../lib/color-map'
-import vertSource from '../shaders/vert.glsl?raw'
-import fragSource from '../shaders/frag.glsl?raw'
+import vertSource from '../shaders/point-vert.glsl?raw'
+import fragSource from '../shaders/point-frag.glsl?raw'
 
 const POS_FPV = 3
 const SEL_FPV = 3
