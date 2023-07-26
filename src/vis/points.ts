@@ -119,10 +119,9 @@ class Points {
 
     setupSelectHandlers (
         gl: WebGLRenderingContext,
-        data: GalaxyData,
         canvas: HTMLCanvasElement,
         camera: Camera,
-        setSelected: (fields: Array<string>) => void
+        setSelected: (ind: number) => void
     ): (() => void) {
         const mouseDown = (e: MouseEvent): void => {
             // wrap in request frame to wait for current render to finish before getting pixel data
@@ -135,7 +134,7 @@ class Points {
                 const ind = this.selectMap[hex]
                 if (ind) {
                     camera.setFocus(this.positions.slice(ind * POS_FPV, ind * POS_FPV + POS_FPV))
-                    setSelected(data.entries[ind])
+                    setSelected(ind)
                 }
             })
         }

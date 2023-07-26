@@ -58,12 +58,10 @@ class VisRenderer {
 
     setupSelectHandlers (
         canvas: HTMLCanvasElement,
-        data: GalaxyData,
-        setSelected: (fields: Array<string>) => void
+        setSelected: (ind: number) => void
     ): (() => void) {
         const removePointHandlers = this.points.setupSelectHandlers(
             this.gl,
-            data,
             canvas,
             this.camera,
             setSelected

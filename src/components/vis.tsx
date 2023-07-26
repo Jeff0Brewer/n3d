@@ -6,7 +6,7 @@ import styles from '../styles/vis.module.css'
 
 type VisProps = {
     data: GalaxyData,
-    setSelected: (fields: Array<string>) => void,
+    setSelected: (ind: number | null) => void,
     colorField: string,
     filterOptions: FilterOptions
 }
@@ -59,11 +59,7 @@ const Vis: FC<VisProps> = ({ data, setSelected, colorField, filterOptions }) => 
 
         visRef.current.setSelectMode(selecting)
         if (selecting) {
-            return visRef.current.setupSelectHandlers(
-                canvasRef.current,
-                data,
-                setSelected
-            )
+            return visRef.current.setupSelectHandlers(canvasRef.current, setSelected)
         }
     }, [selecting, data, setSelected])
 
