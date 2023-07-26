@@ -30,4 +30,17 @@ const colorHexToFloat = (hex: string): vec3 => {
     return color
 }
 
+const colorArrToGradient = (colors: Array<string>): string => {
+    let inner = ''
+    for (const color of colors) {
+        inner += `#${color}, `
+    }
+    inner = inner.substr(0, inner.length - 2)
+    return `linear-gradient(to right, ${inner})`
+}
+
 export default ColorMap
+
+export {
+    colorArrToGradient
+}
