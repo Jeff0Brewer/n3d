@@ -94,9 +94,11 @@ class Points {
         this.setInvMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uInvMatrix, false, mat) }
         this.setDevicePixelRatio = (ratio: number): void => { gl.uniform1f(uDevicePixelRatio, ratio) }
         this.setSelecting = (selecting: boolean): void => {
+            gl.useProgram(this.program)
             gl.uniform1i(uSelecting, selecting ? 1 : 0)
         }
         this.setMousePos = (x: number, y: number): void => {
+            gl.useProgram(this.program)
             gl.uniform2f(uMousePos, x, y)
         }
 

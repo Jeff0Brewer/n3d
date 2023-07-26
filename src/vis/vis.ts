@@ -5,6 +5,7 @@ import type { FilterOptions } from '../components/filter'
 import type { GalaxyData } from '../lib/data'
 import Camera from '../lib/camera'
 import Points from '../vis/points'
+import Highlight from '../vis/highlight'
 
 const FOV = 1
 const NEAR = 0.1
@@ -15,8 +16,9 @@ class VisRenderer {
     model: mat4
     view: mat4
     proj: mat4
-    points: Points
     camera: Camera
+    points: Points
+    highlight: Highlight
 
     constructor (canvas: HTMLCanvasElement, data: GalaxyData) {
         this.gl = initGl(canvas)
@@ -36,7 +38,8 @@ class VisRenderer {
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
         this.points = new Points(this.gl, this.model, this.view, this.proj, inv, data)
-        this.points.colorMapField(this.gl, data, '2MASS  K_s_total')
+
+        this.highlight = new Highlight(this.gl, this.model, this.view, this.proj)
     }
 
     colorMapField (data: GalaxyData, field: string | null): void {
@@ -80,6 +83,10 @@ class VisRenderer {
             this.gl.useProgram(this.points.program)
             this.points.setProjMatrix(this.proj)
             this.points.setDevicePixelRatio(window.devicePixelRatio)
+
+            this.gl.useProgram(this.highlight.program)
+            this.highlight.setProjMatrix(this.proj)
+            this.highlight.setDevicePixelRatio(window.devicePixelRatio)
         }
         window.addEventListener('resize', resize)
         return (): void => {
@@ -92,6 +99,9 @@ class VisRenderer {
     draw (): void {
         this.camera.update()
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
+
+        this.highlight.draw(this.gl, this.view)
+
         const inv = getInvMatrix([this.proj, this.view, this.model])
         this.points.draw(this.gl, this.view, inv)
     }

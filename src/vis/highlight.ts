@@ -1,7 +1,7 @@
-import { mat4, vec3 } from 'gl-matrix'
+import { mat4 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
-import vertSource from '../shaders/vert.glsl?raw'
-import fragSource from '../shaders/frag.glsl?raw'
+import vertSource from '../shaders/highlight-vert.glsl?raw'
+import fragSource from '../shaders/highlight-frag.glsl?raw'
 
 const POS_FPV = 3
 
@@ -59,3 +59,5 @@ class Highlight {
         gl.drawArrays(gl.POINTS, 0, this.numVertex)
     }
 }
+
+export default Highlight
