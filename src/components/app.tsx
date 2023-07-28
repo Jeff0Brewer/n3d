@@ -3,29 +3,29 @@ import { loadData } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
 import type { FilterOptions } from '../components/filter'
 import GalaxyInfo from '../components/info'
-import ColorMapMenu from '../components/color-map'
+import ColorMapMenu, { ColorField } from '../components/color-map'
 import Filter from '../components/filter'
 import Vis from '../components/vis'
 
 const App: FC = () => {
     const [data, setData] = useState<GalaxyData | null>(null)
     const [selected, setSelected] = useState <number | null>(null)
-    const [colorField, setColorField] = useState<string>('2MASS  J_total')
+    const [colorField, setColorField] = useState<ColorField | null>(null)
     const [filterOptions, setFilterOptions] = useState<FilterOptions>({})
 
-    const getPositions = async (): Promise<void> => {
+    const getData = async (): Promise<void> => {
         const data = await loadData('./data/data.csv')
         setData(data)
     }
 
     useEffect(() => {
-        getPositions()
+        getData()
     }, [])
 
     if (!data) { return <></> }
     return (
         <main>
-            <ColorMapMenu colorField={colorField} setColorField={setColorField} />
+            <ColorMapMenu data={data} colorField={colorField} setColorField={setColorField} />
             <Filter data={data} options={filterOptions} setOptions={setFilterOptions} />
             { selected && <GalaxyInfo headers={data.headers} fields={data.entries[selected]} /> }
             <Vis

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, FC } from 'react'
 import type { GalaxyData } from '../lib/data'
 import type { FilterOptions } from '../components/filter'
+import type { ColorField } from '../components/color-map'
 import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 
@@ -8,7 +9,7 @@ type VisProps = {
     data: GalaxyData,
     selected: number | null,
     setSelected: (ind: number | null) => void,
-    colorField: string,
+    colorField: ColorField | null,
     filterOptions: FilterOptions
 }
 

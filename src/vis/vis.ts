@@ -3,6 +3,7 @@ import { initGl } from '../lib/gl-wrap'
 import { getInvMatrix } from '../lib/unproject'
 import type { FilterOptions } from '../components/filter'
 import type { GalaxyData } from '../lib/data'
+import type { ColorField } from '../components/color-map'
 import Camera from '../lib/camera'
 import Points from '../vis/points'
 import Highlight from '../vis/highlight'
@@ -47,7 +48,7 @@ class VisRenderer {
         this.setSelected(null)
     }
 
-    colorMapField (data: GalaxyData, field: string | null): void {
+    colorMapField (data: GalaxyData, field: ColorField | null): void {
         if (field) {
             this.points.colorMapField(this.gl, data, field)
         }

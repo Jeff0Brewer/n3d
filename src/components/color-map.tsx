@@ -1,14 +1,41 @@
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 import { colorArrToGradient } from '../lib/color-map'
+import type { GalaxyData } from '../lib/data'
 import styles from '../styles/color-field.module.css'
 
-type ColorMapMenuProps = {
-    colorField: string,
-    setColorField: (field: string) => void
+type ColorField = {
+    name: string,
+    min: number,
+    max: number
 }
 
-const ColorMapMenu: FC<ColorMapMenuProps> = ({ colorField, setColorField }) => {
+type ColorMapMenuProps = {
+    data: GalaxyData,
+    colorField: ColorField | null,
+    setColorField: (field: ColorField) => void
+}
+
+const ColorMapMenu: FC<ColorMapMenuProps> = ({ data, colorField, setColorField }) => {
     const [open, setOpen] = useState<boolean>(false)
+    const [colorFields, setColorFields] = useState<Array<ColorField>>([])
+
+    useEffect(() => {
+        const { headers, entries } = data
+        const colorFields: Array<ColorField> = COLOR_MAP_FIELDS.map((name: string) => {
+            const fieldInd = headers[name]
+            let min = Number.MAX_VALUE
+            let max = Number.MIN_VALUE
+            for (const entry of entries) {
+                const value = parseFloat(entry[fieldInd])
+                if (!Number.isNaN(value)) {
+                    min = Math.min(min, value)
+                    max = Math.max(max, value)
+                }
+            }
+            return { name, min, max }
+        })
+        setColorFields(colorFields)
+    }, [data])
 
     return (
         <div className={styles.wrap}>
@@ -20,12 +47,13 @@ const ColorMapMenu: FC<ColorMapMenuProps> = ({ colorField, setColorField }) => {
                 ></div>
             </a>
             { open && <div className={styles.scroll}>
-                { COLOR_MAP_FIELDS.map((field, i) =>
-                    <a
-                        className={colorField === field ? styles.selected : styles.field}
-                        onClick={(): void => setColorField(field)}
-                        key={i}
-                    > {field} </a>
+                { colorFields.map((field, i) =>
+                    <a className={colorField?.name === field.name
+                        ? styles.selected
+                        : styles.field}
+                    onClick={(): void => setColorField(field)}
+                    key={i}
+                    > {field.name} </a>
                 )}
             </div> }
         </div>
@@ -82,7 +110,5 @@ const COLOR_MAP_FIELDS = [
 ]
 
 export default ColorMapMenu
-
-export {
-    COLOR_MAP_COLORS
-}
+export type { ColorField }
+export { COLOR_MAP_COLORS }

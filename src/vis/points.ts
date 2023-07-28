@@ -4,6 +4,7 @@ import { getPositions, getSelectColors } from '../lib/data'
 import { COLOR_MAP_COLORS } from '../components/color-map'
 import type { GalaxyData, SelectMap } from '../lib/data'
 import type { FilterOptions } from '../components/filter'
+import type { ColorField } from '../components/color-map'
 import Camera from '../lib/camera'
 import ColorMap from '../lib/color-map'
 import vertSource from '../shaders/point-vert.glsl?raw'
@@ -144,32 +145,21 @@ class Points {
         }
     }
 
-    colorMapField (gl: WebGLRenderingContext, data: GalaxyData, field: string): void {
+    colorMapField (gl: WebGLRenderingContext, data: GalaxyData, field: ColorField): void {
         const { headers, entries } = data
-        const fieldInd = headers[field]
-
-        let min = Number.MAX_VALUE
-        let max = Number.MIN_VALUE
-        const values = new Float32Array(entries.length)
-        for (let i = 0; i < values.length; i++) {
-            values[i] = parseFloat(entries[i][fieldInd])
-            if (Number.isNaN(values[i])) {
-                continue
-            }
-            min = Math.min(min, values[i])
-            max = Math.max(max, values[i])
-        }
+        const fieldInd = headers[field.name]
 
         const colors = new Uint8Array(entries.length * COL_FPV)
         let colInd = 0
-        for (let i = 0; i < values.length; i++) {
-            if (Number.isNaN(values[i])) {
+        for (const entry of entries) {
+            const value = parseFloat(entry[fieldInd])
+            if (Number.isNaN(value)) {
                 colors[colInd++] = 80
                 colors[colInd++] = 80
                 colors[colInd++] = 80
                 continue
             }
-            const per = (values[i] - min) / (max - min)
+            const per = (value - field.min) / (field.max - field.min)
             const color = this.colorMap.map(per)
             colors[colInd++] = color[0] * 255
             colors[colInd++] = color[1] * 255
