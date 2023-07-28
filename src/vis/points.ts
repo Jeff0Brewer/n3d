@@ -1,7 +1,7 @@
 import { mat4 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getPositions, getSelectColors } from '../lib/data'
-import { COLOR_MAP_COLORS } from '../components/color-select'
+import { COLOR_MAP_COLORS } from '../components/color-map'
 import type { GalaxyData, SelectMap } from '../lib/data'
 import type { FilterOptions } from '../components/filter'
 import Camera from '../lib/camera'

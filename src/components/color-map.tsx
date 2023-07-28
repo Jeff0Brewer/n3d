@@ -2,12 +2,12 @@ import { FC, useState } from 'react'
 import { colorArrToGradient } from '../lib/color-map'
 import styles from '../styles/color-field.module.css'
 
-type ColorFieldSelectProps = {
+type ColorMapMenuProps = {
     colorField: string,
     setColorField: (field: string) => void
 }
 
-const ColorFieldSelect: FC<ColorFieldSelectProps> = ({ colorField, setColorField }) => {
+const ColorMapMenu: FC<ColorMapMenuProps> = ({ colorField, setColorField }) => {
     const [open, setOpen] = useState<boolean>(false)
 
     return (
@@ -81,7 +81,7 @@ const COLOR_MAP_FIELDS = [
     'M_Ks'
 ]
 
-export default ColorFieldSelect
+export default ColorMapMenu
 
 export {
     COLOR_MAP_COLORS

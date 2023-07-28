@@ -3,7 +3,7 @@ import { loadData } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
 import type { FilterOptions } from '../components/filter'
 import GalaxyInfo from '../components/info'
-import ColorFieldSelect from '../components/color-select'
+import ColorMapMenu from '../components/color-map'
 import Filter from '../components/filter'
 import Vis from '../components/vis'
 
@@ -25,7 +25,7 @@ const App: FC = () => {
     if (!data) { return <></> }
     return (
         <main>
-            <ColorFieldSelect colorField={colorField} setColorField={setColorField} />
+            <ColorMapMenu colorField={colorField} setColorField={setColorField} />
             <Filter data={data} options={filterOptions} setOptions={setFilterOptions} />
             { selected && <GalaxyInfo headers={data.headers} fields={data.entries[selected]} /> }
             <Vis
