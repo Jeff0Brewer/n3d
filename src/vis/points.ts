@@ -159,7 +159,7 @@ class Points {
                 colors[colInd++] = 80
                 continue
             }
-            const per = (value - field.min) / (field.max - field.min)
+            const per = (value - field.currMin) / (field.currMax - field.currMin)
             const color = this.colorMap.map(per)
             colors[colInd++] = color[0] * 255
             colors[colInd++] = color[1] * 255
