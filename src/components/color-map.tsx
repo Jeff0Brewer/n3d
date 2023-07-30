@@ -148,7 +148,7 @@ const ColorBounds: FC<ColorBoundsProps> = ({ min, max, setMin, setMax, colorFiel
     return (
         <div ref={boundsRef} className={styles.bounds}>
             <div style={{
-                backgroundColor: MIN_COLOR,
+                backgroundColor: `#${MIN_COLOR}`,
                 width: `${min * 100}%`
             }}></div>
             <a
@@ -169,7 +169,7 @@ const ColorBounds: FC<ColorBoundsProps> = ({ min, max, setMin, setMax, colorFiel
                 style={{ width: `${handleWidth}px` }}
             ></a>
             <div style={{
-                backgroundColor: MAX_COLOR,
+                backgroundColor: `#${MAX_COLOR}`,
                 width: `${(1 - max) * 100}%`
             }}></div>
         </div>
