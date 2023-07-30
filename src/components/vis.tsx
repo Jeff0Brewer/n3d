@@ -24,6 +24,7 @@ const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField, filterOpti
     const resetCamera = (): void => {
         if (visRef.current) {
             visRef.current.resetCamera()
+            setSelected(null)
         }
     }
 
