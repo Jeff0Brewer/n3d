@@ -25,8 +25,6 @@
 
 .createTabs {
     display: flex;
-    border-top: var(--border);
-    border-bottom: var(--border);
     background-color: var(--color1);
 }
 
@@ -35,11 +33,20 @@
     height: 30px;
 }
 
+.createTabs > button[data-active="false"] {
+    opacity: 0.3;
+}
+
 .createTabs > button:not(:last-child) {
     border-right: var(--border);
 }
 
+.createTabs > button:hover {
+    background-color: var(--color0);
+}
+
 .createTypesMenu {
+    border-top: var(--border);
     padding-bottom: var(--create-button-height);
 }
 

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { ReactElement, FC, useState } from 'react'
 import { FaEye, FaBan, FaCaretRight, FaCaretLeft } from 'react-icons/fa'
 import FilterSelect from '../components/filter-select'
 import type { GalaxyData } from '../lib/data'
@@ -47,6 +47,8 @@ const SelectMenu: FC<SelectMenuProps> = ({
     )
 }
 
+type SelectionMode = 'filter' | 'sphere' | 'cone' | null
+
 type CreateMenuProps = {
     data: GalaxyData,
     selections: Array<Selection>,
@@ -54,14 +56,43 @@ type CreateMenuProps = {
 }
 
 const CreateMenu: FC<CreateMenuProps> = ({ data, selections, setSelections }) => {
+    const [selectionMode, setSelectionMode] = useState<SelectionMode>(null)
     const [newSelection, setNewSelection] = useState<Selection | null>(null)
     const [selectionCount, setSelectionCount] = useState<number>(0)
 
     const addSelection = (): void => {
         if (newSelection) {
+            setSelectionCount(selectionCount + 1)
             setSelections([...selections, newSelection])
             setNewSelection(null)
-            setSelectionCount(selectionCount + 1)
+            setSelectionMode(null)
+        }
+    }
+
+    const getModeSetter = (mode: SelectionMode): (() => void) => {
+        return (): void => {
+            if (selectionMode === mode) {
+                setSelectionMode(null)
+            } else {
+                setSelectionMode(mode)
+            }
+        }
+    }
+
+    const renderSelectModeMenu = (mode: SelectionMode): ReactElement => {
+        switch (mode) {
+            case 'filter':
+                return <FilterSelect
+                    data={data}
+                    selectionCount={selectionCount}
+                    setSelection={setNewSelection}
+                />
+            case 'sphere':
+                return <></>
+            case 'cone':
+                return <></>
+            case null:
+                return <></>
         }
     }
 
@@ -69,21 +100,34 @@ const CreateMenu: FC<CreateMenuProps> = ({ data, selections, setSelections }) =>
         <div className={styles.createMenu}>
             <p className={styles.header}>Create Selection</p>
             <span className={styles.createTabs}>
-                <button>Filter</button>
-                <button>Sphere</button>
-                <button>Cone</button>
+                <button
+                    data-active={selectionMode === 'filter'}
+                    onClick={getModeSetter('filter')}
+                >
+                    Filter
+                </button>
+                <button
+                    data-active={selectionMode === 'sphere'}
+                    onClick={getModeSetter('sphere')}
+                >
+                    Sphere
+                </button>
+                <button
+                    data-active={selectionMode === 'cone'}
+                    onClick={getModeSetter('cone')}
+                >
+                    Cone
+                </button>
             </span>
-            <div className={styles.createTypesMenu}>
-                <FilterSelect
-                    data={data}
-                    selectionCount={selectionCount}
-                    setSelection={setNewSelection}
-                />
-            </div>
-            <button
-                className={styles.createButton}
-                onClick={addSelection}
-            >create</button>
+            { selectionMode !== null && <>
+                <div className={styles.createTypesMenu}>
+                    { renderSelectModeMenu(selectionMode) }
+                </div>
+                <button
+                    className={styles.createButton}
+                    onClick={addSelection}
+                >create</button>
+            </>}
         </div>
     )
 }
