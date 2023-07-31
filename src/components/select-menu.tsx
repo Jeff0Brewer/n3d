@@ -22,10 +22,40 @@ type SelectMenuProps = {
 const SelectMenu: FC<SelectMenuProps> = ({
     data, selections, setSelections, selected, setSelected
 }) => {
-    const [newSelection, setNewSelection] = useState<Selection | null>(null)
     const [displaySelection, setDisplaySelection] = useState<Selection | null>(null)
+
+    return (
+        <section className={styles.selectMenu}>
+            <CreateMenu
+                data={data}
+                selections={selections}
+                setSelections={setSelections}
+            />
+            <ViewMenu
+                selections={selections}
+                setSelections={setSelections}
+                displaySelection={displaySelection}
+                setDisplaySelection={setDisplaySelection}
+            />
+            <GalaxyDisplay
+                data={data}
+                selection={displaySelection}
+                selected={selected}
+                setSelected={setSelected}
+            />
+        </section>
+    )
+}
+
+type CreateMenuProps = {
+    data: GalaxyData,
+    selections: Array<Selection>,
+    setSelections: (selections: Array<Selection>) => void,
+}
+
+const CreateMenu: FC<CreateMenuProps> = ({ data, selections, setSelections }) => {
+    const [newSelection, setNewSelection] = useState<Selection | null>(null)
     const [selectionCount, setSelectionCount] = useState<number>(0)
-    const nameInd = data.headers['Object Name']
 
     const addSelection = (): void => {
         if (newSelection) {
@@ -35,6 +65,39 @@ const SelectMenu: FC<SelectMenuProps> = ({
         }
     }
 
+    return (
+        <div className={styles.createMenu}>
+            <p className={styles.header}>Create Selection</p>
+            <span className={styles.createTabs}>
+                <button>Filter</button>
+                <button>Sphere</button>
+                <button>Cone</button>
+            </span>
+            <div className={styles.createTypesMenu}>
+                <FilterSelect
+                    data={data}
+                    selectionCount={selectionCount}
+                    setSelection={setNewSelection}
+                />
+            </div>
+            <button
+                className={styles.createButton}
+                onClick={addSelection}
+            >create</button>
+        </div>
+    )
+}
+
+type ViewMenuProps = {
+    selections: Array<Selection>,
+    setSelections: (selections: Array<Selection>) => void,
+    displaySelection: Selection | null,
+    setDisplaySelection: (selection: Selection | null) => void
+}
+
+const ViewMenu: FC<ViewMenuProps> = ({
+    selections, setSelections, displaySelection, setDisplaySelection
+}) => {
     const setSelectionName = (ind: number): ((name: string) => void) => {
         return (name: string): void => {
             selections[ind].name = name
@@ -60,62 +123,28 @@ const SelectMenu: FC<SelectMenuProps> = ({
         }
     }
 
+    if (selections.length === 0) { return <></> }
     return (
-        <section className={styles.selectMenu}>
-            <div className={styles.createMenu}>
-                <p className={styles.header}>Create Selection</p>
-                <span className={styles.createTabs}>
-                    <button>Filter</button>
-                    <button>Sphere</button>
-                    <button>Cone</button>
-                </span>
-                <div className={styles.createTypesMenu}>
-                    <FilterSelect
-                        data={data}
-                        selectionCount={selectionCount}
-                        setSelection={setNewSelection}
+        <div className={styles.viewMenu}>
+            <p className={styles.header}>Selections</p>
+            <div className={styles.selectionsList}>
+                { selections.map((selection, i) =>
+                    <ViewItem
+                        selection={selection}
+                        displaySelection={displaySelection}
+                        setDisplaySelection={setDisplaySelection}
+                        setName={setSelectionName(i)}
+                        deleteSelection={deleteSelection(i)}
+                        toggleVisibility={toggleVisiblity(i)}
+                        key={selection.key}
                     />
-                </div>
-                <button
-                    className={styles.createButton}
-                    onClick={addSelection}
-                >create</button>
+                )}
             </div>
-            { selections.length > 0 && <div className={styles.viewMenu}>
-                <p className={styles.header}>Selections</p>
-                <div className={styles.selectionsList}>
-                    { selections.map((selection, i) =>
-                        <SelectionView
-                            selection={selection}
-                            displaySelection={displaySelection}
-                            setDisplaySelection={setDisplaySelection}
-                            setName={setSelectionName(i)}
-                            deleteSelection={deleteSelection(i)}
-                            toggleVisibility={toggleVisiblity(i)}
-                            key={selection.key}
-                        />
-                    )}
-                </div>
-            </div> }
-            { displaySelection && <div className={styles.selectionDisplay}>
-                <p className={styles.header}>{displaySelection.name}</p>
-                <div className={styles.galaxyList}>
-                    { displaySelection.inds.map((ind, i) =>
-                        <a
-                            data-active={ind === selected}
-                            onClick={(): void => setSelected(ind)}
-                            key={i}
-                        >
-                            {data.entries[ind][nameInd]}
-                        </a>
-                    )}
-                </div>
-            </div> }
-        </section>
+        </div>
     )
 }
 
-type SelectionViewProps = {
+type ViewItemProps = {
     selection: Selection,
     displaySelection: Selection | null,
     setDisplaySelection: (selection: Selection | null) => void,
@@ -124,7 +153,7 @@ type SelectionViewProps = {
     toggleVisibility: () => void
 }
 
-const SelectionView: FC<SelectionViewProps> = ({
+const ViewItem: FC<ViewItemProps> = ({
     selection, displaySelection, setDisplaySelection,
     setName, deleteSelection, toggleVisibility
 }) => {
@@ -157,6 +186,37 @@ const SelectionView: FC<SelectionViewProps> = ({
                 } </div>
             </div>
         </span>
+    )
+}
+
+type GalaxyDisplayProps = {
+    data: GalaxyData,
+    selection: Selection | null,
+    selected: number | null,
+    setSelected: (ind: number | null) => void
+}
+
+const GalaxyDisplay: FC<GalaxyDisplayProps> = ({
+    data, selection, selected, setSelected
+}) => {
+    const nameInd = data.headers['Object Name']
+
+    if (!selection) { return <></> }
+    return (
+        <div className={styles.selectionDisplay}>
+            <p className={styles.header}>{selection.name}</p>
+            <div className={styles.galaxyList}>
+                { selection.inds.map((ind, i) =>
+                    <a
+                        data-active={ind === selected}
+                        onClick={(): void => setSelected(ind)}
+                        key={i}
+                    >
+                        {data.entries[ind][nameInd]}
+                    </a>
+                )}
+            </div>
+        </div>
     )
 }
 
