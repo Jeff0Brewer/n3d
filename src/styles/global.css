@@ -28,3 +28,10 @@ button {
     font: inherit;
     color: inherit;
 }
+
+input {
+    background-color: transparent;
+    border: none;
+    font: inherit;
+    color: inherit;
+}

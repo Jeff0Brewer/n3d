@@ -71,6 +71,7 @@ const FilterSelect: FC<FilterSelectProps> = ({ data, selectionCount, setSelectio
         }
         setSelection({
             name: `Selection ${selectionCount}`,
+            key: selectionCount,
             visible: true,
             inds
         })

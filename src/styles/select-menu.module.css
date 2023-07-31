@@ -69,6 +69,10 @@
     justify-content: space-between;
 }
 
+.selectionView > input {
+    width: 80px;
+}
+
 .selectionViewOptions {
     width: 40px;
     display: flex;
