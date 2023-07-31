@@ -59,10 +59,13 @@ class VisRenderer {
     }
 
     setSelected (ind: number | null): void {
-        const pos = ind
-            ? this.points.positions.slice(ind * 3, ind * 3 + 3)
-            : new Float32Array(0)
-        this.highlight.setPositions(this.gl, pos)
+        if (ind) {
+            const pos = this.points.positions.slice(ind * 3, ind * 3 + 3)
+            this.highlight.setPositions(this.gl, pos)
+            this.camera.setFocus(pos)
+        } else {
+            this.highlight.setPositions(this.gl, new Float32Array(0))
+        }
     }
 
     setSelectMode (selecting: boolean): void {
@@ -76,7 +79,6 @@ class VisRenderer {
         const removePointHandlers = this.points.setupSelectHandlers(
             this.gl,
             canvas,
-            this.camera,
             setSelected
         )
         return removePointHandlers

@@ -5,7 +5,6 @@ import { COLOR_MAP_COLORS } from '../components/color-map'
 import type { GalaxyData, SelectMap } from '../lib/data'
 import type { ColorField } from '../components/color-map'
 import type { Selection } from '../components/select-menu'
-import Camera from '../lib/camera'
 import ColorMap from '../lib/color-map'
 import vertSource from '../shaders/point-vert.glsl?raw'
 import fragSource from '../shaders/point-frag.glsl?raw'
@@ -121,7 +120,6 @@ class Points {
     setupSelectHandlers (
         gl: WebGLRenderingContext,
         canvas: HTMLCanvasElement,
-        camera: Camera,
         setSelected: (ind: number) => void
     ): (() => void) {
         const mouseDown = (e: MouseEvent): void => {
@@ -134,7 +132,6 @@ class Points {
                 const hex = pixel[0].toString(16) + pixel[1].toString(16) + pixel[2].toString(16)
                 const ind = this.selectMap[hex]
                 if (ind) {
-                    camera.setFocus(this.positions.slice(ind * POS_FPV, ind * POS_FPV + POS_FPV))
                     setSelected(ind)
                 }
             })
