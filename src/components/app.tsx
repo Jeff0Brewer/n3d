@@ -24,7 +24,7 @@ const App: FC = () => {
     if (!data) { return <></> }
     return (
         <main>
-            <SelectMenu data={data} selections={selections} />
+            <SelectMenu data={data} selections={selections} setSelections={setSelections} />
             <ColorMapMenu data={data} colorField={colorField} setColorField={setColorField} />
             { selected && <GalaxyInfo headers={data.headers} fields={data.entries[selected]} /> }
             <Vis
