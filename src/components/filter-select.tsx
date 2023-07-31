@@ -26,10 +26,10 @@ const optionMap: { [option: string]: string } = {
 
 type FilterSelectProps = {
     data: GalaxyData,
-    addSelection: (selection: Array<number>) => void
+    setSelection: (selection: Array<number>) => void
 }
 
-const FilterSelect: FC<FilterSelectProps> = ({ data, addSelection }) => {
+const FilterSelect: FC<FilterSelectProps> = ({ data, setSelection }) => {
     const [options, setOptions] = useState<FilterOptions>({
         luminosity: null,
         hierarchy: null,
@@ -67,12 +67,8 @@ const FilterSelect: FC<FilterSelectProps> = ({ data, addSelection }) => {
                 }
             }
         }
-        if (selection.length > 0) {
-            addSelection(selection)
-        }
-        // disable exhaustive deps to prevent loop on selection addition
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [data, options])
+        setSelection(selection)
+    }, [data, options, setSelection])
 
     const setLuminosity = (value: string | null): void => {
         options.luminosity = value
