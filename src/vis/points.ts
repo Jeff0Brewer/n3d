@@ -4,6 +4,7 @@ import { getPositions, getSelectColors } from '../lib/data'
 import { COLOR_MAP_COLORS } from '../components/color-map'
 import type { GalaxyData, SelectMap } from '../lib/data'
 import type { ColorField } from '../components/color-map'
+import type { Selection } from '../components/select-menu'
 import Camera from '../lib/camera'
 import ColorMap from '../lib/color-map'
 import vertSource from '../shaders/point-vert.glsl?raw'
@@ -171,15 +172,16 @@ class Points {
 
     filterSelections (
         gl: WebGLRenderingContext,
-        selections: Array<Array<number>>
+        selections: Array<Selection>
     ): void {
-        const allSelections = selections.flat()
-        if (allSelections.length <= 0) { return }
+        if (selections.length === 0) { return }
 
         const visibility = new Uint8Array(this.numVertex * VIS_FPV)
         visibility.fill(0)
-        for (const ind of allSelections) {
-            visibility[ind] = 1
+        for (const selection of selections) {
+            for (const ind of selection.inds) {
+                visibility[ind] = 1
+            }
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.visBuffer)
         gl.bufferData(gl.ARRAY_BUFFER, visibility, gl.STATIC_DRAW)

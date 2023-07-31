@@ -1,6 +1,7 @@
 import { FC, useEffect, useState } from 'react'
 import { loadData } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
+import type { Selection } from '../components/select-menu'
 import GalaxyInfo from '../components/info'
 import ColorMapMenu, { ColorField } from '../components/color-map'
 import SelectMenu from '../components/select-menu'
@@ -9,7 +10,7 @@ import Vis from '../components/vis'
 const App: FC = () => {
     const [data, setData] = useState<GalaxyData | null>(null)
     const [selected, setSelected] = useState <number | null>(null)
-    const [selections, setSelections] = useState<Array<Array<number>>>([])
+    const [selections, setSelections] = useState <Array<Selection>>([])
     const [colorField, setColorField] = useState<ColorField | null>(null)
 
     const getData = async (): Promise<void> => {

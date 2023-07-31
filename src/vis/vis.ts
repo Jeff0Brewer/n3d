@@ -3,6 +3,7 @@ import { initGl } from '../lib/gl-wrap'
 import { getInvMatrix } from '../lib/unproject'
 import type { GalaxyData } from '../lib/data'
 import type { ColorField } from '../components/color-map'
+import type { Selection } from '../components/select-menu'
 import Camera from '../lib/camera'
 import Points from '../vis/points'
 import Highlight from '../vis/highlight'
@@ -53,7 +54,7 @@ class VisRenderer {
         }
     }
 
-    filterSelections (selections: Array<Array<number>>): void {
+    filterSelections (selections: Array<Selection>): void {
         this.points.filterSelections(this.gl, selections)
     }
 

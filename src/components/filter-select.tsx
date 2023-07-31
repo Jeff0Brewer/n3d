@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from 'react'
 import { getFieldSet } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
+import type { Selection } from '../components/select-menu'
 import styles from '../styles/filter.module.css'
 
 type FilterOptions = {
@@ -26,7 +27,7 @@ const optionMap: { [option: string]: string } = {
 
 type FilterSelectProps = {
     data: GalaxyData,
-    setSelection: (selection: Array<number>) => void
+    setSelection: (selection: Selection) => void
 }
 
 const FilterSelect: FC<FilterSelectProps> = ({ data, setSelection }) => {
@@ -54,7 +55,7 @@ const FilterSelect: FC<FilterSelectProps> = ({ data, setSelection }) => {
 
     useEffect(() => {
         const { headers, entries } = data
-        const selection = []
+        const inds = []
         for (const [option, value] of Object.entries(options)) {
             if (!option) { return } // don't filter on null option
 
@@ -63,11 +64,15 @@ const FilterSelect: FC<FilterSelectProps> = ({ data, setSelection }) => {
 
             for (let i = 0; i < entries.length; i++) {
                 if (entries[i][optionInd] === value) {
-                    selection.push(i)
+                    inds.push(i)
                 }
             }
         }
-        setSelection(selection)
+        setSelection({
+            name: 'aaaa',
+            visible: true,
+            inds
+        })
     }, [data, options, setSelection])
 
     const setLuminosity = (value: string | null): void => {

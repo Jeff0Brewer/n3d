@@ -3,19 +3,25 @@ import FilterSelect from '../components/filter-select'
 import type { GalaxyData } from '../lib/data'
 import styles from '../styles/select-menu.module.css'
 
+type Selection = {
+    name: string,
+    visible: boolean,
+    inds: Array<number>
+}
+
 type SelectMenuProps = {
     data: GalaxyData,
-    selections: Array<Array<number>>,
-    setSelections: (selections: Array<Array<number>>) => void
+    selections: Array<Selection>,
+    setSelections: (selections: Array<Selection>) => void
 }
 
 const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) => {
-    const [currSelection, setCurrSelection] = useState<Array<number>>([])
+    const [currSelection, setCurrSelection] = useState<Selection | null>(null)
 
     const addSelection = (): void => {
-        if (currSelection.length) {
+        if (currSelection) {
             setSelections([currSelection, ...selections])
-            setCurrSelection([])
+            setCurrSelection(null)
         }
     }
 
@@ -44,3 +50,4 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
 }
 
 export default SelectMenu
+export type { Selection }
