@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useState, useEffect } from 'react'
 import { getFieldSet } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
 import styles from '../styles/filter.module.css'
@@ -19,10 +19,28 @@ type FilterValues = {
 
 type SelectMenuProps = {
     data: GalaxyData,
-    selections: Array<Array<number>>
+    selections: Array<Array<number>>,
+    setSelections: (selections: Array<Array<number>>) => void
 }
 
-const SelectMenu: FC<SelectMenuProps> = ({ data, selections }) => {
+const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) => {
+    const addSelection = (selection: Array<number>): void => {
+        setSelections([selection, ...selections])
+    }
+
+    return (
+        <div>
+            <FilterSelect data={data} addSelection={addSelection} />
+        </div>
+    )
+}
+
+type FilterSelectProps = {
+    data: GalaxyData,
+    addSelection: (selection: Array<number>) => void
+}
+
+const FilterSelect: FC<FilterSelectProps> = ({ data, addSelection }) => {
     const [options, setOptions] = useState<FilterOptions>({
         luminosity: null,
         hierarchy: null,
@@ -30,11 +48,43 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections }) => {
         activity: null
     })
     const [filterValues, setFilterValues] = useState<FilterValues>({
-        luminosity: getFieldSet(data, 'Luminosity Class'),
-        hierarchy: getFieldSet(data, 'Hierarchy'),
-        morphology: getFieldSet(data, 'Galaxy Morphology'),
-        activity: getFieldSet(data, 'Activity Type')
+        luminosity: [],
+        hierarchy: [],
+        morphology: [],
+        activity: []
     })
+
+    useEffect(() => {
+        setFilterValues({
+            luminosity: getFieldSet(data, 'Luminosity Class'),
+            hierarchy: getFieldSet(data, 'Hierarchy'),
+            morphology: getFieldSet(data, 'Galaxy Morphology'),
+            activity: getFieldSet(data, 'Activity Type')
+        })
+    }, [data])
+
+    useEffect(() => {
+        const { headers, entries } = data
+        const selection = []
+        for (const [option, value] of Object.entries(options)) {
+            if (!option) { return } // don't filter on null option
+
+            // use option map to convert field name to csv header name
+            const optionInd = headers[optionMap[option]]
+
+            for (let i = 0; i < entries.length; i++) {
+                if (entries[i][optionInd] === value) {
+                    selection.push(i)
+                }
+            }
+        }
+        if (selection.length > 0) {
+            addSelection(selection)
+        }
+
+        // disable exhaustive deps to prevent loop on selection addition
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data, options])
 
     const setLuminosity = (value: string | null): void => {
         options.luminosity = value
@@ -128,6 +178,17 @@ const FilterOption: FC<FilterOptionProps> = ({ label, option, values, setOption 
                 : <p className={styles.selected}>{option || 'all'}</p> }
         </div>
     )
+}
+
+type OptionMap = {
+    [option: string]: string
+}
+
+const optionMap: OptionMap = {
+    luminosity: 'Luminosity Class',
+    hierarchy: 'Hierarchy',
+    morphology: 'Galaxy Morphology',
+    activity: 'Activity Type'
 }
 
 export default SelectMenu
