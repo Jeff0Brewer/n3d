@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import FilterSelect from '../components/filter-select'
 import type { GalaxyData } from '../lib/data'
+import styles from '../styles/select-menu.module.css'
 
 type SelectMenuProps = {
     data: GalaxyData,
@@ -14,9 +15,9 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
     }
 
     return (
-        <div>
+        <section className={styles.selectMenu}>
             <FilterSelect data={data} addSelection={addSelection} />
-        </div>
+        </section>
     )
 }
 
