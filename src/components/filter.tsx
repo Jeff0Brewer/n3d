@@ -1,67 +1,118 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState } from 'react'
 import { getFieldSet } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
 import styles from '../styles/filter.module.css'
 
 type FilterOptions = {
-    [field: string]: null | string
+    luminosity: string | null,
+    hierarchy: string | null,
+    morphology: string | null,
+    activity: string | null
 }
 
-type FilterProps = {
-    data: GalaxyData,
-    options: FilterOptions,
-    setOptions: (options: FilterOptions) => void
+type FilterValues = {
+    luminosity: Array<string>,
+    hierarchy: Array<string>,
+    morphology: Array<string>,
+    activity: Array<string>,
 }
 
-const Filter: FC<FilterProps> = ({ data, options, setOptions }) => {
+type SelectMenuProps = {
+    data: GalaxyData
+}
+
+const SelectMenu: FC<SelectMenuProps> = ({ data }) => {
+    const [options, setOptions] = useState<FilterOptions>({
+        luminosity: null,
+        hierarchy: null,
+        morphology: null,
+        activity: null
+    })
+    const [filterValues, setFilterValues] = useState<FilterValues>({
+        luminosity: getFieldSet(data, 'Luminosity Class'),
+        hierarchy: getFieldSet(data, 'Hierarchy'),
+        morphology: getFieldSet(data, 'Galaxy Morphology'),
+        activity: getFieldSet(data, 'Activity Type')
+    })
+
+    const setLuminosity = (value: string | null): void => {
+        options.luminosity = value
+        setOptions({ ...options })
+    }
+
+    const setHierarchy = (value: string | null): void => {
+        options.hierarchy = value
+        setOptions({ ...options })
+    }
+
+    const setMorphology = (value: string | null): void => {
+        options.morphology = value
+        setOptions({ ...options })
+    }
+
+    const setActivity = (value: string | null): void => {
+        options.activity = value
+        setOptions({ ...options })
+    }
+
     return (
         <div className={styles.wrap}>
-            { FILTER_FIELDS.map((field, i) =>
-                <FilterOption
-                    data={data}
-                    field={field}
-                    options={options}
-                    setOptions={setOptions}
-                    key={i}
-                />
-            )}
+            <FilterOption
+                label={'Luminosity Class'}
+                option={options.luminosity}
+                values={filterValues.luminosity}
+                setOption={setLuminosity}
+            />
+            <FilterOption
+                label={'Hierarchy'}
+                option={options.hierarchy}
+                values={filterValues.hierarchy}
+                setOption={setHierarchy}
+            />
+            <FilterOption
+                label={'Morphology'}
+                option={options.morphology}
+                values={filterValues.morphology}
+                setOption={setMorphology}
+            />
+            <FilterOption
+                label={'Activity Type'}
+                option={options.activity}
+                values={filterValues.activity}
+                setOption={setActivity}
+            />
         </div>
     )
 }
 
 type FilterOptionProps = {
-    data: GalaxyData,
-    field: string,
-    options: FilterOptions,
-    setOptions: (options: FilterOptions) => void
+    label: string,
+    option: string | null
+    values: Array<string>,
+    setOption: (value: string | null) => void
 }
 
-const FilterOption: FC<FilterOptionProps> = ({ data, field, options, setOptions }) => {
-    const [values, setValues] = useState<Array<string>>([])
+const FilterOption: FC<FilterOptionProps> = ({ label, option, values, setOption }) => {
     const [open, setOpen] = useState<boolean>(false)
 
     const clearField = (): void => {
-        options[field] = null
-        setOptions({ ...options })
+        setOption(null)
         setOpen(false)
     }
 
     const setField = (value: string): void => {
-        options[field] = value
-        setOptions({ ...options })
+        setOption(value)
         setOpen(false)
     }
-
-    useEffect(() => {
-        setValues(getFieldSet(data, field))
-    }, [data, field])
 
     return (
         <div className={styles.dropdown}>
             <span>
-                <a onClick={(): void => setOpen(!open)}>{field}</a>
-                { options[field] &&
-                    <a className={styles.reset} onClick={clearField}>x</a> }
+                <a onClick={(): void => setOpen(!open)}>{label}</a>
+                { option && <a
+                    className={styles.reset}
+                    onClick={clearField}
+                >x</a> }
             </span>
             { open
                 ? <div className={styles.options}>
@@ -73,19 +124,12 @@ const FilterOption: FC<FilterOptionProps> = ({ data, field, options, setOptions 
                         > {value} </a>
                     )}
                 </div>
-                : <p className={styles.selected}>{options[field] || 'all'}</p> }
+                : <p className={styles.selected}>{option || 'all'}</p> }
         </div>
     )
 }
 
-const FILTER_FIELDS = [
-    'Luminosity Class',
-    'Hierarchy',
-    'Galaxy Morphology',
-    'Activity Type'
-]
-
-export default Filter
+export default SelectMenu
 
 export type {
     FilterOptions

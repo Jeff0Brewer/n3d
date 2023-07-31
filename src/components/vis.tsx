@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect, FC } from 'react'
 import type { GalaxyData } from '../lib/data'
-import type { FilterOptions } from '../components/filter'
 import type { ColorField } from '../components/color-map'
 import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
@@ -9,11 +8,10 @@ type VisProps = {
     data: GalaxyData,
     selected: number | null,
     setSelected: (ind: number | null) => void,
-    colorField: ColorField | null,
-    filterOptions: FilterOptions
+    colorField: ColorField | null
 }
 
-const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField, filterOptions }) => {
+const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField }) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
     const [selecting, setSelecting] = useState<boolean>(false)
@@ -71,13 +69,6 @@ const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField, filterOpti
             visRef.current.setSelected(selected)
         }
     }, [selected])
-
-    // filter on filter option
-    useEffect(() => {
-        if (visRef.current) {
-            visRef.current.filter(data, filterOptions)
-        }
-    }, [data, filterOptions])
 
     // color map on field change
     useEffect(() => {
