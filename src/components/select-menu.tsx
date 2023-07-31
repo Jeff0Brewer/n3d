@@ -1,5 +1,5 @@
-import React, { FC, useState } from 'react'
-import { FaEye, FaBan, FaCaretRight } from 'react-icons/fa'
+import React, { FC, useState, useEffect } from 'react'
+import { FaEye, FaBan, FaCaretRight, FaCaretLeft } from 'react-icons/fa'
 import FilterSelect from '../components/filter-select'
 import type { GalaxyData } from '../lib/data'
 import styles from '../styles/select-menu.module.css'
@@ -18,13 +18,15 @@ type SelectMenuProps = {
 }
 
 const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) => {
-    const [currSelection, setCurrSelection] = useState<Selection | null>(null)
+    const [newSelection, setNewSelection] = useState<Selection | null>(null)
+    const [displaySelection, setDisplaySelection] = useState<Selection | null>(null)
     const [selectionCount, setSelectionCount] = useState<number>(0)
+    const nameInd = data.headers['Object Name']
 
     const addSelection = (): void => {
-        if (currSelection) {
-            setSelections([...selections, currSelection])
-            setCurrSelection(null)
+        if (newSelection) {
+            setSelections([...selections, newSelection])
+            setNewSelection(null)
             setSelectionCount(selectionCount + 1)
         }
     }
@@ -38,6 +40,10 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
 
     const deleteSelection = (ind: number): (() => void) => {
         return (): void => {
+            // remove display menu if deleting displayed selection
+            if (displaySelection?.key === selections[ind].key) {
+                setDisplaySelection(null)
+            }
             selections.splice(ind, 1)
             setSelections([...selections])
         }
@@ -63,7 +69,7 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
                     <FilterSelect
                         data={data}
                         selectionCount={selectionCount}
-                        setSelection={setCurrSelection}
+                        setSelection={setNewSelection}
                     />
                 </div>
                 <button
@@ -77,11 +83,21 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
                     { selections.map((selection, i) =>
                         <SelectionView
                             selection={selection}
+                            displaySelection={displaySelection}
+                            setDisplaySelection={setDisplaySelection}
                             setName={setSelectionName(i)}
                             deleteSelection={deleteSelection(i)}
                             toggleVisibility={toggleVisiblity(i)}
                             key={selection.key}
                         />
+                    )}
+                </div>
+            </div> }
+            { displaySelection && <div className={styles.selectionDisplay}>
+                <p className={styles.header}>{displaySelection.name}</p>
+                <div className={styles.galaxyList}>
+                    { displaySelection.inds.map((ind, i) =>
+                        <a key={i}>{data.entries[ind][nameInd]}</a>
                     )}
                 </div>
             </div> }
@@ -91,13 +107,16 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
 
 type SelectionViewProps = {
     selection: Selection,
+    displaySelection: Selection | null,
+    setDisplaySelection: (selection: Selection | null) => void,
     setName: (name: string) => void,
     deleteSelection: () => void,
     toggleVisibility: () => void
 }
 
 const SelectionView: FC<SelectionViewProps> = ({
-    selection, setName, deleteSelection, toggleVisibility
+    selection, displaySelection, setDisplaySelection,
+    setName, deleteSelection, toggleVisibility
 }) => {
     const updateName = (e: React.ChangeEvent): void => {
         if (!(e.target instanceof HTMLInputElement)) {
@@ -118,7 +137,14 @@ const SelectionView: FC<SelectionViewProps> = ({
                     <FaEye />
                 </a>
                 <a onClick={deleteSelection}><FaBan /></a>
-                <a> <FaCaretRight /> </a>
+                <div> { displaySelection?.key !== selection.key
+                    ? <a onClick={(): void => setDisplaySelection(selection)}>
+                        <FaCaretRight />
+                    </a>
+                    : <a onClick={(): void => setDisplaySelection(null)}>
+                        <FaCaretLeft />
+                    </a>
+                } </div>
             </div>
         </span>
     )

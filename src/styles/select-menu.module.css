@@ -59,7 +59,7 @@
 .selectionsList {
     border-top: var(--border);
     overflow-y: scroll;
-    max-height: 250px;
+    max-height: 200px;
     overflow-y: scroll;
 }
 
@@ -80,7 +80,7 @@
     align-items: center;
 }
 
-.selectionViewOptions > * {
+.selectionViewOptions * {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -89,4 +89,20 @@
 
 .selectionViewOptions > *[data-active="false"] {
     color: #777;
+}
+
+.selectionDisplay {
+    max-width: 200px;
+}
+
+.galaxyList {
+    display: flex;
+    flex-direction: column;
+    max-height: 200px;
+    overflow-y: scroll;
+    border-top: var(--border);
+}
+
+.galaxyList > a {
+    padding: 3px 10px;
 }
