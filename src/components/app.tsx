@@ -3,7 +3,7 @@ import { loadData } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
 import GalaxyInfo from '../components/info'
 import ColorMapMenu, { ColorField } from '../components/color-map'
-import SelectMenu from '../components/filter'
+import SelectMenu from '../components/select-menu'
 import Vis from '../components/vis'
 
 const App: FC = () => {
