@@ -27,10 +27,11 @@ const optionMap: { [option: string]: string } = {
 
 type FilterSelectProps = {
     data: GalaxyData,
+    selectionCount: number,
     setSelection: (selection: Selection) => void
 }
 
-const FilterSelect: FC<FilterSelectProps> = ({ data, setSelection }) => {
+const FilterSelect: FC<FilterSelectProps> = ({ data, selectionCount, setSelection }) => {
     const [options, setOptions] = useState<FilterOptions>({
         luminosity: null,
         hierarchy: null,
@@ -69,11 +70,11 @@ const FilterSelect: FC<FilterSelectProps> = ({ data, setSelection }) => {
             }
         }
         setSelection({
-            name: 'aaaa',
+            name: `Selection ${selectionCount}`,
             visible: true,
             inds
         })
-    }, [data, options, setSelection])
+    }, [data, options, selectionCount, setSelection])
 
     const setLuminosity = (value: string | null): void => {
         options.luminosity = value

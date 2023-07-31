@@ -17,11 +17,13 @@ type SelectMenuProps = {
 
 const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) => {
     const [currSelection, setCurrSelection] = useState<Selection | null>(null)
+    const [selectionCount, setSelectionCount] = useState<number>(0)
 
     const addSelection = (): void => {
         if (currSelection) {
-            setSelections([currSelection, ...selections])
+            setSelections([...selections, currSelection])
             setCurrSelection(null)
+            setSelectionCount(selectionCount + 1)
         }
     }
 
@@ -35,7 +37,11 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
                     <button>Cone</button>
                 </span>
                 <div className={styles.createTypesMenu}>
-                    <FilterSelect data={data} setSelection={setCurrSelection} />
+                    <FilterSelect
+                        data={data}
+                        selectionCount={selectionCount}
+                        setSelection={setCurrSelection}
+                    />
                 </div>
                 <button
                     className={styles.createButton}
