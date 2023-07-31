@@ -16,7 +16,18 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
 
     return (
         <section className={styles.selectMenu}>
-            <FilterSelect data={data} addSelection={addSelection} />
+            <div className={styles.createMenu}>
+                <p className={styles.header}>Create Selection</p>
+                <span className={styles.createTabs}>
+                    <button>Filter</button>
+                    <button>Sphere</button>
+                    <button>Cone</button>
+                </span>
+                <div className={styles.createTypesMenu}>
+                    <FilterSelect data={data} addSelection={addSelection} />
+                </div>
+                <button className={styles.createButton}>create</button>
+            </div>
         </section>
     )
 }

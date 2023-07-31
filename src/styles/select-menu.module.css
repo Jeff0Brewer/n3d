@@ -5,3 +5,41 @@
     z-index: 10;
     font-size: 12px;
 }
+
+.header {
+    font-size: 14px;
+    padding-bottom: 5px;
+    padding: 10px;
+    text-align: center;
+}
+
+.createMenu {
+    background-color: var(--color0);
+    min-width: 150px;
+}
+
+.createTabs {
+    display: flex;
+    border-top: var(--border);
+    border-bottom: var(--border);
+    background-color: var(--color1);
+}
+
+.createTabs > button {
+    width: 33.33%;
+    height: 30px;
+}
+
+.createTabs > button:not(:last-child) {
+    border-right: var(--border);
+}
+
+.createTypesMenu {
+    border-bottom: var(--border);
+}
+
+.createButton {
+    width: 100%;
+    height: 30px;
+    background-color: var(--color1);
+}
