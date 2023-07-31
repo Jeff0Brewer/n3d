@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react'
+import { FC, useState } from 'react'
 import FilterSelect from '../components/filter-select'
 import type { GalaxyData } from '../lib/data'
 import styles from '../styles/select-menu.module.css'
@@ -36,6 +36,9 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
                     onClick={addSelection}
                 >create</button>
             </div>
+            { selections.length > 0 && <div className={styles.selectionsView}>
+                <p className={styles.header}>Selections</p>
+            </div> }
         </section>
     )
 }
