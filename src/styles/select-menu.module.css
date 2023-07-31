@@ -14,12 +14,12 @@
 
 .header {
     font-size: 14px;
-    padding-bottom: 5px;
     padding: 10px;
     text-align: center;
 }
 
 .createMenu {
+    position: relative;
     min-width: 150px;
 }
 
@@ -40,15 +40,49 @@
 }
 
 .createTypesMenu {
-    border-bottom: var(--border);
+    padding-bottom: var(--create-button-height);
 }
 
 .createButton {
+    position: absolute;
+    bottom: 0;
     width: 100%;
-    height: 30px;
+    height: var(--create-button-height);
     background-color: var(--color1);
+    border-top: var(--border);
 }
 
-.selectionsView {
-    min-width: 120px;
+.viewMenu {
+    min-width: 150px;
+}
+
+.selectionsList {
+    border-top: var(--border);
+    overflow-y: scroll;
+    max-height: 250px;
+    overflow-y: scroll;
+}
+
+.selectionView {
+    display: flex;
+    padding: 3px 10px;
+    justify-content: space-between;
+}
+
+.selectionViewOptions {
+    width: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selectionViewOptions > * {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 10px;
+}
+
+.selectionViewOptions > *[data-active="false"] {
+    color: #777;
 }

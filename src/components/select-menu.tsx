@@ -1,4 +1,5 @@
 import { FC, useState } from 'react'
+import { FaEye, FaBan, FaCaretRight } from 'react-icons/fa'
 import FilterSelect from '../components/filter-select'
 import type { GalaxyData } from '../lib/data'
 import styles from '../styles/select-menu.module.css'
@@ -27,6 +28,16 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
         }
     }
 
+    const deleteSelection = (ind: number): void => {
+        selections.splice(ind, 1)
+        setSelections([...selections])
+    }
+
+    const toggleVisiblity = (ind: number): void => {
+        selections[ind].visible = !selections[ind].visible
+        setSelections([...selections])
+    }
+
     return (
         <section className={styles.selectMenu}>
             <div className={styles.createMenu}>
@@ -48,10 +59,41 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
                     onClick={addSelection}
                 >create</button>
             </div>
-            { selections.length > 0 && <div className={styles.selectionsView}>
+            { selections.length > 0 && <div className={styles.viewMenu}>
                 <p className={styles.header}>Selections</p>
+                <div className={styles.selectionsList}>
+                    { selections.map((selection, i) =>
+                        <SelectionView
+                            selection={selection}
+                            deleteSelection={(): void => deleteSelection(i)}
+                            toggleVisibility={(): void => toggleVisiblity(i)}
+                            key={i}
+                        />
+                    )}
+                </div>
             </div> }
         </section>
+    )
+}
+
+type SelectionViewProps = {
+    selection: Selection,
+    deleteSelection: () => void,
+    toggleVisibility: () => void
+}
+
+const SelectionView: FC<SelectionViewProps> = ({ selection, deleteSelection, toggleVisibility }) => {
+    return (
+        <span className={styles.selectionView}>
+            <p>{selection.name}</p>
+            <div className={styles.selectionViewOptions}>
+                <a onClick={toggleVisibility} data-active={selection.visible}>
+                    <FaEye />
+                </a>
+                <a onClick={deleteSelection}><FaBan /></a>
+                <a> <FaCaretRight /> </a>
+            </div>
+        </span>
     )
 }
 
