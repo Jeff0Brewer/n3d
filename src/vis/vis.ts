@@ -1,7 +1,6 @@
 import { mat4, vec3 } from 'gl-matrix'
 import { initGl } from '../lib/gl-wrap'
 import { getInvMatrix } from '../lib/unproject'
-import type { FilterOptions } from '../components/filter'
 import type { GalaxyData } from '../lib/data'
 import type { ColorField } from '../components/color-map'
 import Camera from '../lib/camera'
@@ -54,8 +53,8 @@ class VisRenderer {
         }
     }
 
-    filter (data: GalaxyData, options: FilterOptions): void {
-        this.points.filter(this.gl, data, options)
+    filterSelections (selections: Array<Array<number>>): void {
+        this.points.filterSelections(this.gl, selections)
     }
 
     setSelected (ind: number | null): void {

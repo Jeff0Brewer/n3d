@@ -3,7 +3,6 @@ import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getPositions, getSelectColors } from '../lib/data'
 import { COLOR_MAP_COLORS } from '../components/color-map'
 import type { GalaxyData, SelectMap } from '../lib/data'
-import type { FilterOptions } from '../components/filter'
 import type { ColorField } from '../components/color-map'
 import Camera from '../lib/camera'
 import ColorMap from '../lib/color-map'
@@ -170,20 +169,16 @@ class Points {
         gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW)
     }
 
-    filter (gl: WebGLRenderingContext, data: GalaxyData, options: FilterOptions): void {
+    filterSelections (
+        gl: WebGLRenderingContext,
+        selections: Array<Array<number>>
+    ): void {
         const visibility = new Uint8Array(this.numVertex * VIS_FPV)
         visibility.fill(1)
 
-        const { headers, entries } = data
-        for (const [field, value] of Object.entries(options)) {
-            if (!value) { continue } // don't filter if value null
-
-            const fieldInd = headers[field]
-            for (let i = 0; i < entries.length; i++) {
-                if (entries[i][fieldInd] !== value) {
-                    visibility[i] = 0
-                }
-            }
+        const allSelections = selections.flat()
+        for (const ind of allSelections) {
+            visibility[ind] = 0
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.visBuffer)

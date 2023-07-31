@@ -9,7 +9,7 @@ import Vis from '../components/vis'
 const App: FC = () => {
     const [data, setData] = useState<GalaxyData | null>(null)
     const [selected, setSelected] = useState <number | null>(null)
-    const [selections, setSelections] = useState<Array<Array<string>>>([])
+    const [selections, setSelections] = useState<Array<Array<number>>>([])
     const [colorField, setColorField] = useState<ColorField | null>(null)
 
     const getData = async (): Promise<void> => {
@@ -24,7 +24,7 @@ const App: FC = () => {
     if (!data) { return <></> }
     return (
         <main>
-            <SelectMenu data={data} />
+            <SelectMenu data={data} selections={selections} />
             <ColorMapMenu data={data} colorField={colorField} setColorField={setColorField} />
             { selected && <GalaxyInfo headers={data.headers} fields={data.entries[selected]} /> }
             <Vis
@@ -32,6 +32,7 @@ const App: FC = () => {
                 selected={selected}
                 setSelected={setSelected}
                 colorField={colorField}
+                selections={selections}
             />
         </main>
     )

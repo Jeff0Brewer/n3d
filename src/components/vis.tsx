@@ -8,10 +8,11 @@ type VisProps = {
     data: GalaxyData,
     selected: number | null,
     setSelected: (ind: number | null) => void,
-    colorField: ColorField | null
+    colorField: ColorField | null,
+    selections: Array<Array<number>>
 }
 
-const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField }) => {
+const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField, selections }) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
     const [selecting, setSelecting] = useState<boolean>(false)
@@ -76,6 +77,13 @@ const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField }) => {
             visRef.current.colorMapField(data, colorField)
         }
     }, [data, colorField])
+
+    // filter by selections
+    useEffect(() => {
+        if (visRef.current) {
+            visRef.current.filterSelections(selections)
+        }
+    }, [selections])
 
     // start draw loop
     useEffect(() => {

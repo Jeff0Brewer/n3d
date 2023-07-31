@@ -18,10 +18,11 @@ type FilterValues = {
 }
 
 type SelectMenuProps = {
-    data: GalaxyData
+    data: GalaxyData,
+    selections: Array<Array<number>>
 }
 
-const SelectMenu: FC<SelectMenuProps> = ({ data }) => {
+const SelectMenu: FC<SelectMenuProps> = ({ data, selections }) => {
     const [options, setOptions] = useState<FilterOptions>({
         luminosity: null,
         hierarchy: null,
