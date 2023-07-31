@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { FC, useState } from 'react'
 import { FaEye, FaBan, FaCaretRight, FaCaretLeft } from 'react-icons/fa'
 import FilterSelect from '../components/filter-select'
 import type { GalaxyData } from '../lib/data'
@@ -14,10 +14,14 @@ type Selection = {
 type SelectMenuProps = {
     data: GalaxyData,
     selections: Array<Selection>,
-    setSelections: (selections: Array<Selection>) => void
+    setSelections: (selections: Array<Selection>) => void,
+    selected: number | null,
+    setSelected: (ind: number | null) => void
 }
 
-const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) => {
+const SelectMenu: FC<SelectMenuProps> = ({
+    data, selections, setSelections, selected, setSelected
+}) => {
     const [newSelection, setNewSelection] = useState<Selection | null>(null)
     const [displaySelection, setDisplaySelection] = useState<Selection | null>(null)
     const [selectionCount, setSelectionCount] = useState<number>(0)
@@ -97,7 +101,13 @@ const SelectMenu: FC<SelectMenuProps> = ({ data, selections, setSelections }) =>
                 <p className={styles.header}>{displaySelection.name}</p>
                 <div className={styles.galaxyList}>
                     { displaySelection.inds.map((ind, i) =>
-                        <a key={i}>{data.entries[ind][nameInd]}</a>
+                        <a
+                            data-active={ind === selected}
+                            onClick={(): void => setSelected(ind)}
+                            key={i}
+                        >
+                            {data.entries[ind][nameInd]}
+                        </a>
                     )}
                 </div>
             </div> }

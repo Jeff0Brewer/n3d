@@ -106,3 +106,7 @@
 .galaxyList > a {
     padding: 3px 10px;
 }
+
+.galaxyList > a[data-active="true"] {
+    background-color: var(--color1);
+}
