@@ -173,14 +173,14 @@ class Points {
         gl: WebGLRenderingContext,
         selections: Array<Array<number>>
     ): void {
-        const visibility = new Uint8Array(this.numVertex * VIS_FPV)
-        visibility.fill(1)
-
         const allSelections = selections.flat()
-        for (const ind of allSelections) {
-            visibility[ind] = 0
-        }
+        if (allSelections.length <= 0) { return }
 
+        const visibility = new Uint8Array(this.numVertex * VIS_FPV)
+        visibility.fill(0)
+        for (const ind of allSelections) {
+            visibility[ind] = 1
+        }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.visBuffer)
         gl.bufferData(gl.ARRAY_BUFFER, visibility, gl.STATIC_DRAW)
     }
