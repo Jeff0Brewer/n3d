@@ -1,6 +1,6 @@
 import { mat4 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
-import { getPositions, getSelectColors } from '../lib/data'
+import { getSelectColors } from '../lib/data'
 import { COLOR_MAP_COLORS } from '../components/color-map'
 import type { GalaxyData, SelectMap } from '../lib/data'
 import type { ColorField } from '../components/color-map'
@@ -49,9 +49,16 @@ class Points {
     ) {
         this.program = initProgram(gl, vertSource, fragSource)
 
-        this.positions = getPositions(data)
+        // copy positions from dataset into buffer
+        this.positions = new Float32Array(data.entries.length * POS_FPV)
+        let ind = 0
+        for (const { position } of data.entries) {
+            this.positions.set(position, ind)
+            ind += POS_FPV
+        }
         this.posBuffer = initBuffer(gl)
         gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW)
+
         this.bindPosition = initAttribute(gl, this.program, 'position', POS_FPV, POS_FPV, 0, gl.FLOAT)
         this.numVertex = this.positions.length / POS_FPV
 

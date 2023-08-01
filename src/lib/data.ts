@@ -1,3 +1,4 @@
+import { vec3 } from 'gl-matrix'
 import Papa from 'papaparse'
 import type { ParseConfig } from 'papaparse'
 
@@ -11,7 +12,8 @@ type DataHeaders = {
 
 type DataEntry = {
     strValues: Array<string>,
-    numValues: Array<number>
+    numValues: Array<number>,
+    position: vec3
 }
 
 type GalaxyData = {
@@ -37,6 +39,7 @@ const loadData = async (path: string): Promise<GalaxyData> => {
     const csvString = await res.text()
     const { data } = Papa.parse(csvString, csvParseConfig)
 
+    // get header indices for number / string entry values
     const headerRow = data[0]
     const headers: DataHeaders = {
         strHeaders: {},
@@ -44,7 +47,6 @@ const loadData = async (path: string): Promise<GalaxyData> => {
     }
     let numInd = 0
     let strInd = 0
-    // get header indices for number / string entry values
     for (let i = 0; i < headerRow.length; i++) {
         if (entryStrInds.indexOf(i) === -1) {
             headers.numHeaders[headerRow[i]] = numInd
@@ -60,7 +62,11 @@ const loadData = async (path: string): Promise<GalaxyData> => {
     data.filter(row => row[objTypeInd] === 'G')
         .forEach(row => {
             const entryInd = entries.length
-            entries.push({ strValues: [], numValues: [] })
+            entries.push({
+                strValues: [],
+                numValues: [],
+                position: vec3.create()
+            })
             row.forEach((value: string, i: number) => {
                 entryStrInds.indexOf(i) === -1
                     ? entries[entryInd].numValues.push(parseFloat(value))
@@ -68,7 +74,11 @@ const loadData = async (path: string): Promise<GalaxyData> => {
             })
         })
 
-    return { headers, entries }
+    // calculate positions and update dataset
+    const galaxyData = { headers, entries }
+    calcPositions(galaxyData)
+
+    return galaxyData
 }
 
 const getFieldSet = (data: GalaxyData, field: string): Array<string> => {
@@ -112,35 +122,34 @@ const getSelectColors = (data: GalaxyData): SelectColors => {
     return { map, buffer }
 }
 
-const getPositions = (data: GalaxyData): Float32Array => {
+// calculate galaxy positions from lat / lng / redshift
+// modifies data object in place
+const calcPositions = (data: GalaxyData): void => {
     const { headers, entries } = data
-    const positions = new Float32Array(entries.length * 3)
     const DEG_TO_RAD = Math.PI / 180
     const POS_SCALE = 0.012
-    let ind = 0
 
     // get indices of required fields for easy access in loop
     const lngInd = headers.numHeaders.LON
     const latInd = headers.numHeaders.LAT
     const redInd = headers.numHeaders.Redshift
-    for (const { numValues } of entries) {
-        const lng = numValues[lngInd] * DEG_TO_RAD
-        const lat = numValues[latInd] * DEG_TO_RAD
-        const red = numValues[redInd]
+    for (const entry of entries) {
+        const lng = entry.numValues[lngInd] * DEG_TO_RAD
+        const lat = entry.numValues[latInd] * DEG_TO_RAD
+        const red = entry.numValues[redInd]
 
         const dist = POS_SCALE * red * 4222 // magic number from legacy source, investigate
 
-        positions[ind++] = dist * Math.sin(lng) * Math.cos(lat)
-        positions[ind++] = dist * Math.cos(lng) * Math.cos(lat)
-        positions[ind++] = dist * Math.sin(lat)
+        vec3.copy(entry.position, [
+            dist * Math.sin(lng) * Math.cos(lat),
+            dist * Math.cos(lng) * Math.cos(lat),
+            dist * Math.sin(lat)
+        ])
     }
-
-    return positions
 }
 
 export {
     loadData,
-    getPositions,
     getSelectColors,
     getFieldSet
 }
