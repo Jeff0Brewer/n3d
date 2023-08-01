@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react'
 import { getFieldSet } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
 import type { Selection } from '../components/select-menu'
-import styles from '../styles/filter.module.css'
+import styles from '../styles/filter-select.module.css'
 
 type FilterOptions = {
     luminosity: string | null,
