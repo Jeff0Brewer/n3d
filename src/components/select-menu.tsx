@@ -110,7 +110,7 @@ const CreateMenu: FC<CreateMenuProps> = ({
                     data={data}
                     selected={selected}
                     selectionCount={selectionCount}
-                    setSelection={addSelection}
+                    addSelection={addSelection}
                 />
             case null:
                 return <></>

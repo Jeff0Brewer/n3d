@@ -27,10 +27,10 @@ type ConeSelectProps = {
     data: GalaxyData,
     selected: number | null,
     selectionCount: number,
-    setSelection: (selection: Selection) => void
+    addSelection: (selection: Selection) => void
 }
 
-const ConeSelect: FC<ConeSelectProps> = ({ data, selected, selectionCount, setSelection }) => {
+const ConeSelect: FC<ConeSelectProps> = ({ data, selected, selectionCount, addSelection }) => {
     const [lat, setLat] = useState<number>(0)
     const [lng, setLng] = useState<number>(0)
     const [arc, setArc] = useState<number>(20)
@@ -55,7 +55,7 @@ const ConeSelect: FC<ConeSelectProps> = ({ data, selected, selectionCount, setSe
     }, [data, selected])
 
     // update selection on lat / lng / arc changes
-    useEffect(() => {
+    const coneSelect = (): void => {
         const { headers, entries } = data
         const latInd = headers.numHeaders.LAT
         const lngInd = headers.numHeaders.LON
@@ -72,14 +72,13 @@ const ConeSelect: FC<ConeSelectProps> = ({ data, selected, selectionCount, setSe
                 inds.push(i)
             }
         }
-
-        setSelection({
+        addSelection({
             name: `Cone ${selectionCount}`,
             key: selectionCount,
             visible: true,
             inds
         })
-    }, [data, lat, lng, arc, selectionCount, setSelection])
+    }
 
     return (
         <div className={styles.wrap}>
@@ -121,6 +120,10 @@ const ConeSelect: FC<ConeSelectProps> = ({ data, selected, selectionCount, setSe
                     onChange={setFromInput(setArc)}
                 />
             </div>
+            <button
+                className={styles.createButton}
+                onClick={coneSelect}
+            > create </button>
         </div>
     )
 }
