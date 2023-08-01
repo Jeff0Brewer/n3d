@@ -11,7 +11,7 @@ const GalaxyInfo: FC<GalaxyInfoProps> = ({ headers, fields }) => {
     return (
         <div className={styles.info}>
             { Object.entries(INFO_FIELDS).map(([key, value], i) => {
-                const field = fields[headers[value]]
+                const field = fields[headers.strHeaders[value]]
                 return (
                     <div className={field ? styles.wrap : styles.hidden} key={i}>
                         <p className={styles.label}>{key}</p>

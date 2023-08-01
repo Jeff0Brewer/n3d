@@ -243,7 +243,8 @@ type GalaxyDisplayProps = {
 const GalaxyDisplay: FC<GalaxyDisplayProps> = ({
     data, selection, selected, setSelected
 }) => {
-    const nameInd = data.headers['Object Name']
+    const { headers, entries } = data
+    const nameInd = headers.strHeaders['Object Name']
 
     if (!selection) { return <></> }
     return (
@@ -256,7 +257,7 @@ const GalaxyDisplay: FC<GalaxyDisplayProps> = ({
                         onClick={(): void => setSelected(ind)}
                         key={i}
                     >
-                        {data.entries[ind][nameInd]}
+                        {entries[ind].strValues[nameInd]}
                     </a>
                 )}
             </div>

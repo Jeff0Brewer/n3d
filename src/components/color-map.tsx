@@ -39,11 +39,11 @@ const ColorMapMenu: FC<ColorMapMenuProps> = ({ data, colorField, setColorField }
     useEffect(() => {
         const { headers, entries } = data
         const colorFields: Array<ColorField> = COLOR_MAP_FIELDS.map((name: string) => {
-            const fieldInd = headers[name]
+            const fieldInd = headers.numHeaders[name]
             let min = Number.MAX_VALUE
             let max = Number.MIN_VALUE
             for (const entry of entries) {
-                const value = parseFloat(entry[fieldInd])
+                const value = entry.numValues[fieldInd]
                 if (!Number.isNaN(value)) {
                     min = Math.min(min, value)
                     max = Math.max(max, value)

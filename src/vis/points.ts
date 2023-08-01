@@ -144,12 +144,12 @@ class Points {
 
     colorMapField (gl: WebGLRenderingContext, data: GalaxyData, field: ColorField): void {
         const { headers, entries } = data
-        const fieldInd = headers[field.name]
+        const fieldInd = headers.numHeaders[field.name]
 
         const colors = new Uint8Array(entries.length * COL_FPV)
         let colInd = 0
         for (const entry of entries) {
-            const value = parseFloat(entry[fieldInd])
+            const value = entry.numValues[fieldInd]
             if (Number.isNaN(value)) {
                 colors[colInd++] = 80
                 colors[colInd++] = 80

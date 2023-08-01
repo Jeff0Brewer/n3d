@@ -1,13 +1,22 @@
 import Papa from 'papaparse'
 import type { ParseConfig } from 'papaparse'
 
+// helper info for parsing csv with string / number fields
+const entryStrInds = [0, 1, 2, 5, 7, 8, 9, 10]
+
 type DataHeaders = {
-    [name: string]: number
+    strHeaders: { [name: string]: number },
+    numHeaders: { [name: string]: number }
+}
+
+type DataEntry = {
+    strValues: Array<string>,
+    numValues: Array<number>
 }
 
 type GalaxyData = {
     headers: DataHeaders,
-    entries: Array<Array<string>>
+    entries: Array<DataEntry>
 }
 
 type SelectMap = {
@@ -29,27 +38,50 @@ const loadData = async (path: string): Promise<GalaxyData> => {
     const { data } = Papa.parse(csvString, csvParseConfig)
 
     const headerRow = data[0]
-    const headers: DataHeaders = {}
-    for (let i = 0; i < headerRow.length; i++) {
-        headers[headerRow[i]] = i
+    const headers: DataHeaders = {
+        strHeaders: {},
+        numHeaders: {}
     }
-    const objTypeInd = headers['Object Type']
-    const entries = data.filter(row => row[objTypeInd] === 'G')
+    let numInd = 0
+    let strInd = 0
+    // get header indices for number / string entry values
+    for (let i = 0; i < headerRow.length; i++) {
+        if (entryStrInds.indexOf(i) === -1) {
+            headers.numHeaders[headerRow[i]] = numInd
+            numInd++
+        } else {
+            headers.strHeaders[headerRow[i]] = strInd
+            strInd++
+        }
+    }
+    // split csv data into string / number value arrays
+    const entries: Array<DataEntry> = []
+    const objTypeInd = headerRow.indexOf('Object Type')
+    data.filter(row => row[objTypeInd] === 'G')
+        .forEach(row => {
+            const entryInd = entries.length
+            entries.push({ strValues: [], numValues: [] })
+            row.forEach((value: string, i: number) => {
+                entryStrInds.indexOf(i) === -1
+                    ? entries[entryInd].numValues.push(parseFloat(value))
+                    : entries[entryInd].strValues.push(value)
+            })
+        })
 
     return { headers, entries }
 }
 
 const getFieldSet = (data: GalaxyData, field: string): Array<string> => {
     const { headers, entries } = data
-    const fieldInd = headers[field]
+    const fieldInd = headers.strHeaders[field]
     if (!fieldInd) {
         throw new Error(`Field ${field} does not exit in dataset headers`)
     }
 
     const values = new Set<string>()
     for (const entry of entries) {
-        const value = entry[fieldInd]
-        if (value) {
+        const value = entry.strValues[fieldInd]
+        if (value && typeof value === 'string') {
             values.add(value)
         }
     }
@@ -82,23 +114,19 @@ const getSelectColors = (data: GalaxyData): SelectColors => {
 
 const getPositions = (data: GalaxyData): Float32Array => {
     const { headers, entries } = data
-    // get indices of required fields for easy access in loop
-    const objTypeInd = headers['Object Type']
-    const lngInd = headers.LON
-    const latInd = headers.LAT
-    const redInd = headers.Redshift
-
+    const positions = new Float32Array(entries.length * 3)
     const DEG_TO_RAD = Math.PI / 180
     const POS_SCALE = 0.012
-
     let ind = 0
-    const positions = new Float32Array(entries.length * 3)
-    for (const row of entries) {
-        if (row[objTypeInd] !== 'G') { continue }
 
-        const lng = parseFloat(row[lngInd]) * DEG_TO_RAD
-        const lat = parseFloat(row[latInd]) * DEG_TO_RAD
-        const red = parseFloat(row[redInd])
+    // get indices of required fields for easy access in loop
+    const lngInd = headers.numHeaders.LON
+    const latInd = headers.numHeaders.LAT
+    const redInd = headers.numHeaders.Redshift
+    for (const { numValues } of entries) {
+        const lng = numValues[lngInd] * DEG_TO_RAD
+        const lat = numValues[latInd] * DEG_TO_RAD
+        const red = numValues[redInd]
 
         const dist = POS_SCALE * red * 4222 // magic number from legacy source, investigate
 
@@ -120,5 +148,6 @@ export {
 export type {
     GalaxyData,
     SelectMap,
-    DataHeaders
+    DataHeaders,
+    DataEntry
 }

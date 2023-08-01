@@ -61,10 +61,10 @@ const FilterSelect: FC<FilterSelectProps> = ({ data, selectionCount, setSelectio
             if (!option) { return } // don't filter on null option
 
             // use option map to convert field name to csv header name
-            const optionInd = headers[optionMap[option]]
+            const optionInd = headers.strHeaders[optionMap[option]]
 
             for (let i = 0; i < entries.length; i++) {
-                if (entries[i][optionInd] === value) {
+                if (entries[i].strValues[optionInd] === value) {
                     inds.push(i)
                 }
             }
