@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react'
 import { loadData } from '../lib/data'
+import { getColorField } from '../lib/color-map'
 import type { GalaxyData } from '../lib/data'
 import type { Selection } from '../components/select-menu'
 import type { ColorField } from '../lib/color-map'
@@ -21,6 +22,9 @@ const App: FC = () => {
     const getData = async (): Promise<void> => {
         const data = await loadData('./data/data.csv')
         setData(data)
+
+        // update default color field once data loaded
+        setColorField(getColorField(data, '2MASS  K_s_total'))
     }
 
     useEffect(() => {
