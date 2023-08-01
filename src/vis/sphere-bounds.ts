@@ -3,7 +3,7 @@ import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getIcosphere } from '../lib/icosphere'
 import type { Icosphere } from '../lib/icosphere'
 import vertSource from '../shaders/sphere-vert.glsl?raw'
-import fragSource from '../shaders/sphere-frag.glsl?raw'
+import fragSource from '../shaders/bounds-frag.glsl?raw'
 
 type Sphere = {
     center: vec3,
