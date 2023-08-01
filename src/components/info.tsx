@@ -1,21 +1,23 @@
 import { FC } from 'react'
-import type { DataHeaders } from '../lib/data'
+import type { DataHeaders, DataEntry } from '../lib/data'
 import styles from '../styles/info.module.css'
 
 type GalaxyInfoProps = {
     headers: DataHeaders,
-    fields: Array<string>
+    entry: DataEntry
 }
 
-const GalaxyInfo: FC<GalaxyInfoProps> = ({ headers, fields }) => {
+const GalaxyInfo: FC<GalaxyInfoProps> = ({ headers, entry }) => {
     return (
         <div className={styles.info}>
-            { Object.entries(INFO_FIELDS).map(([key, value], i) => {
-                const field = fields[headers.strHeaders[value]]
+            { Object.entries(INFO_FIELDS).map(([key, field], i) => {
+                const strVal = entry.strValues[headers.strHeaders[field]]
+                const numVal = entry.numValues[headers.numHeaders[field]]
+                const value = strVal || numVal
                 return (
-                    <div className={field ? styles.wrap : styles.hidden} key={i}>
+                    <div className={value ? styles.wrap : styles.hidden} key={i}>
                         <p className={styles.label}>{key}</p>
-                        <p>{field}</p>
+                        <p>{value}</p>
                     </div>
                 )
             }
