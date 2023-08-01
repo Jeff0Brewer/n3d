@@ -2,7 +2,7 @@ import { FC, useState, useEffect } from 'react'
 import { getFieldSet } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
 import type { Selection } from '../components/select-menu'
-import styles from '../styles/filter-select.module.css'
+import styles from '../styles/select-modes.module.css'
 
 type FilterOptions = {
     luminosity: string | null,
@@ -28,10 +28,10 @@ const optionMap: { [option: string]: string } = {
 type FilterSelectProps = {
     data: GalaxyData,
     selectionCount: number,
-    setSelection: (selection: Selection) => void
+    addSelection: (selection: Selection) => void
 }
 
-const FilterSelect: FC<FilterSelectProps> = ({ data, selectionCount, setSelection }) => {
+const FilterSelect: FC<FilterSelectProps> = ({ data, selectionCount, addSelection }) => {
     const [options, setOptions] = useState<FilterOptions>({
         luminosity: null,
         hierarchy: null,
@@ -45,16 +45,7 @@ const FilterSelect: FC<FilterSelectProps> = ({ data, selectionCount, setSelectio
         activity: []
     })
 
-    useEffect(() => {
-        setFilterValues({
-            luminosity: getFieldSet(data, 'Luminosity Class'),
-            hierarchy: getFieldSet(data, 'Hierarchy'),
-            morphology: getFieldSet(data, 'Galaxy Morphology'),
-            activity: getFieldSet(data, 'Activity Type')
-        })
-    }, [data])
-
-    useEffect(() => {
+    const filterSelect = (): void => {
         const { headers, entries } = data
         const inds = []
         for (const [option, value] of Object.entries(options)) {
@@ -69,13 +60,22 @@ const FilterSelect: FC<FilterSelectProps> = ({ data, selectionCount, setSelectio
                 }
             }
         }
-        setSelection({
+        addSelection({
             name: `Filter ${selectionCount}`,
             key: selectionCount,
             visible: true,
             inds
         })
-    }, [data, options, selectionCount, setSelection])
+    }
+
+    useEffect(() => {
+        setFilterValues({
+            luminosity: getFieldSet(data, 'Luminosity Class'),
+            hierarchy: getFieldSet(data, 'Hierarchy'),
+            morphology: getFieldSet(data, 'Galaxy Morphology'),
+            activity: getFieldSet(data, 'Activity Type')
+        })
+    }, [data])
 
     const setLuminosity = (value: string | null): void => {
         options.luminosity = value
@@ -123,6 +123,10 @@ const FilterSelect: FC<FilterSelectProps> = ({ data, selectionCount, setSelectio
                 values={filterValues.activity}
                 setOption={setActivity}
             />
+            <button
+                className={styles.createButton}
+                onClick={filterSelect}
+            > create </button>
         </div>
     )
 }
@@ -148,28 +152,28 @@ const FilterOption: FC<FilterOptionProps> = ({ label, option, values, setOption 
     }
 
     return (
-        <div className={styles.dropdown}>
+        <div className={styles.filterDropdown}>
             <span>
                 <a
-                    className={styles.label}
+                    className={styles.filterLabel}
                     onClick={(): void => setOpen(!open)}
                 >{label}</a>
                 { option && <a
-                    className={styles.reset}
+                    className={styles.filterReset}
                     onClick={clearField}
                 >x</a> }
             </span>
             { open
-                ? <div className={styles.options}>
+                ? <div className={styles.filterOptions}>
                     { values.map((value, i) =>
                         <a
-                            className={styles.option}
+                            className={styles.filterOption}
                             onClick={(): void => setField(value)}
                             key={i}
                         > {value} </a>
                     )}
                 </div>
-                : <p className={styles.selected}>{option || 'all'}</p> }
+                : <p>{option || 'all'}</p> }
         </div>
     )
 }

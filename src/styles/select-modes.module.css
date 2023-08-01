@@ -1,5 +1,6 @@
 .wrap {
-    padding: 5px 10px 10px 10px;
+    position: relative;
+    padding-bottom: var(--create-button-height);
 }
 
 .header {
@@ -35,6 +36,31 @@
 
 .angleValue > input, .sphereRadius > input {
     width: 150px;
+}
+
+.filterDropdown {
+    padding: 5px;
+}
+
+.filterLabel {
+    text-transform: uppercase;
+    color: var(--text0);
+}
+
+.filterOptions {
+    display: flex;
+    flex-direction: column;
+    max-height: 200px;
+    overflow-y: scroll;
+}
+
+.filterOption {
+    margin: 2px;
+}
+
+.filterReset {
+    margin-left: 5px;
+    color: #888;
 }
 
 .createButton {

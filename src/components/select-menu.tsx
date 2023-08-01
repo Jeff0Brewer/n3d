@@ -78,11 +78,11 @@ const CreateMenu: FC<CreateMenuProps> = ({
 
     const getModeSetter = (mode: SelectionMode): (() => void) => {
         return (): void => {
+            if (mode !== 'sphere' || selectionMode !== 'sphere') {
+                setSphere(null)
+            }
             if (selectionMode === mode) {
                 setSelectionMode(null)
-                if (mode === 'sphere') {
-                    setSphere(null)
-                }
             } else {
                 setSelectionMode(mode)
             }
@@ -95,7 +95,7 @@ const CreateMenu: FC<CreateMenuProps> = ({
                 return <FilterSelect
                     data={data}
                     selectionCount={selectionCount}
-                    setSelection={addSelection}
+                    addSelection={addSelection}
                 />
             case 'sphere':
                 return <SphereSelect
@@ -141,13 +141,7 @@ const CreateMenu: FC<CreateMenuProps> = ({
                 </button>
             </span>
             { selectionMode !== null && <>
-                <div className={styles.createTypesMenu}>
-                    { renderSelectModeMenu(selectionMode) }
-                </div>
-                <button
-                    className={styles.createButton}
-                    onClick={addSelection}
-                >create</button>
+                { renderSelectModeMenu(selectionMode) }
             </>}
         </div>
     )
