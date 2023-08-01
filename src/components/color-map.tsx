@@ -1,15 +1,8 @@
 import { FC, useState, useEffect, useRef } from 'react'
-import { colorArrToGradient } from '../lib/color-map'
+import { colorArrToGradient, getColorField } from '../lib/color-map'
 import type { GalaxyData } from '../lib/data'
+import type { ColorField } from '../lib/color-map'
 import styles from '../styles/color-field.module.css'
-
-type ColorField = {
-    name: string,
-    min: number,
-    max: number,
-    currMin: number,
-    currMax: number
-}
 
 type ColorMapMenuProps = {
     data: GalaxyData,
@@ -37,20 +30,9 @@ const ColorMapMenu: FC<ColorMapMenuProps> = ({ data, colorField, setColorField }
 
     // get min / max for all fields, store results
     useEffect(() => {
-        const { headers, entries } = data
-        const colorFields: Array<ColorField> = COLOR_MAP_FIELDS.map((name: string) => {
-            const fieldInd = headers.numHeaders[name]
-            let min = Number.MAX_VALUE
-            let max = Number.MIN_VALUE
-            for (const entry of entries) {
-                const value = entry.numValues[fieldInd]
-                if (!Number.isNaN(value)) {
-                    min = Math.min(min, value)
-                    max = Math.max(max, value)
-                }
-            }
-            return { name, min, max, currMin: min, currMax: max }
-        })
+        const colorFields: Array<ColorField> = COLOR_MAP_FIELDS.map((name: string) =>
+            getColorField(data, name)
+        )
         setColorFields(colorFields)
     }, [data])
 
@@ -228,5 +210,4 @@ const COLOR_MAP_FIELDS = [
 ]
 
 export default ColorMapMenu
-export type { ColorField }
 export { COLOR_MAP_COLORS }

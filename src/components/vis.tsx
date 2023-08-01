@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, FC } from 'react'
 import type { GalaxyData } from '../lib/data'
-import type { ColorField } from '../components/color-map'
+import type { ColorField } from '../lib/color-map'
 import type { Selection } from '../components/select-menu'
 import type { Sphere } from '../vis/sphere-bounds'
 import type { Cone } from '../vis/cone-bounds'

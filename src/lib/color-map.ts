@@ -1,4 +1,5 @@
 import { vec3 } from 'gl-matrix'
+import type { GalaxyData } from '../lib/data'
 
 class ColorMap {
     colors: Array<vec3>
@@ -39,8 +40,38 @@ const colorArrToGradient = (colors: Array<string>): string => {
     return `linear-gradient(to right, ${inner})`
 }
 
-export default ColorMap
+type ColorField = {
+    name: string,
+    min: number,
+    max: number,
+    currMin: number,
+    currMax: number
+}
 
+const getColorField = (data: GalaxyData, field: string): ColorField => {
+    const { headers, entries } = data
+    const fieldInd = headers.numHeaders[field]
+    let min = Number.MAX_VALUE
+    let max = Number.MIN_VALUE
+    for (const entry of entries) {
+        const value = entry.numValues[fieldInd]
+        if (!Number.isNaN(value)) {
+            min = Math.min(min, value)
+            max = Math.max(max, value)
+        }
+    }
+    return {
+        name: field,
+        min,
+        max,
+        currMin: min,
+        currMax: max
+    }
+}
+
+export default ColorMap
+export type { ColorField }
 export {
-    colorArrToGradient
+    colorArrToGradient,
+    getColorField
 }
