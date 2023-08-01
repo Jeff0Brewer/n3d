@@ -23,7 +23,7 @@ const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField, selections
 
     const resetCamera = (): void => {
         if (visRef.current) {
-            visRef.current.resetCamera()
+            visRef.current.resetCamera(data)
             setSelected(null)
         }
     }
@@ -68,9 +68,9 @@ const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField, selections
 
     useEffect(() => {
         if (visRef.current) {
-            visRef.current.setSelected(selected)
+            visRef.current.setSelected(data, selected)
         }
-    }, [selected])
+    }, [data, selected])
 
     // color map on field change
     useEffect(() => {

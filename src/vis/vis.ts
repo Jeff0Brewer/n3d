@@ -43,9 +43,9 @@ class VisRenderer {
         this.highlight = new Highlight(this.gl, this.model, this.view, this.proj)
     }
 
-    resetCamera (): void {
+    resetCamera (data: GalaxyData): void {
         this.camera.reset()
-        this.setSelected(null)
+        this.setSelected(data, null)
     }
 
     colorMapField (data: GalaxyData, field: ColorField | null): void {
@@ -58,11 +58,11 @@ class VisRenderer {
         this.points.filterSelections(this.gl, selections)
     }
 
-    setSelected (ind: number | null): void {
+    setSelected (data: GalaxyData, ind: number | null): void {
         if (ind !== null) {
-            const pos = this.points.positions.slice(ind * 3, ind * 3 + 3)
-            this.highlight.setPositions(this.gl, pos)
+            const pos = data.entries[ind].position
             this.camera.setFocus(pos)
+            this.highlight.setPositions(this.gl, new Float32Array(pos))
         } else {
             this.highlight.setPositions(this.gl, new Float32Array(0))
         }
