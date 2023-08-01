@@ -13,9 +13,10 @@
 }
 
 .header {
-    font-size: 14px;
     padding: 10px;
     text-align: center;
+    text-transform: uppercase;
+    color: var(--text0);
 }
 
 .createMenu {
@@ -31,6 +32,7 @@
 .createTabs > button {
     width: 33.33%;
     height: 30px;
+    text-transform: lowercase;
 }
 
 .createTabs > button[data-active="false"] {

@@ -150,7 +150,10 @@ const FilterOption: FC<FilterOptionProps> = ({ label, option, values, setOption 
     return (
         <div className={styles.dropdown}>
             <span>
-                <a onClick={(): void => setOpen(!open)}>{label}</a>
+                <a
+                    className={styles.label}
+                    onClick={(): void => setOpen(!open)}
+                >{label}</a>
                 { option && <a
                     className={styles.reset}
                     onClick={clearField}

@@ -15,6 +15,10 @@
     display: flex;
 }
 
+.angleValue > p, .sphereRadius > p {
+    width: 50px;
+}
+
 .sphereCoords {
     display: flex;
 }
@@ -23,7 +27,7 @@
     margin-right: 10px;
 }
 
-.sphereRadius {
+.angleValue, .sphereRadius {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -31,5 +35,4 @@
 
 .angleValue > input, .sphereRadius > input {
     width: 150px;
-    margin-left: 10px;
 }
