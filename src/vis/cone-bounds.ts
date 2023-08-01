@@ -14,7 +14,7 @@ const CONE_LENGTH = 5
 const DEG_TO_RAD = Math.PI / 180
 
 const getConeVerts = (detail: number): Float32Array => {
-    const verts = new Float32Array(detail * 2 * POS_FPV)
+    const verts = new Float32Array((detail + 1) * 2 * POS_FPV)
     let ind = 0
     const setVert = (x: number, y: number, z: number): void => {
         verts[ind++] = x
