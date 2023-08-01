@@ -1,7 +1,7 @@
 import { mat4 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
-import vertSource from '../shaders/sphere-vert.glsl?raw'
-import fragSource from '../shaders/sphere-frag.glsl?raw'
+import vertSource from '../shaders/cone-vert.glsl?raw'
+import fragSource from '../shaders/bounds-frag.glsl?raw'
 
 type Cone = {
     lat: number,
