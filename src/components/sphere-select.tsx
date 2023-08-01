@@ -6,7 +6,7 @@ import type { Sphere } from '../vis/sphere-bounds'
 import styles from '../styles/select-modes.module.css'
 
 const DEFAULT_POSITION = vec3.fromValues(0, 0, 0)
-const DEFAULT_RADIUS = 1
+const DEFAULT_RADIUS = 0.25
 
 type SphereSelectProps = {
     data: GalaxyData,
