@@ -13,7 +13,7 @@ const GalaxyInfo: FC<GalaxyInfoProps> = ({ headers, entry }) => {
             { Object.entries(INFO_FIELDS).map(([key, field], i) => {
                 const strVal = entry.strValues[headers.strHeaders[field]]
                 const numVal = entry.numValues[headers.numHeaders[field]]
-                const value = strVal || numVal
+                const value = strVal || (!Number.isNaN(numVal) && numVal) || null
                 return (
                     <div className={value ? styles.wrap : styles.hidden} key={i}>
                         <p className={styles.label}>{key}</p>
