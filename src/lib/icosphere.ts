@@ -91,6 +91,5 @@ const getIcosphere = (iterations: number): Icosphere => {
     return { triangles: tris, vertices: vert }
 }
 
-export {
-    getIcosphere
-}
+export { getIcosphere }
+export type { Icosphere }

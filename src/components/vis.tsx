@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, FC } from 'react'
 import type { GalaxyData } from '../lib/data'
 import type { ColorField } from '../components/color-map'
 import type { Selection } from '../components/select-menu'
+import type { Sphere } from '../vis/sphere-bounds'
 import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 
@@ -10,10 +11,13 @@ type VisProps = {
     selected: number | null,
     setSelected: (ind: number | null) => void,
     colorField: ColorField | null,
-    selections: Array<Selection>
+    selections: Array<Selection>,
+    sphere: Sphere | null
 }
 
-const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField, selections }) => {
+const Vis: FC<VisProps> = ({
+    data, selected, setSelected, colorField, selections, sphere
+}) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
     const [selecting, setSelecting] = useState<boolean>(false)
@@ -85,6 +89,13 @@ const Vis: FC<VisProps> = ({ data, selected, setSelected, colorField, selections
             visRef.current.filterSelections(selections)
         }
     }, [selections])
+
+    // update sphere bounds in renderer on prop change
+    useEffect(() => {
+        if (visRef.current) {
+            visRef.current.setSphereBounds(sphere)
+        }
+    }, [sphere])
 
     // start draw loop
     useEffect(() => {

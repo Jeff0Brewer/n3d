@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react'
 import { loadData } from '../lib/data'
 import type { GalaxyData } from '../lib/data'
 import type { Selection } from '../components/select-menu'
+import type { Sphere } from '../vis/sphere-bounds'
 import GalaxyInfo from '../components/info'
 import ColorMapMenu, { ColorField } from '../components/color-map'
 import SelectMenu from '../components/select-menu'
@@ -12,6 +13,7 @@ const App: FC = () => {
     const [selected, setSelected] = useState <number | null>(null)
     const [selections, setSelections] = useState <Array<Selection>>([])
     const [colorField, setColorField] = useState<ColorField | null>(null)
+    const [sphere, setSphere] = useState<Sphere | null>(null)
 
     const getData = async (): Promise<void> => {
         const data = await loadData('./data/data.csv')
@@ -31,6 +33,8 @@ const App: FC = () => {
                 setSelections={setSelections}
                 selected={selected}
                 setSelected={setSelected}
+                sphere={sphere}
+                setSphere={setSphere}
             />
             <ColorMapMenu data={data} colorField={colorField} setColorField={setColorField} />
             { selected !== null &&
@@ -41,6 +45,7 @@ const App: FC = () => {
                 setSelected={setSelected}
                 colorField={colorField}
                 selections={selections}
+                sphere={sphere}
             />
         </main>
     )

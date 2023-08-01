@@ -4,6 +4,7 @@ import FilterSelect from '../components/filter-select'
 import SphereSelect from '../components/sphere-select'
 import ConeSelect from '../components/cone-select'
 import type { GalaxyData } from '../lib/data'
+import type { Sphere } from '../vis/sphere-bounds'
 import styles from '../styles/select-menu.module.css'
 
 type Selection = {
@@ -18,11 +19,12 @@ type SelectMenuProps = {
     selections: Array<Selection>,
     setSelections: (selections: Array<Selection>) => void,
     selected: number | null,
-    setSelected: (ind: number | null) => void
+    setSelected: (ind: number | null) => void,
+    setSphere: (sphere: Sphere | null) => void
 }
 
 const SelectMenu: FC<SelectMenuProps> = ({
-    data, selections, setSelections, selected, setSelected
+    data, selections, setSelections, selected, setSelected, setSphere
 }) => {
     const [displaySelection, setDisplaySelection] = useState<Selection | null>(null)
 
@@ -33,6 +35,7 @@ const SelectMenu: FC<SelectMenuProps> = ({
                 selected={selected}
                 selections={selections}
                 setSelections={setSelections}
+                setSphere={setSphere}
             />
             <ViewMenu
                 selections={selections}
@@ -57,9 +60,12 @@ type CreateMenuProps = {
     selected: number | null,
     selections: Array<Selection>,
     setSelections: (selections: Array<Selection>) => void,
+    setSphere: (sphere: Sphere | null) => void
 }
 
-const CreateMenu: FC<CreateMenuProps> = ({ data, selected, selections, setSelections }) => {
+const CreateMenu: FC<CreateMenuProps> = ({
+    data, selected, selections, setSelections, setSphere
+}) => {
     const [selectionMode, setSelectionMode] = useState<SelectionMode>(null)
     const [newSelection, setNewSelection] = useState<Selection | null>(null)
     const [selectionCount, setSelectionCount] = useState<number>(0)
@@ -70,6 +76,7 @@ const CreateMenu: FC<CreateMenuProps> = ({ data, selected, selections, setSelect
             setSelections([...selections, newSelection])
             setNewSelection(null)
             setSelectionMode(null)
+            setSphere(null)
         }
     }
 
@@ -77,6 +84,9 @@ const CreateMenu: FC<CreateMenuProps> = ({ data, selected, selections, setSelect
         return (): void => {
             if (selectionMode === mode) {
                 setSelectionMode(null)
+                if (mode === 'sphere') {
+                    setSphere(null)
+                }
             } else {
                 setSelectionMode(mode)
             }
@@ -97,6 +107,7 @@ const CreateMenu: FC<CreateMenuProps> = ({ data, selected, selections, setSelect
                     selected={selected}
                     selectionCount={selectionCount}
                     setSelection={setNewSelection}
+                    setSphere={setSphere}
                 />
             case 'cone':
                 return <ConeSelect
