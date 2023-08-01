@@ -37,7 +37,7 @@ const ConeSelect: FC<ConeSelectProps> = ({
 }) => {
     const [lat, setLat] = useState<number>(0)
     const [lng, setLng] = useState<number>(0)
-    const [arc, setArc] = useState<number>(20)
+    const [arc, setArc] = useState<number>(10)
     const latInputRef = useRef<HTMLInputElement>(null)
     const lngInputRef = useRef<HTMLInputElement>(null)
 
