@@ -46,7 +46,7 @@ const SphereSelect: FC<SphereSelectProps> = ({ data, selected, selectionCount, s
             }
         }
         setSelection({
-            name: `Selection ${selectionCount}`,
+            name: `Sphere ${selectionCount}`,
             key: selectionCount,
             visible: true,
             inds
