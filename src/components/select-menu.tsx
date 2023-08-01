@@ -78,19 +78,19 @@ const CreateMenu: FC<CreateMenuProps> = ({
         setSelections([...selections, selection])
         setSelectionMode(null)
         setSphere(null)
+        setCone(null)
     }
 
     const getModeSetter = (mode: SelectionMode): (() => void) => {
         return (): void => {
-            // clear sphere if toggling off sphere select mode
-            if (mode !== 'sphere' || selectionMode === mode) {
-                setSphere(null)
-            }
             if (selectionMode === mode) {
                 setSelectionMode(null)
             } else {
                 setSelectionMode(mode)
             }
+            // clear bounds if toggling off bound select mode
+            if (mode !== 'sphere' || selectionMode === mode) { setSphere(null) }
+            if (mode !== 'cone' || selectionMode === mode) { setCone(null) }
         }
     }
 
