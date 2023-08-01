@@ -109,6 +109,12 @@ class VisRenderer {
             this.gl.useProgram(this.highlight.program)
             this.highlight.setProjMatrix(this.proj)
             this.highlight.setDevicePixelRatio(window.devicePixelRatio)
+
+            this.gl.useProgram(this.sphereBounds.program)
+            this.sphereBounds.setProjMatrix(this.proj)
+
+            this.gl.useProgram(this.coneBounds.program)
+            this.coneBounds.setProjMatrix(this.proj)
         }
         window.addEventListener('resize', resize)
         return (): void => {
