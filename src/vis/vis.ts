@@ -32,7 +32,7 @@ class VisRenderer {
 
         this.model = mat4.create()
 
-        const eye = vec3.fromValues(7.0, 0.0, 0.0)
+        const eye = vec3.fromValues(0.0, 7.0, 0.0)
         const focus = vec3.fromValues(0, 0, 0)
         const up = vec3.fromValues(0, 0, 1)
         this.view = mat4.lookAt(mat4.create(), eye, focus, up)
