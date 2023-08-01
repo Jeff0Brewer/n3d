@@ -3,6 +3,7 @@ import type { GalaxyData } from '../lib/data'
 import type { ColorField } from '../components/color-map'
 import type { Selection } from '../components/select-menu'
 import type { Sphere } from '../vis/sphere-bounds'
+import type { Cone } from '../vis/cone-bounds'
 import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 
@@ -12,11 +13,12 @@ type VisProps = {
     setSelected: (ind: number | null) => void,
     colorField: ColorField | null,
     selections: Array<Selection>,
-    sphere: Sphere | null
+    sphere: Sphere | null,
+    cone: Cone | null
 }
 
 const Vis: FC<VisProps> = ({
-    data, selected, setSelected, colorField, selections, sphere
+    data, selected, setSelected, colorField, selections, sphere, cone
 }) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
@@ -96,6 +98,13 @@ const Vis: FC<VisProps> = ({
             visRef.current.setSphereBounds(sphere)
         }
     }, [sphere])
+
+    // update cone bounds in renderer on prop change
+    useEffect(() => {
+        if (visRef.current) {
+            visRef.current.setConeBounds(cone)
+        }
+    }, [cone])
 
     // start draw loop
     useEffect(() => {

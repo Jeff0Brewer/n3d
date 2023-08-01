@@ -5,6 +5,7 @@ import SphereSelect from '../components/sphere-select'
 import ConeSelect from '../components/cone-select'
 import type { GalaxyData } from '../lib/data'
 import type { Sphere } from '../vis/sphere-bounds'
+import type { Cone } from '../vis/cone-bounds'
 import styles from '../styles/select-menu.module.css'
 
 type Selection = {
@@ -20,11 +21,12 @@ type SelectMenuProps = {
     setSelections: (selections: Array<Selection>) => void,
     selected: number | null,
     setSelected: (ind: number | null) => void,
-    setSphere: (sphere: Sphere | null) => void
+    setSphere: (sphere: Sphere | null) => void,
+    setCone: (cone: Cone | null) => void
 }
 
 const SelectMenu: FC<SelectMenuProps> = ({
-    data, selections, setSelections, selected, setSelected, setSphere
+    data, selections, setSelections, selected, setSelected, setSphere, setCone
 }) => {
     const [displaySelection, setDisplaySelection] = useState<Selection | null>(null)
 
@@ -36,6 +38,7 @@ const SelectMenu: FC<SelectMenuProps> = ({
                 selections={selections}
                 setSelections={setSelections}
                 setSphere={setSphere}
+                setCone={setCone}
             />
             <ViewMenu
                 selections={selections}
@@ -60,11 +63,12 @@ type CreateMenuProps = {
     selected: number | null,
     selections: Array<Selection>,
     setSelections: (selections: Array<Selection>) => void,
-    setSphere: (sphere: Sphere | null) => void
+    setSphere: (sphere: Sphere | null) => void,
+    setCone: (cone: Cone | null) => void
 }
 
 const CreateMenu: FC<CreateMenuProps> = ({
-    data, selected, selections, setSelections, setSphere
+    data, selected, selections, setSelections, setSphere, setCone
 }) => {
     const [selectionMode, setSelectionMode] = useState<SelectionMode>(null)
     const [selectionCount, setSelectionCount] = useState<number>(0)
@@ -112,6 +116,7 @@ const CreateMenu: FC<CreateMenuProps> = ({
                     selected={selected}
                     selectionCount={selectionCount}
                     addSelection={addSelection}
+                    setCone={setCone}
                 />
             case null:
                 return <></>

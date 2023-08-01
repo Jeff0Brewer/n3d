@@ -5,10 +5,12 @@ import Camera from '../lib/camera'
 import Points from '../vis/points'
 import Highlight from '../vis/highlight'
 import SphereBounds from '../vis/sphere-bounds'
+import ConeBounds from '../vis/cone-bounds'
 import type { GalaxyData } from '../lib/data'
 import type { ColorField } from '../components/color-map'
 import type { Selection } from '../components/select-menu'
 import type { Sphere } from '../vis/sphere-bounds'
+import type { Cone } from '../vis/cone-bounds'
 
 const FOV = 1
 const NEAR = 0.1
@@ -23,6 +25,7 @@ class VisRenderer {
     points: Points
     highlight: Highlight
     sphereBounds: SphereBounds
+    coneBounds: ConeBounds
 
     constructor (canvas: HTMLCanvasElement, data: GalaxyData) {
         this.gl = initGl(canvas)
@@ -46,6 +49,7 @@ class VisRenderer {
         this.points = new Points(this.gl, this.model, this.view, this.proj, inv, data)
         this.highlight = new Highlight(this.gl, this.model, this.view, this.proj)
         this.sphereBounds = new SphereBounds(this.gl, this.model, this.view, this.proj)
+        this.coneBounds = new ConeBounds(this.gl, this.model, this.view, this.proj)
     }
 
     resetCamera (data: GalaxyData): void {
@@ -118,6 +122,10 @@ class VisRenderer {
         this.sphereBounds.updateSphere(this.gl, sphere)
     }
 
+    setConeBounds (cone: Cone | null): void {
+        this.coneBounds.updateCone(this.gl, cone)
+    }
+
     draw (): void {
         this.camera.update()
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
@@ -126,6 +134,7 @@ class VisRenderer {
         this.points.draw(this.gl, this.view, inv)
         this.highlight.draw(this.gl, this.view)
         this.sphereBounds.draw(this.gl, this.view)
+        this.coneBounds.draw(this.gl, this.view)
     }
 }
 
