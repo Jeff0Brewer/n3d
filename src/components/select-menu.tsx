@@ -67,17 +67,13 @@ const CreateMenu: FC<CreateMenuProps> = ({
     data, selected, selections, setSelections, setSphere
 }) => {
     const [selectionMode, setSelectionMode] = useState<SelectionMode>(null)
-    const [newSelection, setNewSelection] = useState<Selection | null>(null)
     const [selectionCount, setSelectionCount] = useState<number>(0)
 
-    const addSelection = (): void => {
-        if (newSelection) {
-            setSelectionCount(selectionCount + 1)
-            setSelections([...selections, newSelection])
-            setNewSelection(null)
-            setSelectionMode(null)
-            setSphere(null)
-        }
+    const addSelection = (selection: Selection): void => {
+        setSelectionCount(selectionCount + 1)
+        setSelections([...selections, selection])
+        setSelectionMode(null)
+        setSphere(null)
     }
 
     const getModeSetter = (mode: SelectionMode): (() => void) => {
@@ -99,14 +95,14 @@ const CreateMenu: FC<CreateMenuProps> = ({
                 return <FilterSelect
                     data={data}
                     selectionCount={selectionCount}
-                    setSelection={setNewSelection}
+                    setSelection={addSelection}
                 />
             case 'sphere':
                 return <SphereSelect
                     data={data}
                     selected={selected}
                     selectionCount={selectionCount}
-                    setSelection={setNewSelection}
+                    addSelection={addSelection}
                     setSphere={setSphere}
                 />
             case 'cone':
@@ -114,7 +110,7 @@ const CreateMenu: FC<CreateMenuProps> = ({
                     data={data}
                     selected={selected}
                     selectionCount={selectionCount}
-                    setSelection={setNewSelection}
+                    setSelection={addSelection}
                 />
             case null:
                 return <></>

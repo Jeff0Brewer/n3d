@@ -12,12 +12,12 @@ type SphereSelectProps = {
     data: GalaxyData,
     selected: number | null,
     selectionCount: number,
-    setSelection: (selection: Selection | null) => void,
+    addSelection: (selection: Selection) => void,
     setSphere: (sphere: Sphere | null) => void
 }
 
 const SphereSelect: FC<SphereSelectProps> = ({
-    data, selected, selectionCount, setSelection, setSphere
+    data, selected, selectionCount, addSelection, setSphere
 }) => {
     const [centerName, setCenterName] = useState<string | null>(null)
     const [center, setCenter] = useState<vec3>(DEFAULT_POSITION)
@@ -29,8 +29,8 @@ const SphereSelect: FC<SphereSelectProps> = ({
         setRadius(value)
     }
 
-    // update selection on change
-    useEffect(() => {
+    // calculate entries inside selection and add
+    const selectSphere = (): void => {
         const { entries } = data
         const inds = []
         for (let i = 0; i < entries.length; i++) {
@@ -39,13 +39,13 @@ const SphereSelect: FC<SphereSelectProps> = ({
                 inds.push(i)
             }
         }
-        setSelection({
+        addSelection({
             name: `Sphere ${selectionCount}`,
             key: selectionCount,
             visible: true,
             inds
         })
-    }, [data, center, radius, selectionCount, setSelection])
+    }
 
     // set sphere center to current selected galaxy position
     // or [0, 0, 0] if none selected
@@ -89,6 +89,10 @@ const SphereSelect: FC<SphereSelectProps> = ({
                     onChange={inputRadius}
                 />
             </div>
+            <button
+                className={styles.createButton}
+                onClick={selectSphere}
+            > create </button>
         </div>
     )
 }

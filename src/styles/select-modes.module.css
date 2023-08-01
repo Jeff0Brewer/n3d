@@ -36,3 +36,12 @@
 .angleValue > input, .sphereRadius > input {
     width: 150px;
 }
+
+.createButton {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: var(--create-button-height);
+    background-color: var(--color1);
+    border-top: var(--border);
+}

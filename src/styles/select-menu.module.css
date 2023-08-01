@@ -52,15 +52,6 @@
     padding-bottom: var(--create-button-height);
 }
 
-.createButton {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: var(--create-button-height);
-    background-color: var(--color1);
-    border-top: var(--border);
-}
-
 .viewMenu {
     min-width: 150px;
 }
