@@ -2,6 +2,7 @@ import React, { ReactElement, FC, useState } from 'react'
 import { FaEye, FaBan, FaCaretRight, FaCaretLeft } from 'react-icons/fa'
 import FilterSelect from '../components/filter-select'
 import SphereSelect from '../components/sphere-select'
+import ConeSelect from '../components/cone-select'
 import type { GalaxyData } from '../lib/data'
 import styles from '../styles/select-menu.module.css'
 
@@ -98,7 +99,12 @@ const CreateMenu: FC<CreateMenuProps> = ({ data, selected, selections, setSelect
                     setSelection={setNewSelection}
                 />
             case 'cone':
-                return <></>
+                return <ConeSelect
+                    data={data}
+                    selected={selected}
+                    selectionCount={selectionCount}
+                    setSelection={setNewSelection}
+                />
             case null:
                 return <></>
         }

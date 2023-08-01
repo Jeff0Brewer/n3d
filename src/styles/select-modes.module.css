@@ -1,5 +1,5 @@
 .wrap {
-    padding: 0 10px;
+    padding: 5px 10px 10px 10px;
 }
 
 .header {
@@ -7,8 +7,12 @@
     text-transform: uppercase;
 }
 
-.sphereCenter, .sphereRadius {
+.sphereCenter, .sphereRadius, .angleValue {
     color: var(--text0);
+}
+
+.angleValue {
+    display: flex;
 }
 
 .sphereCoords {
@@ -25,7 +29,7 @@
     justify-content: space-between;
 }
 
-.sphereRadius > input {
+.angleValue > input, .sphereRadius > input {
     width: 150px;
     margin-left: 10px;
 }
