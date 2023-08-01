@@ -10,7 +10,7 @@ type Cone = {
 }
 
 const POS_FPV = 3
-const CONE_LENGTH = 6
+const CONE_LENGTH = 5
 const DEG_TO_RAD = Math.PI / 180
 
 const getConeVerts = (detail: number): Float32Array => {
@@ -23,7 +23,8 @@ const getConeVerts = (detail: number): Float32Array => {
     }
 
     const angleInc = Math.PI * 2 / detail
-    for (let angle = 0; angle <= Math.PI * 2; angle += angleInc) {
+    const maxAngle = Math.PI * 2 + angleInc
+    for (let angle = 0; angle <= maxAngle; angle += angleInc) {
         // start at origin
         setVert(0, 0, 0)
         // go to circle in +y direction
@@ -93,7 +94,7 @@ class ConeBounds {
 
             const width = CONE_LENGTH * Math.tan(cone.arc * DEG_TO_RAD)
             const rotationX = cone.lat * DEG_TO_RAD
-            const rotationZ = cone.lng * DEG_TO_RAD
+            const rotationZ = -cone.lng * DEG_TO_RAD
             const rotation = mat4.create()
             mat4.rotateZ(rotation, rotation, rotationZ)
             mat4.rotateX(rotation, rotation, rotationX)
@@ -111,7 +112,7 @@ class ConeBounds {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
             this.bindAttrib()
             gl.depthMask(false)
-            gl.drawArrays(gl.TRIANGLES, 0, this.numVertex)
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.numVertex)
             gl.depthMask(true)
         }
     }
