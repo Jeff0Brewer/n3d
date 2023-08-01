@@ -1,0 +1,31 @@
+.wrap {
+    padding: 0 10px;
+}
+
+.header {
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+
+.sphereCenter, .sphereRadius {
+    color: var(--text0);
+}
+
+.sphereCoords {
+    display: flex;
+}
+
+.sphereCoords > * {
+    margin-right: 10px;
+}
+
+.sphereRadius {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sphereRadius > input {
+    width: 150px;
+    margin-left: 10px;
+}

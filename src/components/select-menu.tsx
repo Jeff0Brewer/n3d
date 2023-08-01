@@ -1,6 +1,7 @@
 import React, { ReactElement, FC, useState } from 'react'
 import { FaEye, FaBan, FaCaretRight, FaCaretLeft } from 'react-icons/fa'
 import FilterSelect from '../components/filter-select'
+import SphereSelect from '../components/sphere-select'
 import type { GalaxyData } from '../lib/data'
 import styles from '../styles/select-menu.module.css'
 
@@ -28,6 +29,7 @@ const SelectMenu: FC<SelectMenuProps> = ({
         <section className={styles.selectMenu}>
             <CreateMenu
                 data={data}
+                selected={selected}
                 selections={selections}
                 setSelections={setSelections}
             />
@@ -51,11 +53,12 @@ type SelectionMode = 'filter' | 'sphere' | 'cone' | null
 
 type CreateMenuProps = {
     data: GalaxyData,
+    selected: number | null,
     selections: Array<Selection>,
     setSelections: (selections: Array<Selection>) => void,
 }
 
-const CreateMenu: FC<CreateMenuProps> = ({ data, selections, setSelections }) => {
+const CreateMenu: FC<CreateMenuProps> = ({ data, selected, selections, setSelections }) => {
     const [selectionMode, setSelectionMode] = useState<SelectionMode>(null)
     const [newSelection, setNewSelection] = useState<Selection | null>(null)
     const [selectionCount, setSelectionCount] = useState<number>(0)
@@ -88,7 +91,12 @@ const CreateMenu: FC<CreateMenuProps> = ({ data, selections, setSelections }) =>
                     setSelection={setNewSelection}
                 />
             case 'sphere':
-                return <></>
+                return <SphereSelect
+                    data={data}
+                    selected={selected}
+                    selectionCount={selectionCount}
+                    setSelection={setNewSelection}
+                />
             case 'cone':
                 return <></>
             case null:
