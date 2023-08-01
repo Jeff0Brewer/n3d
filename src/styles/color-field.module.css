@@ -5,11 +5,11 @@
     bottom: 0;
     width: 180px;
     background-color: #111;
-    padding: 10px;
     font-size: 12px;
 }
 
 .label {
+    padding: 10px;
     display: block;
     text-transform: uppercase;
     color: var(--text0);
@@ -27,7 +27,7 @@
 
 .field, .selected {
     text-wrap: nowrap;
-    padding: 5px;
+    padding: 5px 10px;
 }
 
 .selected {
