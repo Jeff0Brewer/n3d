@@ -59,7 +59,7 @@ class VisRenderer {
     }
 
     setSelected (ind: number | null): void {
-        if (ind) {
+        if (ind !== null) {
             const pos = this.points.positions.slice(ind * 3, ind * 3 + 3)
             this.highlight.setPositions(this.gl, pos)
             this.camera.setFocus(pos)

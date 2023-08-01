@@ -33,7 +33,8 @@ const App: FC = () => {
                 setSelected={setSelected}
             />
             <ColorMapMenu data={data} colorField={colorField} setColorField={setColorField} />
-            { selected && <GalaxyInfo headers={data.headers} fields={data.entries[selected].strValues} /> }
+            { selected !== null &&
+                <GalaxyInfo headers={data.headers} fields={data.entries[selected].strValues} /> }
             <Vis
                 data={data}
                 selected={selected}
