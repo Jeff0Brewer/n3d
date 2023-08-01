@@ -13,8 +13,9 @@
 }
 
 .header {
+    display: flex;
+    justify-content: center;
     padding: 10px;
-    text-align: center;
     text-transform: uppercase;
     color: var(--text0);
 }
@@ -109,4 +110,13 @@
 
 .galaxyList > a[data-active="true"] {
     background-color: var(--color1);
+}
+
+.exportButton {
+    color: #fff;
+    margin-left: 10px;
+}
+
+.exportButton:hover {
+    opacity: 0.5;
 }

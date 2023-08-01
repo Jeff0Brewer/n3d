@@ -1,5 +1,6 @@
 import React, { ReactElement, FC, useState } from 'react'
-import { FaEye, FaBan, FaCaretRight, FaCaretLeft } from 'react-icons/fa'
+import { FaEye, FaBan, FaCaretRight, FaCaretLeft, FaFileDownload } from 'react-icons/fa'
+import { selectionsToText, downloadTxt } from '../lib/export'
 import FilterSelect from '../components/filter-select'
 import SphereSelect from '../components/sphere-select'
 import ConeSelect from '../components/cone-select'
@@ -41,6 +42,7 @@ const SelectMenu: FC<SelectMenuProps> = ({
                 setCone={setCone}
             />
             <ViewMenu
+                data={data}
                 selections={selections}
                 setSelections={setSelections}
                 displaySelection={displaySelection}
@@ -154,6 +156,7 @@ const CreateMenu: FC<CreateMenuProps> = ({
 }
 
 type ViewMenuProps = {
+    data: GalaxyData,
     selections: Array<Selection>,
     setSelections: (selections: Array<Selection>) => void,
     displaySelection: Selection | null,
@@ -161,7 +164,7 @@ type ViewMenuProps = {
 }
 
 const ViewMenu: FC<ViewMenuProps> = ({
-    selections, setSelections, displaySelection, setDisplaySelection
+    data, selections, setSelections, displaySelection, setDisplaySelection
 }) => {
     const setSelectionName = (ind: number): ((name: string) => void) => {
         return (name: string): void => {
@@ -188,10 +191,20 @@ const ViewMenu: FC<ViewMenuProps> = ({
         }
     }
 
+    const exportSelections = (): void => {
+        downloadTxt(selectionsToText(data, selections))
+    }
+
     if (selections.length === 0) { return <></> }
     return (
         <div className={styles.viewMenu}>
-            <p className={styles.header}>Selections</p>
+            <div className={styles.header}>
+                <p>Selections</p>
+                <a
+                    className={styles.exportButton}
+                    onClick={exportSelections}
+                ><FaFileDownload /></a>
+            </div>
             <div className={styles.selectionsList}>
                 { selections.map((selection, i) =>
                     <ViewItem
