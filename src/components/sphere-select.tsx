@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useRef } from 'react'
+import React, { FC, useState, useEffect } from 'react'
 import { vec3 } from 'gl-matrix'
 import type { GalaxyData } from '../lib/data'
 import type { Selection } from '../components/select-menu'
@@ -25,7 +25,7 @@ const SphereSelect: FC<SphereSelectProps> = ({ data, selected, selectionCount, s
     // set sphere center to current selected galaxy position
     // or [0, 0, 0] if none selected
     useEffect(() => {
-        if (selected) {
+        if (selected !== null) {
             const nameInd = data.headers.strHeaders['Object Name']
             setCenterName(data.entries[selected].strValues[nameInd])
             setCenter(data.entries[selected].position)
