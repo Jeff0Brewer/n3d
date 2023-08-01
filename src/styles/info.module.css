@@ -19,3 +19,9 @@
 .hidden {
     display: none;
 }
+
+.swatch {
+    width: 1em;
+    height: 1em;
+    margin-left: 5px;
+}

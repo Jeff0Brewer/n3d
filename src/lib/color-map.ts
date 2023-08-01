@@ -31,6 +31,15 @@ const colorHexToFloat = (hex: string): vec3 => {
     return color
 }
 
+const colorFloatToHex = (float: vec3): string => {
+    const [x, y, z] = float
+    const hex =
+        Math.round(x * 255).toString(16) +
+        Math.round(y * 255).toString(16) +
+        Math.round(z * 255).toString(16)
+    return hex
+}
+
 const colorArrToGradient = (colors: Array<string>): string => {
     let inner = ''
     for (const color of colors) {
@@ -73,5 +82,6 @@ export default ColorMap
 export type { ColorField }
 export {
     colorArrToGradient,
-    getColorField
+    getColorField,
+    colorFloatToHex
 }

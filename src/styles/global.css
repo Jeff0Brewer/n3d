@@ -37,3 +37,7 @@ input {
     font: inherit;
     color: inherit;
 }
+
+span {
+    display: flex;
+}
