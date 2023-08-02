@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react'
-import { loadData } from '../lib/data'
+import { loadDataset } from '../lib/data'
 import { getColorField } from '../lib/color-map'
-import type { GalaxyData } from '../lib/data'
+import type { GalaxyData, Landmark } from '../lib/data'
 import type { Selection } from '../components/select-menu'
 import type { ColorField } from '../lib/color-map'
 import type { Sphere } from '../vis/sphere-bounds'
@@ -12,7 +12,8 @@ import SelectMenu from '../components/select-menu'
 import Vis from '../components/vis'
 
 const App: FC = () => {
-    const [data, setData] = useState<GalaxyData | null>(null)
+    const [galaxyData, setGalaxyData] = useState<GalaxyData | null>(null)
+    const [landmarkData, setLandmarkData] = useState<Array<Landmark>>([])
     const [selected, setSelected] = useState <number | null>(null)
     const [selections, setSelections] = useState <Array<Selection>>([])
     const [colorField, setColorField] = useState<ColorField | null>(null)
@@ -20,22 +21,23 @@ const App: FC = () => {
     const [cone, setCone] = useState<Cone | null>(null)
 
     const getData = async (): Promise<void> => {
-        const data = await loadData('./data/data.csv')
-        setData(data)
+        const { galaxies, landmarks } = await loadDataset('./data/data.csv')
+        setGalaxyData(galaxies)
+        setLandmarkData(landmarks)
 
         // update default color field once data loaded
-        setColorField(getColorField(data, '2MASS  K_s_total'))
+        setColorField(getColorField(galaxies, '2MASS  K_s_total'))
     }
 
     useEffect(() => {
         getData()
     }, [])
 
-    if (!data) { return <></> }
+    if (!galaxyData) { return <></> }
     return (
         <main>
             <SelectMenu
-                data={data}
+                data={galaxyData}
                 selections={selections}
                 setSelections={setSelections}
                 selected={selected}
@@ -43,15 +45,20 @@ const App: FC = () => {
                 setSphere={setSphere}
                 setCone={setCone}
             />
-            <ColorMapMenu data={data} colorField={colorField} setColorField={setColorField} />
+            <ColorMapMenu
+                data={galaxyData}
+                colorField={colorField}
+                setColorField={setColorField}
+            />
             { selected !== null &&
                 <GalaxyInfo
-                    headers={data.headers}
-                    entry={data.entries[selected]}
+                    headers={galaxyData.headers}
+                    entry={galaxyData.entries[selected]}
                     colorField={colorField}
                 /> }
             <Vis
-                data={data}
+                galaxyData={galaxyData}
+                landmarkData={landmarkData}
                 selected={selected}
                 setSelected={setSelected}
                 colorField={colorField}

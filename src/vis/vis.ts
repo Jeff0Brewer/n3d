@@ -6,7 +6,7 @@ import Points from '../vis/points'
 import Highlight from '../vis/highlight'
 import SphereBounds from '../vis/sphere-bounds'
 import ConeBounds from '../vis/cone-bounds'
-import type { GalaxyData } from '../lib/data'
+import type { GalaxyData, Landmark } from '../lib/data'
 import type { ColorField } from '../lib/color-map'
 import type { Selection } from '../components/select-menu'
 import type { Sphere } from '../vis/sphere-bounds'
@@ -27,7 +27,11 @@ class VisRenderer {
     sphereBounds: SphereBounds
     coneBounds: ConeBounds
 
-    constructor (canvas: HTMLCanvasElement, data: GalaxyData) {
+    constructor (
+        canvas: HTMLCanvasElement,
+        galaxyData: GalaxyData,
+        landmarkData: Array<Landmark>
+    ) {
         this.gl = initGl(canvas)
         this.gl.enable(this.gl.DEPTH_TEST)
         this.gl.enable(this.gl.BLEND)
@@ -46,7 +50,7 @@ class VisRenderer {
         this.camera = new Camera(this.view, eye, focus, up)
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
-        this.points = new Points(this.gl, this.model, this.view, this.proj, inv, data)
+        this.points = new Points(this.gl, this.model, this.view, this.proj, inv, galaxyData)
         this.highlight = new Highlight(this.gl, this.model, this.view, this.proj)
         this.sphereBounds = new SphereBounds(this.gl, this.model, this.view, this.proj)
         this.coneBounds = new ConeBounds(this.gl, this.model, this.view, this.proj)

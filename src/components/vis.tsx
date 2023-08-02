@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, FC } from 'react'
-import type { GalaxyData } from '../lib/data'
+import type { GalaxyData, Landmark } from '../lib/data'
 import type { ColorField } from '../lib/color-map'
 import type { Selection } from '../components/select-menu'
 import type { Sphere } from '../vis/sphere-bounds'
@@ -8,7 +8,8 @@ import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 
 type VisProps = {
-    data: GalaxyData,
+    galaxyData: GalaxyData,
+    landmarkData: Array<Landmark>,
     selected: number | null,
     setSelected: (ind: number | null) => void,
     colorField: ColorField | null,
@@ -18,7 +19,8 @@ type VisProps = {
 }
 
 const Vis: FC<VisProps> = ({
-    data, selected, setSelected, colorField, selections, sphere, cone
+    galaxyData, landmarkData, selected, setSelected,
+    colorField, selections, sphere, cone
 }) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
@@ -29,7 +31,7 @@ const Vis: FC<VisProps> = ({
 
     const resetCamera = (): void => {
         if (visRef.current) {
-            visRef.current.resetCamera(data)
+            visRef.current.resetCamera(galaxyData)
             setSelected(null)
         }
     }
@@ -37,11 +39,11 @@ const Vis: FC<VisProps> = ({
     // init vis renderer
     useEffect(() => {
         if (canvasRef.current) {
-            visRef.current = new VisRenderer(canvasRef.current, data)
+            visRef.current = new VisRenderer(canvasRef.current, galaxyData, landmarkData)
             const removeHandlers = visRef.current.setupHandlers(canvasRef.current)
             return removeHandlers
         }
-    }, [data])
+    }, [galaxyData, landmarkData])
 
     // setup event handlers
     useEffect(() => {
@@ -70,20 +72,20 @@ const Vis: FC<VisProps> = ({
         if (selecting) {
             return visRef.current.setupSelectHandlers(canvasRef.current, setSelected)
         }
-    }, [selecting, data, setSelected])
+    }, [galaxyData, selecting, setSelected])
 
     useEffect(() => {
         if (visRef.current) {
-            visRef.current.setSelected(data, selected)
+            visRef.current.setSelected(galaxyData, selected)
         }
-    }, [data, selected])
+    }, [galaxyData, selected])
 
     // color map on field change
     useEffect(() => {
         if (visRef.current) {
-            visRef.current.colorMapField(data, colorField)
+            visRef.current.colorMapField(galaxyData, colorField)
         }
-    }, [data, colorField])
+    }, [galaxyData, colorField])
 
     // filter by selections
     useEffect(() => {

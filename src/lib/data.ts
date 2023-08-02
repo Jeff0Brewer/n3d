@@ -21,6 +21,17 @@ type GalaxyData = {
     entries: Array<GalaxyEntry>
 }
 
+type Landmark = {
+    name: string,
+    position: vec3,
+    radius: number
+}
+
+type Dataset = {
+    galaxies: GalaxyData,
+    landmarks: Array<Landmark>
+}
+
 type SelectMap = {
     [color: string]: number
 }
@@ -30,16 +41,49 @@ type SelectColors = {
     buffer: Uint8Array
 }
 
+const POS_SCALE = 0.012
+const DEG_TO_RAD = Math.PI / 180
+
 const csvParseConfig: ParseConfig = {
     transform: (value: string): string => value.trim()
 }
 
-const loadData = async (path: string): Promise<GalaxyData> => {
-    const res = await fetch(path)
-    const csvString = await res.text()
-    const { data } = Papa.parse(csvString, csvParseConfig)
+const parseLandmarkData = (data: Array<Array<string>>): Array<Landmark> => {
+    // get indices of required fields for access in loop
+    const headerRow = data[0]
+    const objTypeInd = headerRow.indexOf('Object Type')
+    const nameInd = headerRow.indexOf('Object Name')
+    const lngInd = headerRow.indexOf('LON')
+    const latInd = headerRow.indexOf('LAT')
+    const diameterInd = headerRow.indexOf('SDSS-DR6 r Isophotal 25.0 mag arcsec^-2 Major Diam')
+    const distInd = headerRow.indexOf('Metric Dist.')
 
-    // get header indices for number / string entry values
+    const landmarks: Array<Landmark> = []
+    data.filter(row => row[objTypeInd] === 'LM')
+        .forEach(row => {
+            const lng = parseFloat(row[lngInd]) * DEG_TO_RAD
+            const lat = parseFloat(row[latInd]) * DEG_TO_RAD
+            const dist = parseFloat(row[distInd]) * POS_SCALE
+            const position = vec3.fromValues(
+                dist * Math.sin(lng) * Math.cos(lat),
+                dist * Math.cos(lng) * Math.cos(lat),
+                dist * Math.sin(lat)
+            )
+            const diameter = parseFloat(row[diameterInd]) * POS_SCALE
+            const name = row[nameInd]
+            landmarks.push({
+                name,
+                position,
+                radius: diameter * 0.5
+            })
+        })
+
+    return landmarks
+}
+
+const parseGalaxyData = (data: Array<Array<string>>): GalaxyData => {
+    // get header indices for number / string values
+    // for indexing into galaxy entries
     const headerRow = data[0]
     const headers: GalaxyHeaders = {
         strHeaders: {},
@@ -48,15 +92,11 @@ const loadData = async (path: string): Promise<GalaxyData> => {
     let numInd = 0
     let strInd = 0
     for (let i = 0; i < headerRow.length; i++) {
-        if (entryStrInds.indexOf(i) === -1) {
-            headers.numHeaders[headerRow[i]] = numInd
-            numInd++
-        } else {
-            headers.strHeaders[headerRow[i]] = strInd
-            strInd++
-        }
+        entryStrInds.indexOf(i) === -1
+            ? headers.numHeaders[headerRow[i]] = numInd++
+            : headers.strHeaders[headerRow[i]] = strInd++
     }
-    // split csv data into string / number value arrays
+    // parse galaxy data into number / string arrays
     const entries: Array<GalaxyEntry> = []
     const objTypeInd = headerRow.indexOf('Object Type')
     data.filter(row => row[objTypeInd] === 'G')
@@ -67,18 +107,50 @@ const loadData = async (path: string): Promise<GalaxyData> => {
                 numValues: [],
                 position: vec3.create()
             })
+            // split csv data into string / number value arrays
             row.forEach((value: string, i: number) => {
                 entryStrInds.indexOf(i) === -1
                     ? entries[entryInd].numValues.push(parseFloat(value))
                     : entries[entryInd].strValues.push(value)
             })
         })
-
-    // calculate positions and update dataset
-    const galaxyData = { headers, entries }
-    calcPositions(galaxyData)
-
+    // calculate galaxy positions and update dataset
+    const galaxyData: GalaxyData = { headers, entries }
+    calcGalaxyPositions(galaxyData)
     return galaxyData
+}
+
+// calculate galaxy positions from lat / lng / redshift
+// modifies data object in place
+const calcGalaxyPositions = (data: GalaxyData): void => {
+    const { headers, entries } = data
+
+    // get indices of required fields for easy access in loop
+    const lngInd = headers.numHeaders.LON
+    const latInd = headers.numHeaders.LAT
+    const redInd = headers.numHeaders.Redshift
+    for (const entry of entries) {
+        const lng = entry.numValues[lngInd] * DEG_TO_RAD
+        const lat = entry.numValues[latInd] * DEG_TO_RAD
+        const red = entry.numValues[redInd]
+        const dist = POS_SCALE * red * 4222 // magic number from legacy source, investigate
+
+        vec3.copy(entry.position, [
+            dist * Math.sin(lng) * Math.cos(lat),
+            dist * Math.cos(lng) * Math.cos(lat),
+            dist * Math.sin(lat)
+        ])
+    }
+}
+
+const loadDataset = async (path: string): Promise<Dataset> => {
+    const res = await fetch(path)
+    const csvString = await res.text()
+    const { data } = Papa.parse(csvString, csvParseConfig)
+
+    const galaxies = parseGalaxyData(data)
+    const landmarks = parseLandmarkData(data)
+    return { galaxies, landmarks }
 }
 
 const getFieldSet = (data: GalaxyData, field: string): Array<string> => {
@@ -122,41 +194,16 @@ const getSelectColors = (data: GalaxyData): SelectColors => {
     return { map, buffer }
 }
 
-// calculate galaxy positions from lat / lng / redshift
-// modifies data object in place
-const calcPositions = (data: GalaxyData): void => {
-    const { headers, entries } = data
-    const DEG_TO_RAD = Math.PI / 180
-    const POS_SCALE = 0.012
-
-    // get indices of required fields for easy access in loop
-    const lngInd = headers.numHeaders.LON
-    const latInd = headers.numHeaders.LAT
-    const redInd = headers.numHeaders.Redshift
-    for (const entry of entries) {
-        const lng = entry.numValues[lngInd] * DEG_TO_RAD
-        const lat = entry.numValues[latInd] * DEG_TO_RAD
-        const red = entry.numValues[redInd]
-
-        const dist = POS_SCALE * red * 4222 // magic number from legacy source, investigate
-
-        vec3.copy(entry.position, [
-            dist * Math.sin(lng) * Math.cos(lat),
-            dist * Math.cos(lng) * Math.cos(lat),
-            dist * Math.sin(lat)
-        ])
-    }
-}
-
 export {
-    loadData,
+    loadDataset,
     getSelectColors,
     getFieldSet
 }
 
 export type {
-    GalaxyData,
-    SelectMap,
     GalaxyHeaders,
-    GalaxyEntry
+    GalaxyEntry,
+    GalaxyData,
+    Landmark,
+    SelectMap
 }
