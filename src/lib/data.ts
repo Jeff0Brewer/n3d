@@ -5,20 +5,20 @@ import type { ParseConfig } from 'papaparse'
 // helper info for parsing csv with string / number fields
 const entryStrInds = [0, 1, 2, 5, 7, 8, 9, 10]
 
-type DataHeaders = {
+type GalaxyHeaders = {
     strHeaders: { [name: string]: number },
     numHeaders: { [name: string]: number }
 }
 
-type DataEntry = {
+type GalaxyEntry = {
     strValues: Array<string>,
     numValues: Array<number>,
     position: vec3
 }
 
 type GalaxyData = {
-    headers: DataHeaders,
-    entries: Array<DataEntry>
+    headers: GalaxyHeaders,
+    entries: Array<GalaxyEntry>
 }
 
 type SelectMap = {
@@ -41,7 +41,7 @@ const loadData = async (path: string): Promise<GalaxyData> => {
 
     // get header indices for number / string entry values
     const headerRow = data[0]
-    const headers: DataHeaders = {
+    const headers: GalaxyHeaders = {
         strHeaders: {},
         numHeaders: {}
     }
@@ -57,7 +57,7 @@ const loadData = async (path: string): Promise<GalaxyData> => {
         }
     }
     // split csv data into string / number value arrays
-    const entries: Array<DataEntry> = []
+    const entries: Array<GalaxyEntry> = []
     const objTypeInd = headerRow.indexOf('Object Type')
     data.filter(row => row[objTypeInd] === 'G')
         .forEach(row => {
@@ -157,6 +157,6 @@ export {
 export type {
     GalaxyData,
     SelectMap,
-    DataHeaders,
-    DataEntry
+    GalaxyHeaders,
+    GalaxyEntry
 }
