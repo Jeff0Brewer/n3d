@@ -1,13 +1,16 @@
 attribute vec3 position;
-attribute vec3 normal;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
+uniform vec3 center;
+uniform float radius;
 
 varying vec3 vNormal;
 
 void main() {
-    gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-    vNormal = normal;
+    vec4 pos = vec4(position * radius + center, 1.0);
+    gl_Position = projMatrix * viewMatrix * modelMatrix * pos;
+    // position already normalized, don't need normal attrib
+    vNormal = position;
 }

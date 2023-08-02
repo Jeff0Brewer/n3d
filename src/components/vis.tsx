@@ -39,11 +39,11 @@ const Vis: FC<VisProps> = ({
     // init vis renderer
     useEffect(() => {
         if (canvasRef.current) {
-            visRef.current = new VisRenderer(canvasRef.current, galaxyData, landmarkData)
+            visRef.current = new VisRenderer(canvasRef.current, galaxyData)
             const removeHandlers = visRef.current.setupHandlers(canvasRef.current)
             return removeHandlers
         }
-    }, [galaxyData, landmarkData])
+    }, [galaxyData])
 
     // setup event handlers
     useEffect(() => {
@@ -112,14 +112,14 @@ const Vis: FC<VisProps> = ({
     useEffect(() => {
         const draw = (): void => {
             if (!visRef.current) { return }
-            visRef.current.draw()
+            visRef.current.draw(landmarkData)
             frameIdRef.current = window.requestAnimationFrame(draw)
         }
         frameIdRef.current = window.requestAnimationFrame(draw)
         return (): void => {
             window.cancelAnimationFrame(frameIdRef.current)
         }
-    }, [])
+    }, [landmarkData])
 
     return (
         <div>

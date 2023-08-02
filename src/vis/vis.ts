@@ -31,8 +31,7 @@ class VisRenderer {
 
     constructor (
         canvas: HTMLCanvasElement,
-        galaxyData: GalaxyData,
-        landmarkData: Array<Landmark>
+        galaxyData: GalaxyData
     ) {
         this.gl = initGl(canvas)
         this.gl.enable(this.gl.DEPTH_TEST)
@@ -53,7 +52,7 @@ class VisRenderer {
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
         this.points = new Points(this.gl, this.model, this.view, this.proj, inv, galaxyData)
-        this.landmarks = new LandmarkSpheres(this.gl, this.model, this.view, this.proj, landmarkData)
+        this.landmarks = new LandmarkSpheres(this.gl, this.model, this.view, this.proj)
         this.highlight = new Highlight(this.gl, this.model, this.view, this.proj)
         this.sphereBounds = new SphereBounds(this.gl, this.model, this.view, this.proj)
         this.coneBounds = new ConeBounds(this.gl, this.model, this.view, this.proj)
@@ -139,14 +138,14 @@ class VisRenderer {
         this.coneBounds.updateCone(this.gl, cone)
     }
 
-    draw (): void {
+    draw (landmarks: Array<Landmark>): void {
         this.camera.update()
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
         this.points.draw(this.gl, this.view, inv)
         this.highlight.draw(this.gl, this.view)
-        this.landmarks.draw(this.gl, this.view)
+        this.landmarks.draw(this.gl, this.view, landmarks, this.camera.eye)
         this.sphereBounds.draw(this.gl, this.view)
         this.coneBounds.draw(this.gl, this.view)
     }
