@@ -4,21 +4,6 @@ import type { Landmark } from '../lib/data'
 import vertSource from '../shaders/landmark-label-vert.glsl?raw'
 import fragSource from '../shaders/landmark-label-frag.glsl?raw'
 
-const getLabelVerts = (width: number, height: number): Float32Array => {
-    const x = width * 0.5
-    const y = height * 0.5
-    return new Float32Array([
-        -x, -y,
-        0, 0,
-        -x, y,
-        0, 1,
-        x, -y,
-        1, 0,
-        x, y,
-        1, 1
-    ])
-}
-
 const POS_FPV = 2
 const TEX_FPV = 2
 
@@ -121,6 +106,23 @@ class LandmarkLabels {
         }
         gl.depthMask(true)
     }
+}
+
+const getLabelVerts = (width: number, height: number): Float32Array => {
+    const x = width * 0.5
+    const y = height * 0.5
+    // invert y tex coordinate to line up with
+    // image data from canvas rendering
+    return new Float32Array([
+        -x, -y,
+        0, 1,
+        -x, y,
+        0, 0,
+        x, -y,
+        1, 1,
+        x, y,
+        1, 0
+    ])
 }
 
 class TextRenderer {
