@@ -40,11 +40,11 @@ const Vis: FC<VisProps> = ({
     // init vis renderer
     useEffect(() => {
         if (canvasRef.current) {
-            visRef.current = new VisRenderer(canvasRef.current, galaxyData)
+            visRef.current = new VisRenderer(canvasRef.current, galaxyData, landmarkData)
             const removeHandlers = visRef.current.setupHandlers(canvasRef.current)
             return removeHandlers
         }
-    }, [galaxyData])
+    }, [galaxyData, landmarkData])
 
     // setup event handlers
     useEffect(() => {
