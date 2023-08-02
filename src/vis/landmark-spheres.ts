@@ -26,6 +26,7 @@ class LandmarkSpheres {
     ) {
         this.program = initProgram(gl, vertSource, fragSource)
 
+        // single icosphere in buffer since drawing landmarks individually
         const ico = getIcosphere(3)
         const verts = icosphereToVerts(ico)
         this.buffer = initBuffer(gl)
@@ -68,11 +69,13 @@ class LandmarkSpheres {
             const bDist = vec3.len(vec3.sub(vec3.create(), b.position, eye))
             return bDist - aDist
         }
-        landmarks.sort(compareDist)
+        // copy landmarks arr to prevent mutation in sort
+        const sorted = [...landmarks]
+        sorted.sort(compareDist)
 
         // cull face to prevent depth issues due to triangle order
         gl.enable(gl.CULL_FACE)
-        for (const landmark of landmarks) {
+        for (const landmark of sorted) {
             this.setCenter(landmark.position)
             this.setRadius(landmark.radius)
             gl.drawArrays(gl.TRIANGLES, 0, this.numVertex)
