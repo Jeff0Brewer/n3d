@@ -78,7 +78,11 @@ class LandmarkSpheres {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
         this.bindAttrib()
         this.setViewMatrix(view)
+
+        // cull face to prevent depth issues due to triangle order
+        gl.enable(gl.CULL_FACE)
         gl.drawArrays(gl.TRIANGLES, 0, this.numVertex)
+        gl.disable(gl.CULL_FACE)
     }
 }
 
