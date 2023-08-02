@@ -1,29 +1,14 @@
 import { mat4, vec3 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
-import { getIcosphere } from '../lib/icosphere'
-import type { Icosphere } from '../lib/icosphere'
+import { getIcosphere, icosphereToVerts } from '../lib/icosphere'
 import vertSource from '../shaders/sphere-vert.glsl?raw'
 import fragSource from '../shaders/bounds-frag.glsl?raw'
+
+const POS_FPV = 3
 
 type Sphere = {
     center: vec3,
     radius: number
-}
-
-const POS_FPV = 3
-
-const icosphereToVerts = (ico: Icosphere): Float32Array => {
-    const verts = new Float32Array(ico.triangles.length * 3 * POS_FPV)
-    let ind = 0
-    for (let ti = 0; ti < ico.triangles.length; ti++) {
-        for (let vi = 0; vi < 3; vi++) {
-            const [x, y, z] = ico.vertices[ico.triangles[ti][vi]]
-            verts[ind++] = x
-            verts[ind++] = y
-            verts[ind++] = z
-        }
-    }
-    return verts
 }
 
 class SphereBounds {

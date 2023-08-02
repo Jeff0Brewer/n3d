@@ -91,5 +91,22 @@ const getIcosphere = (iterations: number): Icosphere => {
     return { triangles: tris, vertices: vert }
 }
 
-export { getIcosphere }
+const icosphereToVerts = (ico: Icosphere): Float32Array => {
+    const verts = new Float32Array(ico.triangles.length * 3 * 3)
+    let ind = 0
+    for (let ti = 0; ti < ico.triangles.length; ti++) {
+        for (let vi = 0; vi < 3; vi++) {
+            const [x, y, z] = ico.vertices[ico.triangles[ti][vi]]
+            verts[ind++] = x
+            verts[ind++] = y
+            verts[ind++] = z
+        }
+    }
+    return verts
+}
+
+export {
+    getIcosphere,
+    icosphereToVerts
+}
 export type { Icosphere }
