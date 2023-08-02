@@ -28,6 +28,7 @@ class VisRenderer {
     highlight: Highlight
     sphereBounds: SphereBounds
     coneBounds: ConeBounds
+    drawLandmarks: boolean
 
     constructor (
         canvas: HTMLCanvasElement,
@@ -56,11 +57,17 @@ class VisRenderer {
         this.highlight = new Highlight(this.gl, this.model, this.view, this.proj)
         this.sphereBounds = new SphereBounds(this.gl, this.model, this.view, this.proj)
         this.coneBounds = new ConeBounds(this.gl, this.model, this.view, this.proj)
+
+        this.drawLandmarks = true
     }
 
     resetCamera (data: GalaxyData): void {
         this.camera.reset()
         this.setSelected(data, null)
+    }
+
+    setDrawLandmarks (draw: boolean): void {
+        this.drawLandmarks = draw
     }
 
     colorMapField (data: GalaxyData, field: ColorField | null): void {
@@ -145,7 +152,11 @@ class VisRenderer {
         const inv = getInvMatrix([this.proj, this.view, this.model])
         this.points.draw(this.gl, this.view, inv)
         this.highlight.draw(this.gl, this.view)
-        this.landmarks.draw(this.gl, this.view, landmarks, this.camera.eye)
+
+        if (this.drawLandmarks) {
+            this.landmarks.draw(this.gl, this.view, landmarks, this.camera.eye)
+        }
+
         this.sphereBounds.draw(this.gl, this.view)
         this.coneBounds.draw(this.gl, this.view)
     }

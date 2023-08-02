@@ -6,12 +6,16 @@
     right: 0;
 }
 
-.resetCamera {
+.controls {
     position: absolute;
     right: 0;
     top: 0;
     font-size: 12px;
+}
+
+.controls > * {
     padding: 10px;
+    margin-left: 5px;
     background-color: #111;
     color: var(--text0);
     text-transform: uppercase;

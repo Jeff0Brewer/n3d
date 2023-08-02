@@ -25,6 +25,7 @@ const Vis: FC<VisProps> = ({
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
     const [selecting, setSelecting] = useState<boolean>(false)
+    const [drawLandmarks, setDrawLandmarks] = useState<boolean>(true)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const frameIdRef = useRef<number>(-1)
     const visRef = useRef<VisRenderer | null>(null)
@@ -108,6 +109,13 @@ const Vis: FC<VisProps> = ({
         }
     }, [cone])
 
+    // update landmark draw state in renderer on state change
+    useEffect(() => {
+        if (visRef.current) {
+            visRef.current.setDrawLandmarks(drawLandmarks)
+        }
+    }, [drawLandmarks])
+
     // start draw loop
     useEffect(() => {
         const draw = (): void => {
@@ -130,9 +138,16 @@ const Vis: FC<VisProps> = ({
                 height={height * window.devicePixelRatio}
                 style={{ width: `${width}px`, height: `${height}px` }}
             />
-            <a className={styles.resetCamera} onClick={resetCamera}>
-                reset camera
-            </a>
+            <span className={styles.controls}>
+                <button onClick={(): void => setDrawLandmarks(!drawLandmarks)}>
+                    { drawLandmarks
+                        ? 'hide landmarks'
+                        : 'draw landmarks'}
+                </button>
+                <button onClick={resetCamera}>
+                    reset camera
+                </button>
+            </span>
         </div>
     )
 }
