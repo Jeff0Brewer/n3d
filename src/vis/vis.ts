@@ -3,7 +3,7 @@ import { initGl } from '../lib/gl-wrap'
 import { getInvMatrix } from '../lib/unproject'
 import Camera from '../lib/camera'
 import Points from '../vis/points'
-import LandmarkSpheres from '../vis/landmarks'
+import Landmarks from '../vis/landmarks'
 import Highlight from '../vis/highlight'
 import SphereBounds from '../vis/sphere-bounds'
 import ConeBounds from '../vis/cone-bounds'
@@ -24,7 +24,7 @@ class VisRenderer {
     proj: mat4
     camera: Camera
     points: Points
-    landmarks: LandmarkSpheres
+    landmarks: Landmarks
     highlight: Highlight
     sphereBounds: SphereBounds
     coneBounds: ConeBounds
@@ -53,7 +53,7 @@ class VisRenderer {
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
         this.points = new Points(this.gl, this.model, this.view, this.proj, inv, galaxyData)
-        this.landmarks = new LandmarkSpheres(this.gl, this.model, this.view, this.proj)
+        this.landmarks = new Landmarks(this.gl, this.model, this.view, this.proj)
         this.highlight = new Highlight(this.gl, this.model, this.view, this.proj)
         this.sphereBounds = new SphereBounds(this.gl, this.model, this.view, this.proj)
         this.coneBounds = new ConeBounds(this.gl, this.model, this.view, this.proj)
@@ -122,6 +122,9 @@ class VisRenderer {
             this.gl.useProgram(this.highlight.program)
             this.highlight.setProjMatrix(this.proj)
             this.highlight.setDevicePixelRatio(window.devicePixelRatio)
+
+            this.gl.useProgram(this.landmarks.spheres.program)
+            this.landmarks.spheres.setProjMatrix(this.proj)
 
             this.gl.useProgram(this.sphereBounds.program)
             this.sphereBounds.setProjMatrix(this.proj)
