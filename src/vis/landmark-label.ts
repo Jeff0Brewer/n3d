@@ -32,6 +32,7 @@ class LandmarkLabels {
     ) {
         this.program = initProgram(gl, vertSource, fragSource)
 
+        // get textures for each label
         const textRenderer = new TextRenderer(TEXT_WIDTH, TEXT_HEIGHT)
         this.textures = []
         for (const { name } of landmarks) {
@@ -92,6 +93,7 @@ class LandmarkLabels {
         this.bindAttrib()
         this.setViewMatrix(view)
 
+        // disable depth mask to prevent occlusion from transparent background
         gl.depthMask(false)
         const rotationQuat = quat.create()
         const rotation = mat4.create()
