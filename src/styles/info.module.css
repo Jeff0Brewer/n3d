@@ -25,3 +25,8 @@
     height: 1em;
     margin-left: 5px;
 }
+
+.nameLink {
+    text-decoration: none;
+    color: #eef;
+}

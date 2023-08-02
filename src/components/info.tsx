@@ -11,23 +11,38 @@ type GalaxyInfoProps = {
     colorField: ColorField | null
 }
 
+const galaxyNameToIpacLink = (name: string): string => {
+    const linkName = name.replace('+', '%2B').replace(' ', '+')
+    return `https://ned.ipac.caltech.edu/byname?objname=${linkName}`
+}
+
 const GalaxyInfo: FC<GalaxyInfoProps> = ({ headers, entry, colorField }) => {
     const colorMapRef = useRef<ColorMap>(new ColorMap(COLOR_MAP_COLORS))
 
     let color = 'transparent'
     if (colorField) {
         const value = entry.numValues[headers.numHeaders[colorField.name]]
-        const { currMin: min, currMax: max } = colorField
-        const per = (value - min) / (max - min)
-        color = colorFloatToHex(colorMapRef.current.map(per))
+        if (value) {
+            const { currMin: min, currMax: max } = colorField
+            const per = (value - min) / (max - min)
+            color = colorFloatToHex(colorMapRef.current.map(per))
+        }
     }
+
+    const name = entry.strValues[headers.strHeaders['Object Name']]
 
     return (
         <div className={styles.info}>
             <div className={styles.wrap}>
                 <p className={styles.label}>name</p>
                 <span>
-                    <p>{entry.strValues[headers.strHeaders['Object Name']]}</p>
+                    <a
+                        className={styles.nameLink}
+                        href={galaxyNameToIpacLink(name)}
+                        target={'_blank'}
+                    >
+                        {name}
+                    </a>
                     <div
                         className={styles.swatch}
                         style={{ backgroundColor: `#${color}` }}
