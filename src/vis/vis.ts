@@ -14,7 +14,7 @@ import type { Sphere } from '../vis/sphere-bounds'
 import type { Cone } from '../vis/cone-bounds'
 
 const FOV = 1
-const NEAR = 0.1
+const NEAR = 0.01
 const FAR = 50
 
 class VisRenderer {
