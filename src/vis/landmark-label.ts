@@ -128,7 +128,6 @@ const getLabelVerts = (): Float32Array => {
     ])
 }
 
-const FONT_SIZE = 50
 class TextRenderer {
     ctx: CanvasRenderingContext2D
     width: number
@@ -143,7 +142,6 @@ class TextRenderer {
         if (!ctx) {
             throw new Error('Failed to get offscreen drawing context')
         }
-        ctx.font = `${FONT_SIZE}px sans-serif`
         ctx.textAlign = 'center'
         ctx.fillStyle = '#fff'
 
@@ -154,6 +152,14 @@ class TextRenderer {
 
     getTextImage (text: string): Uint8ClampedArray {
         this.ctx.clearRect(0, 0, this.width, this.height)
+
+        // fit font size to fill canvas width
+        let fontSize = 300
+        do {
+            fontSize -= 5
+            this.ctx.font = `${fontSize}px sans-serif`
+        } while (this.ctx.measureText(text).width > this.width)
+
         this.ctx.fillText(text, this.width * 0.5, this.height * 0.5, this.width)
         return this.ctx.getImageData(0, 0, this.width, this.height).data
     }
