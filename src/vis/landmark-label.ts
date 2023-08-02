@@ -9,7 +9,6 @@ const TEX_FPV = 2
 
 const TEXT_WIDTH = 800
 const TEXT_HEIGHT = 200
-const RENDERED_SIZE = 0.5
 
 class LandmarkLabels {
     program: WebGLProgram
@@ -21,6 +20,7 @@ class LandmarkLabels {
     setProjMatrix: (mat: mat4) => void
     setRotation: (mat: mat4) => void
     setCenter: (center: vec3) => void
+    setSize: (width: number) => void
     numVertex: number
 
     constructor (
@@ -50,8 +50,7 @@ class LandmarkLabels {
             )
         }
 
-        const aspect = TEXT_WIDTH / TEXT_HEIGHT
-        const verts = getLabelVerts(RENDERED_SIZE * aspect, RENDERED_SIZE)
+        const verts = getLabelVerts()
         this.buffer = initBuffer(gl)
         gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW)
         this.numVertex = verts.length / (POS_FPV + TEX_FPV)
@@ -70,6 +69,7 @@ class LandmarkLabels {
         const uProjMatrix = gl.getUniformLocation(this.program, 'projMatrix')
         const uRotation = gl.getUniformLocation(this.program, 'rotation')
         const uCenter = gl.getUniformLocation(this.program, 'center')
+        const uSize = gl.getUniformLocation(this.program, 'size')
 
         // init mvp uniforms
         gl.uniformMatrix4fv(uModelMatrix, false, model)
@@ -82,6 +82,8 @@ class LandmarkLabels {
         this.setProjMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uProjMatrix, false, mat) }
         this.setRotation = (mat: mat4): void => { gl.uniformMatrix4fv(uRotation, false, mat) }
         this.setCenter = (center: vec3): void => { gl.uniform3fv(uCenter, center) }
+        const aspect = TEXT_HEIGHT / TEXT_WIDTH
+        this.setSize = (width: number): void => { gl.uniform2f(uSize, width, width * aspect) }
     }
 
     draw (gl: WebGLRenderingContext, view: mat4, landmarks: Array<Landmark>): void {
@@ -98,9 +100,10 @@ class LandmarkLabels {
             quat.invert(rotationQuat, rotationQuat)
             quat.normalize(rotationQuat, rotationQuat)
             mat4.fromQuat(rotation, rotationQuat)
-            this.setRotation(rotation)
 
+            this.setRotation(rotation)
             this.setCenter(landmarks[i].position)
+            this.setSize(landmarks[i].radius * 2)
             gl.bindTexture(gl.TEXTURE_2D, this.textures[i])
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.numVertex)
         }
@@ -108,9 +111,9 @@ class LandmarkLabels {
     }
 }
 
-const getLabelVerts = (width: number, height: number): Float32Array => {
-    const x = width * 0.5
-    const y = height * 0.5
+const getLabelVerts = (): Float32Array => {
+    const x = 0.5
+    const y = 0.5
     // invert y tex coordinate to line up with
     // image data from canvas rendering
     return new Float32Array([
@@ -125,6 +128,7 @@ const getLabelVerts = (width: number, height: number): Float32Array => {
     ])
 }
 
+const FONT_SIZE = 50
 class TextRenderer {
     ctx: CanvasRenderingContext2D
     width: number
@@ -139,7 +143,7 @@ class TextRenderer {
         if (!ctx) {
             throw new Error('Failed to get offscreen drawing context')
         }
-        ctx.font = '50px sans-serif'
+        ctx.font = `${FONT_SIZE}px sans-serif`
         ctx.textAlign = 'center'
         ctx.fillStyle = '#fff'
 
