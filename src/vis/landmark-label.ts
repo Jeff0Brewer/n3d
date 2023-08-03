@@ -8,7 +8,7 @@ const POS_FPV = 2
 const TEX_FPV = 2
 
 const TEXT_WIDTH = 800
-const TEXT_HEIGHT = 200
+const TEXT_HEIGHT = 300
 
 class LandmarkLabels {
     program: WebGLProgram
