@@ -21,8 +21,8 @@ float distLinePoint(vec3 line0, vec3 line1, vec3 point) {
 void main() {
     gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
     gl_PointSize = visibility * (6.0 * devicePixelRatio) / gl_Position.w;
-    vVisibility = visibility;
     vColor = color / 255.0;
+    vVisibility = visibility;
 
     if (selecting == 0) { return; }
 
@@ -38,6 +38,7 @@ void main() {
 
     if (mouseDist < mouseRange) {
         vColor = selectColor / 255.0;
+        vVisibility = 1.0; // show hidden points when selecting
         gl_PointSize = gl_PointSize + 5.0 * (1.0 - (mouseDist / mouseRange));
     }
 }
