@@ -166,11 +166,11 @@ class VisRenderer {
             this.highlight.draw(this.gl, this.view)
         }
 
+        this.sphereBounds.draw(this.gl, this.view)
+        this.coneBounds.draw(this.gl, this.view)
         if (this.drawLandmarks) {
             this.landmarks.draw(this.gl, this.view, landmarks, this.camera.eye)
         }
-        this.sphereBounds.draw(this.gl, this.view)
-        this.coneBounds.draw(this.gl, this.view)
 
         if (this.selecting) {
             // draw points on top when selecting

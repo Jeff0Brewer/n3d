@@ -83,9 +83,11 @@ class SphereBounds {
             this.bindAttrib()
 
             // cull face to prevent depth issues due to triangle order
+            gl.depthMask(false)
             gl.enable(gl.CULL_FACE)
             gl.drawArrays(gl.TRIANGLES, 0, this.numVertex)
             gl.disable(gl.CULL_FACE)
+            gl.depthMask(true)
         }
     }
 }
