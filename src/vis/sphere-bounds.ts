@@ -2,7 +2,7 @@ import { mat4, vec3 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getIcosphere, icosphereToVerts } from '../lib/icosphere'
 import vertSource from '../shaders/sphere-vert.glsl?raw'
-import fragSource from '../shaders/bounds-frag.glsl?raw'
+import fragSource from '../shaders/sphere-frag.glsl?raw'
 
 const POS_FPV = 3
 
@@ -81,9 +81,11 @@ class SphereBounds {
             this.setViewMatrix(view)
             gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
             this.bindAttrib()
-            gl.depthMask(false)
+
+            // cull face to prevent depth issues due to triangle order
+            gl.enable(gl.CULL_FACE)
             gl.drawArrays(gl.TRIANGLES, 0, this.numVertex)
-            gl.depthMask(true)
+            gl.disable(gl.CULL_FACE)
         }
     }
 }
