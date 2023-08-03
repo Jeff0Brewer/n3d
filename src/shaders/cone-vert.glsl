@@ -9,5 +9,6 @@ varying vec3 vNormal;
 
 void main() {
     gl_Position = projMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-    vNormal = normal;
+    vec4 rotatedNorm = modelMatrix * vec4(normal, 1.0);
+    vNormal = rotatedNorm.xyz;
 }
