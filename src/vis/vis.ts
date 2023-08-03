@@ -43,7 +43,7 @@ class VisRenderer {
 
         this.model = mat4.create()
 
-        const eye = vec3.fromValues(7, 0, 0)
+        const eye = vec3.fromValues(-7, 0, 0)
         const focus = vec3.fromValues(0, 0, 0)
         const up = vec3.fromValues(0, 0, 1)
         this.view = mat4.lookAt(mat4.create(), eye, focus, up)
@@ -130,6 +130,9 @@ class VisRenderer {
             this.gl.useProgram(this.landmarks.spheres.program)
             this.landmarks.spheres.setProjMatrix(this.proj)
 
+            this.gl.useProgram(this.landmarks.labels.program)
+            this.landmarks.labels.setProjMatrix(this.proj)
+
             this.gl.useProgram(this.sphereBounds.program)
             this.sphereBounds.setProjMatrix(this.proj)
 
@@ -160,9 +163,9 @@ class VisRenderer {
         if (!this.selecting) {
             // draw points with depth when not selecting
             this.points.draw(this.gl, this.view, inv)
+            this.highlight.draw(this.gl, this.view)
         }
 
-        this.highlight.draw(this.gl, this.view)
         if (this.drawLandmarks) {
             this.landmarks.draw(this.gl, this.view, landmarks, this.camera.eye)
         }
@@ -173,6 +176,7 @@ class VisRenderer {
             // draw points on top when selecting
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT)
             this.points.draw(this.gl, this.view, inv)
+            this.highlight.draw(this.gl, this.view)
         }
     }
 }
