@@ -2,7 +2,7 @@ import { mat4, vec3 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getIcosphere, icosphereToVerts } from '../lib/icosphere'
 import vertSource from '../shaders/sphere-vert.glsl?raw'
-import fragSource from '../shaders/sphere-frag.glsl?raw'
+import fragSource from '../shaders/bounds-frag.glsl?raw'
 
 const POS_FPV = 3
 
