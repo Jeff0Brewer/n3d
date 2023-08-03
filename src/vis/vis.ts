@@ -61,6 +61,7 @@ class VisRenderer {
         this.landmarks = new Landmarks(this.gl, this.model, this.view, this.proj, landmarkData)
 
         this.drawLandmarks = true
+        this.selecting = false
     }
 
     resetCamera (data: GalaxyData): void {
@@ -170,9 +171,8 @@ class VisRenderer {
 
         if (this.selecting) {
             // draw points on top when selecting
-            this.gl.disable(this.gl.DEPTH_TEST)
+            this.gl.clear(this.gl.DEPTH_BUFFER_BIT)
             this.points.draw(this.gl, this.view, inv)
-            this.gl.enable(this.gl.DEPTH_TEST)
         }
     }
 }
