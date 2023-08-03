@@ -29,6 +29,7 @@ class VisRenderer {
     sphereBounds: SphereBounds
     coneBounds: ConeBounds
     drawLandmarks: boolean
+    selecting: boolean
 
     constructor (
         canvas: HTMLCanvasElement,
@@ -92,6 +93,7 @@ class VisRenderer {
     }
 
     setSelectMode (selecting: boolean): void {
+        this.selecting = selecting
         this.points.setSelecting(selecting)
     }
 
@@ -154,15 +156,24 @@ class VisRenderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
-        this.points.draw(this.gl, this.view, inv)
-        this.highlight.draw(this.gl, this.view)
+        if (!this.selecting) {
+            // draw points with depth when not selecting
+            this.points.draw(this.gl, this.view, inv)
+        }
 
+        this.highlight.draw(this.gl, this.view)
         if (this.drawLandmarks) {
             this.landmarks.draw(this.gl, this.view, landmarks, this.camera.eye)
         }
-
         this.sphereBounds.draw(this.gl, this.view)
         this.coneBounds.draw(this.gl, this.view)
+
+        if (this.selecting) {
+            // draw points on top when selecting
+            this.gl.disable(this.gl.DEPTH_TEST)
+            this.points.draw(this.gl, this.view, inv)
+            this.gl.enable(this.gl.DEPTH_TEST)
+        }
     }
 }
 
