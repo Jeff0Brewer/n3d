@@ -160,23 +160,12 @@ class VisRenderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
-        if (!this.selecting) {
-            // draw points with depth when not selecting
-            this.points.draw(this.gl, this.view, inv)
-            this.highlight.draw(this.gl, this.view)
-        }
-
+        this.points.draw(this.gl, this.view, inv)
+        this.highlight.draw(this.gl, this.view)
         this.sphereBounds.draw(this.gl, this.view)
         this.coneBounds.draw(this.gl, this.view)
         if (this.drawLandmarks) {
             this.landmarks.draw(this.gl, this.view, landmarks, this.camera.eye)
-        }
-
-        if (this.selecting) {
-            // draw points on top when selecting
-            this.gl.clear(this.gl.DEPTH_BUFFER_BIT)
-            this.points.draw(this.gl, this.view, inv)
-            this.highlight.draw(this.gl, this.view)
         }
     }
 }
