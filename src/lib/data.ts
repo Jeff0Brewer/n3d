@@ -171,7 +171,7 @@ const getFieldSet = (data: GalaxyData, field: string): Array<string> => {
 }
 
 const getSelectColors = (data: GalaxyData): SelectColors => {
-    const COLOR_INC = 2
+    const COLOR_INC = 4
     const { entries } = data
     const minBrightness = Math.floor(255 - COLOR_INC * Math.pow(entries.length, 0.333))
 
