@@ -17,6 +17,9 @@ const FOV = 1
 const NEAR = 0.01
 const FAR = 50
 
+const DEFAULT_POINT_SIZE = 6
+const HIGHLIGHT_POINT_INC = 10
+
 class VisRenderer {
     gl: WebGLRenderingContext
     model: mat4
@@ -29,7 +32,7 @@ class VisRenderer {
     sphereBounds: SphereBounds
     coneBounds: ConeBounds
     drawLandmarks: boolean
-    selecting: boolean
+    pointSize: number
 
     constructor (
         canvas: HTMLCanvasElement,
@@ -61,7 +64,8 @@ class VisRenderer {
         this.landmarks = new Landmarks(this.gl, this.model, this.view, this.proj, landmarkData)
 
         this.drawLandmarks = true
-        this.selecting = false
+
+        this.pointSize = DEFAULT_POINT_SIZE
     }
 
     resetCamera (data: GalaxyData): void {
@@ -94,7 +98,6 @@ class VisRenderer {
     }
 
     setSelectMode (selecting: boolean): void {
-        this.selecting = selecting
         this.points.setSelecting(selecting)
     }
 
@@ -139,11 +142,25 @@ class VisRenderer {
             this.gl.useProgram(this.coneBounds.program)
             this.coneBounds.setProjMatrix(this.proj)
         }
+
+        const keyDown = (e: KeyboardEvent): void => {
+            if (e.key !== '+' && e.key !== '-') {
+                return
+            }
+            this.pointSize += e.key === '+' ? 1 : -1
+            this.gl.useProgram(this.points.program)
+            this.points.setPointSize(this.pointSize)
+            this.gl.useProgram(this.highlight.program)
+            this.highlight.setPointSize(this.pointSize + HIGHLIGHT_POINT_INC)
+        }
+
         window.addEventListener('resize', resize)
+        window.addEventListener('keydown', keyDown)
         return (): void => {
             removeCameraHandlers()
             removePointHandlers()
             window.removeEventListener('resize', resize)
+            window.removeEventListener('keydown', keyDown)
         }
     }
 
@@ -171,3 +188,7 @@ class VisRenderer {
 }
 
 export default VisRenderer
+export {
+    DEFAULT_POINT_SIZE,
+    HIGHLIGHT_POINT_INC
+}

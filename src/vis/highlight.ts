@@ -1,5 +1,6 @@
 import { mat4 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
+import { DEFAULT_POINT_SIZE, HIGHLIGHT_POINT_INC } from '../vis/vis'
 import vertSource from '../shaders/highlight-vert.glsl?raw'
 import fragSource from '../shaders/highlight-frag.glsl?raw'
 
@@ -13,6 +14,8 @@ class Highlight {
     setViewMatrix: (mat: mat4) => void
     setProjMatrix: (mat: mat4) => void
     setDevicePixelRatio: (dpr: number) => void
+    setPointSize: (size: number) => void
+
     numVertex: number
 
     constructor (
@@ -31,18 +34,21 @@ class Highlight {
         const uViewMatrix = gl.getUniformLocation(this.program, 'viewMatrix')
         const uProjMatrix = gl.getUniformLocation(this.program, 'projMatrix')
         const uDevicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio')
+        const uPointSize = gl.getUniformLocation(this.program, 'pointSize')
 
         // init uniforms
         gl.uniformMatrix4fv(uModelMatrix, false, model)
         gl.uniformMatrix4fv(uViewMatrix, false, view)
         gl.uniformMatrix4fv(uProjMatrix, false, proj)
         gl.uniform1f(uDevicePixelRatio, window.devicePixelRatio)
+        gl.uniform1f(uPointSize, DEFAULT_POINT_SIZE + HIGHLIGHT_POINT_INC)
 
         // get closures to easily set uniforms
         this.setModelMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uModelMatrix, false, mat) }
         this.setViewMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uViewMatrix, false, mat) }
         this.setProjMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uProjMatrix, false, mat) }
         this.setDevicePixelRatio = (dpr: number): void => { gl.uniform1f(uDevicePixelRatio, dpr) }
+        this.setPointSize = (size: number): void => { gl.uniform1f(uPointSize, size) }
     }
 
     setPositions (gl: WebGLRenderingContext, pos: Float32Array): void {

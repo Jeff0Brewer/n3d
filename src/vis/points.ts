@@ -2,6 +2,7 @@ import { mat4, vec3 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getSelectColors } from '../lib/data'
 import { COLOR_MAP_COLORS } from '../components/color-map'
+import { DEFAULT_POINT_SIZE } from '../vis/vis'
 import type { GalaxyData, SelectMap } from '../lib/data'
 import type { ColorField } from '../lib/color-map'
 import type { Selection } from '../components/select-menu'
@@ -34,6 +35,7 @@ class Points {
     setSelecting: (selecting: boolean) => void
     setMousePos: (x: number, y: number) => void
     setCamPos: (pos: vec3) => void
+    setPointSize: (size: number) => void
 
     numVertex: number
     positions: Float32Array
@@ -89,6 +91,7 @@ class Points {
         const uMousePos = gl.getUniformLocation(this.program, 'mousePos')
         const uSelecting = gl.getUniformLocation(this.program, 'selecting')
         const uCamPos = gl.getUniformLocation(this.program, 'camPos')
+        const uPointSize = gl.getUniformLocation(this.program, 'pointSize')
 
         gl.uniformMatrix4fv(uModelMatrix, false, model)
         gl.uniformMatrix4fv(uViewMatrix, false, view)
@@ -96,6 +99,7 @@ class Points {
         gl.uniformMatrix4fv(uInvMatrix, false, inv)
         gl.uniform1f(uDevicePixelRatio, window.devicePixelRatio)
         gl.uniform1i(uSelecting, 0)
+        gl.uniform1f(uPointSize, DEFAULT_POINT_SIZE)
 
         this.setModelMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uModelMatrix, false, mat) }
         this.setViewMatrix = (mat: mat4): void => { gl.uniformMatrix4fv(uViewMatrix, false, mat) }
@@ -111,6 +115,7 @@ class Points {
             gl.uniform2f(uMousePos, x, y)
         }
         this.setCamPos = (pos: vec3): void => { gl.uniform3fv(uCamPos, pos) }
+        this.setPointSize = (size: number): void => { gl.uniform1f(uPointSize, size) }
 
         this.colorMap = new ColorMap(COLOR_MAP_COLORS)
     }
