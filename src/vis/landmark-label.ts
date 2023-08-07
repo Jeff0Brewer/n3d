@@ -94,7 +94,7 @@ class LandmarkLabels {
         this.setViewMatrix(view)
 
         // disable depth mask to prevent occlusion from transparent background
-        gl.depthMask(false)
+        gl.disable(gl.DEPTH_TEST)
         const rotationQuat = quat.create()
         const rotation = mat4.create()
         for (let i = 0; i < landmarks.length; i++) {
@@ -109,7 +109,7 @@ class LandmarkLabels {
             gl.bindTexture(gl.TEXTURE_2D, this.textures[i])
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.numVertex)
         }
-        gl.depthMask(true)
+        gl.enable(gl.DEPTH_TEST)
     }
 }
 

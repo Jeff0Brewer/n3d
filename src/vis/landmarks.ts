@@ -19,8 +19,8 @@ class Landmarks {
     }
 
     draw (gl: WebGLRenderingContext, view: mat4, landmarks: Array<Landmark>, eye: vec3): void {
-        this.labels.draw(gl, view, landmarks)
         this.spheres.draw(gl, view, landmarks, eye)
+        this.labels.draw(gl, view, landmarks)
     }
 }
 
