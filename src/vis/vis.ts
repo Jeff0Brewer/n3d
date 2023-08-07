@@ -156,11 +156,11 @@ class VisRenderer {
     }
 
     draw (landmarks: Array<Landmark>): void {
-        this.camera.update()
+        const eye = this.camera.update()
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
-        this.points.draw(this.gl, this.view, inv)
+        this.points.draw(this.gl, this.view, inv, eye)
         this.highlight.draw(this.gl, this.view)
         this.sphereBounds.draw(this.gl, this.view)
         this.coneBounds.draw(this.gl, this.view)

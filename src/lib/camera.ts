@@ -25,10 +25,11 @@ class Camera {
         this.defaultFocus = vec3.clone(focus)
     }
 
-    update (): void {
+    update (): vec3 {
         vec3.scale(this.focus, this.focus, 1 - FOCUS_SPEED)
         vec3.scaleAndAdd(this.focus, this.focus, this.focusTarget, FOCUS_SPEED)
         mat4.lookAt(this.view, this.eye, this.focus, this.up)
+        return this.eye
     }
 
     reset (): void {

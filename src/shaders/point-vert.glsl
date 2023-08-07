@@ -9,6 +9,7 @@ uniform mat4 projMatrix;
 uniform mat4 invMatrix;
 uniform float devicePixelRatio;
 uniform vec2 mousePos;
+uniform vec3 camPos;
 uniform int selecting;
 
 varying vec3 vColor;
@@ -40,5 +41,9 @@ void main() {
         vColor = selectColor / 255.0;
         vVisibility = 1.0; // show hidden points when selecting
         gl_PointSize = gl_PointSize + 5.0 * (1.0 - (mouseDist / mouseRange));
+
+        // move point to top of depth when selecting
+        vec4 camera = projMatrix * viewMatrix * modelMatrix * vec4(camPos, 1.0);
+        gl_Position += normalize(camera) * length(camera - gl_Position * 0.99);
     }
 }

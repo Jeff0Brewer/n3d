@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix'
+import { mat4, vec3 } from 'gl-matrix'
 import { initProgram, initBuffer, initAttribute } from '../lib/gl-wrap'
 import { getSelectColors } from '../lib/data'
 import { COLOR_MAP_COLORS } from '../components/color-map'
@@ -33,6 +33,7 @@ class Points {
     setDevicePixelRatio: (ratio: number) => void
     setSelecting: (selecting: boolean) => void
     setMousePos: (x: number, y: number) => void
+    setCamPos: (pos: vec3) => void
 
     numVertex: number
     positions: Float32Array
@@ -87,6 +88,7 @@ class Points {
         const uDevicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio')
         const uMousePos = gl.getUniformLocation(this.program, 'mousePos')
         const uSelecting = gl.getUniformLocation(this.program, 'selecting')
+        const uCamPos = gl.getUniformLocation(this.program, 'camPos')
 
         gl.uniformMatrix4fv(uModelMatrix, false, model)
         gl.uniformMatrix4fv(uViewMatrix, false, view)
@@ -108,6 +110,7 @@ class Points {
             gl.useProgram(this.program)
             gl.uniform2f(uMousePos, x, y)
         }
+        this.setCamPos = (pos: vec3): void => { gl.uniform3fv(uCamPos, pos) }
 
         this.colorMap = new ColorMap(COLOR_MAP_COLORS)
     }
@@ -195,11 +198,12 @@ class Points {
         gl.bufferData(gl.ARRAY_BUFFER, visibility, gl.STATIC_DRAW)
     }
 
-    draw (gl: WebGLRenderingContext, view: mat4, inv: mat4): void {
+    draw (gl: WebGLRenderingContext, view: mat4, inv: mat4, eye: vec3): void {
         gl.useProgram(this.program)
 
         this.setViewMatrix(view)
         this.setInvMatrix(inv)
+        this.setCamPos(eye)
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuffer)
         this.bindPosition()
