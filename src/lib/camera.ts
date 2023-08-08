@@ -1,8 +1,53 @@
 import { mat4, vec3 } from 'gl-matrix'
+import { Bezier } from 'bezier-js'
+import type { Point } from 'bezier-js'
 
 const ROTATE_SPEED = 0.007
 const ZOOM_SPEED = 0.0005
 const FOCUS_SPEED = 0.2
+
+const PATH_STEPS = 1000
+
+class CameraPath {
+    // split 3d path into two 2d paths since
+    // Bezier.quadradicFromPoints has unexpected behavior in 3d
+    pathXY: Bezier
+    pathXZ: Bezier
+    step: number
+    maxStep: number
+
+    constructor (p0: Point, p1: Point, p2: Point, maxStep: number) {
+        if (p0.z === undefined || p1.z === undefined || p2.z === undefined) {
+            throw new Error('2d paths unsupported')
+        }
+        this.pathXY = Bezier.quadraticFromPoints(
+            { x: p0.x, y: p0.y },
+            { x: p1.x, y: p1.y },
+            { x: p2.x, y: p2.y }
+        )
+        this.pathXZ = Bezier.quadraticFromPoints(
+            { x: p0.x, y: p0.z },
+            { x: p1.x, y: p1.z },
+            { x: p2.x, y: p2.z }
+        )
+        this.step = 0
+        this.maxStep = maxStep
+    }
+
+    update (eye: vec3, focus: vec3): void {
+        const per = this.step / this.maxStep
+        this.step = (this.step + 1) % this.maxStep
+
+        // get xy from pathXY and z from pathXZ
+        const { x, y } = this.pathXY.get(per)
+        const { y: z } = this.pathXZ.get(per)
+        const { x: dx, y: dy } = this.pathXY.derivative(per)
+        const { y: dz } = this.pathXZ.derivative(per)
+
+        vec3.copy(eye, [x, y, z])
+        vec3.add(focus, eye, [dx, dy, dz])
+    }
+}
 
 class Camera {
     view: mat4
@@ -13,6 +58,7 @@ class Camera {
     dragging: boolean
     defaultEye: vec3
     defaultFocus: vec3
+    path: CameraPath | null
 
     constructor (view: mat4, eye: vec3, focus: vec3, up: vec3) {
         this.view = view
@@ -23,11 +69,21 @@ class Camera {
         this.dragging = false
         this.defaultEye = vec3.clone(eye)
         this.defaultFocus = vec3.clone(focus)
+        this.path = new CameraPath(
+            { x: -3, y: 1, z: -1 },
+            { x: 1, y: -1, z: 1 },
+            { x: -3, y: 2, z: -1 },
+            PATH_STEPS
+        )
     }
 
     update (): vec3 {
-        vec3.scale(this.focus, this.focus, 1 - FOCUS_SPEED)
-        vec3.scaleAndAdd(this.focus, this.focus, this.focusTarget, FOCUS_SPEED)
+        if (this.path) {
+            this.path.update(this.eye, this.focus)
+        } else {
+            vec3.scale(this.focus, this.focus, 1 - FOCUS_SPEED)
+            vec3.scaleAndAdd(this.focus, this.focus, this.focusTarget, FOCUS_SPEED)
+        }
         mat4.lookAt(this.view, this.eye, this.focus, this.up)
         return this.eye
     }
@@ -37,6 +93,8 @@ class Camera {
         this.focus = vec3.clone(this.defaultFocus)
         this.focusTarget = vec3.clone(this.defaultFocus)
         mat4.lookAt(this.view, this.eye, this.focus, this.up)
+
+        this.path = null
     }
 
     setupHandlers (element: HTMLElement): (() => void) {
