@@ -1,7 +1,7 @@
 import { mat4, vec3 } from 'gl-matrix'
 import { initGl } from '../lib/gl-wrap'
 import { getInvMatrix } from '../lib/unproject'
-import Camera from '../lib/camera'
+import Camera, { CameraPath } from '../lib/camera'
 import Points from '../vis/points'
 import Landmarks from '../vis/landmarks'
 import Highlight from '../vis/highlight'
@@ -66,6 +66,10 @@ class VisRenderer {
         this.drawLandmarks = true
 
         this.pointSize = DEFAULT_POINT_SIZE
+    }
+
+    setCameraPath (path: CameraPath | null): void {
+        this.camera.path = path
     }
 
     resetCamera (data: GalaxyData): void {

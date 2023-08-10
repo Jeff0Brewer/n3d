@@ -6,17 +6,26 @@
     right: 0;
 }
 
-.controls {
+.menu {
     position: absolute;
     right: 0;
     top: 0;
     font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+}
+
+.controls {
+    display: flex;
+    gap: 5px;
 }
 
 .controls > * {
     padding: 10px;
-    margin-left: 5px;
     background-color: #111;
     color: var(--text0);
     text-transform: uppercase;
+    font: inherit;
 }

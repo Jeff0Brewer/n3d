@@ -2,9 +2,12 @@
     position: relative;
     z-index: 20;
     background-color: var(--color0);
-    width: fit-content;
     font-size: 12px;
+    width: fit-content;
     padding-top: 7px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .menu input{

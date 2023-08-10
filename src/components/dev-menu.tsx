@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useState, useEffect } from 'react'
 import type { Point } from 'bezier-js'
 import { CameraPath } from '../lib/camera'
 import styles from '../styles/dev-menu.module.css'
@@ -8,14 +8,17 @@ type DevMenuProps = {
 }
 
 const DevMenu: FC<DevMenuProps> = ({ setCameraPath }) => {
+    const [visible, setVisible] = useState<boolean>(false)
     const [p0, setP0] = useState<Point>({ x: 5, y: 0, z: 1 })
-    const [p1, setP1] = useState<Point>({ x: -1, y: 1, z: -1 })
+    const [p1, setP1] = useState<Point>({ x: 0, y: 0, z: 0 })
     const [p2, setP2] = useState<Point>({ x: 0, y: -5, z: 2 })
     const [duration, setDuration] = useState<number>(1000)
 
     const inputDuration = (e: React.ChangeEvent): void => {
         const value = getInputValue(e)
-        setDuration(value)
+        if (value !== null) {
+            setDuration(value)
+        }
     }
 
     const setPath = (): void => {
@@ -23,6 +26,19 @@ const DevMenu: FC<DevMenuProps> = ({ setCameraPath }) => {
         setCameraPath(path)
     }
 
+    useEffect(() => {
+        const keyDown = (e: KeyboardEvent): void => {
+            if (e.ctrlKey && e.key === 'm') {
+                setVisible(!visible)
+            }
+        }
+        window.addEventListener('keydown', keyDown)
+        return (): void => {
+            window.removeEventListener('keydown', keyDown)
+        }
+    }, [visible])
+
+    if (!visible) { return <></> }
     return (
         <div className={styles.menu}>
             <PointInput label={'p0'} point={p0} setPoint={setP0} />
@@ -53,20 +69,26 @@ type PointInputProps = {
 const PointInput: FC<PointInputProps> = ({ label, point, setPoint }) => {
     const setX = (e: React.ChangeEvent): void => {
         const value = getInputValue(e)
-        point.x = value
-        setPoint({ ...point })
+        if (value !== null) {
+            point.x = value
+            setPoint({ ...point })
+        }
     }
 
     const setY = (e: React.ChangeEvent): void => {
         const value = getInputValue(e)
-        point.y = value
-        setPoint({ ...point })
+        if (value !== null) {
+            point.y = value
+            setPoint({ ...point })
+        }
     }
 
     const setZ = (e: React.ChangeEvent): void => {
         const value = getInputValue(e)
-        point.z = value
-        setPoint({ ...point })
+        if (value !== null) {
+            point.z = value
+            setPoint({ ...point })
+        }
     }
 
     return (
@@ -100,14 +122,14 @@ const PointInput: FC<PointInputProps> = ({ label, point, setPoint }) => {
     )
 }
 
-const getInputValue = (e: React.ChangeEvent): number => {
+const getInputValue = (e: React.ChangeEvent): number | null => {
     if (e.target instanceof HTMLInputElement) {
         const value = parseFloat(e.target.value)
-        if (value) {
+        if (!Number.isNaN(value)) {
             return value
         }
     }
-    throw new Error('Invalid input float value')
+    return null
 }
 
 export default DevMenu
