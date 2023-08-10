@@ -105,7 +105,10 @@ class LandmarkLabels {
 
             this.setRotation(rotation)
             this.setCenter(landmarks[i].position)
-            this.setSize(landmarks[i].radius * 2)
+            this.setSize(Math.min(
+                landmarks[i].radius * 2,
+                0.5
+            ))
             gl.bindTexture(gl.TEXTURE_2D, this.textures[i])
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.numVertex)
         }
