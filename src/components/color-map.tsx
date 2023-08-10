@@ -1,4 +1,5 @@
 import { FC, useState, useEffect, useRef } from 'react'
+import { FaCaretUp, FaCaretDown } from 'react-icons/fa'
 import { colorArrToGradient, getColorField } from '../lib/color-map'
 import type { GalaxyData } from '../lib/data'
 import type { ColorField } from '../lib/color-map'
@@ -38,8 +39,11 @@ const ColorMapMenu: FC<ColorMapMenuProps> = ({ data, colorField, setColorField }
 
     return (
         <div className={styles.wrap}>
-            <div className={styles.label} onClick={(): void => setOpen(!open)}>
-                <p>color map</p>
+            <div className={styles.label}>
+                <a onClick={(): void => setOpen(!open)}>
+                    <p>color map</p>
+                    { open ? <FaCaretUp /> : <FaCaretDown /> }
+                </a>
                 <ColorBounds
                     min={min}
                     max={max}

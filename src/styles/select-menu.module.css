@@ -4,12 +4,12 @@
     bottom: 0;
     z-index: 10;
     display: flex;
+    gap: var(--gap);
     font-size: 12px;
 }
 
 .selectMenu > div {
     background-color: var(--color0);
-    margin: 5px;
 }
 
 .header {
