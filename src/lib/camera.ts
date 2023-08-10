@@ -13,8 +13,9 @@ class CameraPath {
     pathXZ: Bezier
     step: number
     maxStep: number
+    focus: vec3 | null
 
-    constructor (p0: Point, p1: Point, p2: Point, maxStep: number) {
+    constructor (p0: Point, p1: Point, p2: Point, focus: Point | null, maxStep: number) {
         if (p0.z === undefined || p1.z === undefined || p2.z === undefined) {
             throw new Error('2d paths unsupported')
         }
@@ -30,6 +31,12 @@ class CameraPath {
         )
         this.step = 0
         this.maxStep = maxStep
+
+        if (focus && focus.z !== undefined) {
+            this.focus = vec3.fromValues(focus.x, focus.y, focus.z)
+        } else {
+            this.focus = null
+        }
     }
 
     update (eye: vec3, focus: vec3): void {
@@ -39,11 +46,15 @@ class CameraPath {
         // get xy from pathXY and z from pathXZ
         const { x, y } = this.pathXY.get(per)
         const { y: z } = this.pathXZ.get(per)
-        const { x: dx, y: dy } = this.pathXY.derivative(per)
-        const { y: dz } = this.pathXZ.derivative(per)
-
         vec3.copy(eye, [x, y, z])
-        vec3.add(focus, eye, [dx, dy, dz])
+
+        if (!this.focus) {
+            const { x: dx, y: dy } = this.pathXY.derivative(per)
+            const { y: dz } = this.pathXZ.derivative(per)
+            vec3.add(focus, eye, [dx, dy, dz])
+        } else {
+            vec3.copy(focus, this.focus)
+        }
     }
 }
 

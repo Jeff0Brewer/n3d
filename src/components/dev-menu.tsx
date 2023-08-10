@@ -12,6 +12,7 @@ const DevMenu: FC<DevMenuProps> = ({ setCameraPath }) => {
     const [p0, setP0] = useState<Point>({ x: 5, y: 0, z: 1 })
     const [p1, setP1] = useState<Point>({ x: 0, y: 0, z: 0 })
     const [p2, setP2] = useState<Point>({ x: 0, y: -5, z: 2 })
+    const [focus, setFocus] = useState<Point | null>(null)
     const [duration, setDuration] = useState<number>(1000)
 
     const inputDuration = (e: React.ChangeEvent): void => {
@@ -22,7 +23,7 @@ const DevMenu: FC<DevMenuProps> = ({ setCameraPath }) => {
     }
 
     const setPath = (): void => {
-        const path = new CameraPath(p0, p1, p2, duration)
+        const path = new CameraPath(p0, p1, p2, focus, duration)
         setCameraPath(path)
     }
 
@@ -52,6 +53,23 @@ const DevMenu: FC<DevMenuProps> = ({ setCameraPath }) => {
                     onChange={inputDuration}
                 />
             </span>
+            { !focus
+                ? <button
+                    className={styles.focusButton}
+                    onClick={(): void => setFocus({ x: 0, y: 0, z: 0 })}
+                >
+                    add focus
+                </button>
+                : <>
+                    <PointInput label={'focus'} point={focus} setPoint={setFocus} />
+                    <button
+                        className={styles.focusButton}
+                        onClick={(): void => setFocus(null)}
+                    >
+                        remove focus
+                    </button>
+                </>
+            }
             <button
                 className={styles.setButton}
                 onClick={setPath}
