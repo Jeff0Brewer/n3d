@@ -6,8 +6,6 @@ const ROTATE_SPEED = 0.007
 const ZOOM_SPEED = 0.0005
 const FOCUS_SPEED = 0.2
 
-const PATH_STEPS = 1000
-
 class CameraPath {
     // split 3d path into two 2d paths since
     // Bezier.quadradicFromPoints has unexpected behavior in 3d
@@ -69,12 +67,7 @@ class Camera {
         this.dragging = false
         this.defaultEye = vec3.clone(eye)
         this.defaultFocus = vec3.clone(focus)
-        this.path = new CameraPath(
-            { x: -3, y: 1, z: -1 },
-            { x: 1, y: -1, z: 1 },
-            { x: -3, y: 2, z: -1 },
-            PATH_STEPS
-        )
+        this.path = null
     }
 
     update (): vec3 {
