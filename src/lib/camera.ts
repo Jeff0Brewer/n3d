@@ -154,3 +154,4 @@ class Camera {
 }
 
 export default Camera
+export { CameraPath }
