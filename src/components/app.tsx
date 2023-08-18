@@ -14,6 +14,7 @@ import Vis from '../components/vis'
 const App: FC = () => {
     const [galaxyData, setGalaxyData] = useState<GalaxyData | null>(null)
     const [landmarkData, setLandmarkData] = useState<Array<Landmark>>([])
+    const [hovered, setHovered] = useState<number | null>(null)
     const [selected, setSelected] = useState <number | null>(null)
     const [selections, setSelections] = useState <Array<Selection>>([])
     const [colorField, setColorField] = useState<ColorField | null>(null)
@@ -42,6 +43,7 @@ const App: FC = () => {
                 setSelections={setSelections}
                 selected={selected}
                 setSelected={setSelected}
+                hovered={hovered}
                 setSphere={setSphere}
                 setCone={setCone}
             />
@@ -61,6 +63,7 @@ const App: FC = () => {
                 landmarkData={landmarkData}
                 selected={selected}
                 setSelected={setSelected}
+                setHovered={setHovered}
                 colorField={colorField}
                 selections={selections}
                 sphere={sphere}

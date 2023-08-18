@@ -107,12 +107,14 @@ class VisRenderer {
 
     setupSelectHandlers (
         canvas: HTMLCanvasElement,
-        setSelected: (ind: number) => void
+        setSelected: (ind: number) => void,
+        setHovered: (ind: number) => void
     ): (() => void) {
         const removePointHandlers = this.points.setupSelectHandlers(
             this.gl,
             canvas,
-            setSelected
+            setSelected,
+            setHovered
         )
         return removePointHandlers
     }

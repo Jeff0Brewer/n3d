@@ -14,6 +14,7 @@ type VisProps = {
     landmarkData: Array<Landmark>,
     selected: number | null,
     setSelected: (ind: number | null) => void,
+    setHovered: (ind: number | null) => void,
     colorField: ColorField | null,
     selections: Array<Selection>,
     sphere: Sphere | null,
@@ -22,7 +23,7 @@ type VisProps = {
 
 const Vis: FC<VisProps> = ({
     galaxyData, landmarkData, selected, setSelected,
-    colorField, selections, sphere, cone
+    setHovered, colorField, selections, sphere, cone
 }) => {
     const [width, setWidth] = useState<number>(window.innerWidth)
     const [height, setHeight] = useState<number>(window.innerHeight)
@@ -74,9 +75,17 @@ const Vis: FC<VisProps> = ({
 
         visRef.current.setSelectMode(selecting)
         if (selecting) {
-            return visRef.current.setupSelectHandlers(canvasRef.current, setSelected)
+            // add select handlers if selecting
+            return visRef.current.setupSelectHandlers(
+                canvasRef.current,
+                setSelected,
+                setHovered
+            )
+        } else {
+            // clear hovered state on exit select mode
+            setHovered(null)
         }
-    }, [galaxyData, selecting, setSelected])
+    }, [galaxyData, selecting, setSelected, setHovered])
 
     useEffect(() => {
         if (visRef.current) {

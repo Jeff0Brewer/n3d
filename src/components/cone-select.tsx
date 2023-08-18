@@ -27,13 +27,14 @@ const setFromInput = (set: (value: number) => void): ((e: React.ChangeEvent) => 
 type ConeSelectProps = {
     data: GalaxyData,
     selected: number | null,
+    hovered: number | null,
     selectionCount: number,
     addSelection: (selection: Selection) => void,
     setCone: (cone: Cone | null) => void
 }
 
 const ConeSelect: FC<ConeSelectProps> = ({
-    data, selected, selectionCount, addSelection, setCone
+    data, selected, hovered, selectionCount, addSelection, setCone
 }) => {
     const [lat, setLat] = useState<number>(0)
     const [lng, setLng] = useState<number>(0)
@@ -66,22 +67,23 @@ const ConeSelect: FC<ConeSelectProps> = ({
         })
     }
 
-    // set lat / lng current selected galaxy or [0, 0] if none selected
+    // set lat / lng current selected / hovered galaxy or [0, 0] if none selected
     useEffect(() => {
-        if (selected !== null) {
-            const { headers, entries } = data
-            const latInd = headers.numHeaders.LAT
-            const lngInd = headers.numHeaders.LON
-            const lat = entries[selected].numValues[latInd]
-            const lng = entries[selected].numValues[lngInd]
-            setLat(lat)
-            setLng(lng)
-            if (latInputRef.current && lngInputRef.current) {
-                latInputRef.current.value = lat.toString()
-                lngInputRef.current.value = lng.toString()
-            }
+        const ind = hovered !== null ? hovered : selected
+        if (ind === null) { return }
+
+        const latInd = data.headers.numHeaders.LAT
+        const lngInd = data.headers.numHeaders.LON
+        const lat = data.entries[ind].numValues[latInd]
+        const lng = data.entries[ind].numValues[lngInd]
+
+        setLat(lat)
+        setLng(lng)
+        if (latInputRef.current && lngInputRef.current) {
+            latInputRef.current.value = lat.toString()
+            lngInputRef.current.value = lng.toString()
         }
-    }, [data, selected])
+    }, [data, selected, hovered])
 
     // update cone on lat / lng / arc changes
     useEffect(() => {

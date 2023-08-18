@@ -22,12 +22,14 @@ type SelectMenuProps = {
     setSelections: (selections: Array<Selection>) => void,
     selected: number | null,
     setSelected: (ind: number | null) => void,
+    hovered: number | null,
     setSphere: (sphere: Sphere | null) => void,
     setCone: (cone: Cone | null) => void
 }
 
 const SelectMenu: FC<SelectMenuProps> = ({
-    data, selections, setSelections, selected, setSelected, setSphere, setCone
+    data, selections, setSelections, selected,
+    setSelected, hovered, setSphere, setCone
 }) => {
     const [displaySelection, setDisplaySelection] = useState<Selection | null>(null)
 
@@ -36,6 +38,7 @@ const SelectMenu: FC<SelectMenuProps> = ({
             <CreateMenu
                 data={data}
                 selected={selected}
+                hovered={hovered}
                 selections={selections}
                 setSelections={setSelections}
                 setSphere={setSphere}
@@ -63,6 +66,7 @@ type SelectionMode = 'filter' | 'sphere' | 'cone' | null
 type CreateMenuProps = {
     data: GalaxyData,
     selected: number | null,
+    hovered: number | null,
     selections: Array<Selection>,
     setSelections: (selections: Array<Selection>) => void,
     setSphere: (sphere: Sphere | null) => void,
@@ -70,7 +74,7 @@ type CreateMenuProps = {
 }
 
 const CreateMenu: FC<CreateMenuProps> = ({
-    data, selected, selections, setSelections, setSphere, setCone
+    data, selected, hovered, selections, setSelections, setSphere, setCone
 }) => {
     const [selectionMode, setSelectionMode] = useState<SelectionMode>(null)
     const [selectionCount, setSelectionCount] = useState<number>(0)
@@ -108,6 +112,7 @@ const CreateMenu: FC<CreateMenuProps> = ({
                 return <SphereSelect
                     data={data}
                     selected={selected}
+                    hovered={hovered}
                     selectionCount={selectionCount}
                     addSelection={addSelection}
                     setSphere={setSphere}
@@ -116,6 +121,7 @@ const CreateMenu: FC<CreateMenuProps> = ({
                 return <ConeSelect
                     data={data}
                     selected={selected}
+                    hovered={hovered}
                     selectionCount={selectionCount}
                     addSelection={addSelection}
                     setCone={setCone}

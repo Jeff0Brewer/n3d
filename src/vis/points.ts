@@ -135,25 +135,51 @@ class Points {
     setupSelectHandlers (
         gl: WebGLRenderingContext,
         canvas: HTMLCanvasElement,
-        setSelected: (ind: number) => void
+        setSelected: (ind: number) => void,
+        setHovered: (ind: number) => void
     ): (() => void) {
-        const mouseDown = (e: MouseEvent): void => {
-            // wrap in request frame to wait for current render to finish before getting pixel data
+        // convert client coordinates to screen coordinates
+        const getPixelCoords = (e: MouseEvent): {x: number, y: number} => {
+            const x = e.clientX * window.devicePixelRatio
+            const y = (window.innerHeight - e.clientY) * window.devicePixelRatio
+            return { x, y }
+        }
+
+        // pick color at x, y, coordinate, check if listed in select colors,
+        // and run callback on galaxy index if found
+        const checkSelectColor = (
+            x: number,
+            y: number,
+            callback: (ind: number) => void
+        ): void => {
             window.requestAnimationFrame(() => {
-                const x = e.clientX * window.devicePixelRatio
-                const y = (window.innerHeight - e.clientY) * window.devicePixelRatio
                 const pixel = new Uint8Array(4)
                 gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel)
                 const hex = pixel[0].toString(16) + pixel[1].toString(16) + pixel[2].toString(16)
                 const ind = this.selectMap[hex]
                 if (ind) {
-                    setSelected(ind)
+                    callback(ind)
                 }
             })
         }
+
+        // update selected galaxy on mouse click
+        const mouseDown = (e: MouseEvent): void => {
+            const { x, y } = getPixelCoords(e)
+            checkSelectColor(x, y, setSelected)
+        }
+
+        // update hovered galaxy on mouse move
+        const mouseMove = (e: MouseEvent): void => {
+            const { x, y } = getPixelCoords(e)
+            checkSelectColor(x, y, setHovered)
+        }
+
         canvas.addEventListener('mousedown', mouseDown)
+        canvas.addEventListener('mousemove', mouseMove)
         return (): void => {
             canvas.removeEventListener('mousedown', mouseDown)
+            canvas.removeEventListener('mousemove', mouseMove)
         }
     }
 

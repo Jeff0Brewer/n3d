@@ -11,13 +11,14 @@ const DEFAULT_RADIUS = 0.25
 type SphereSelectProps = {
     data: GalaxyData,
     selected: number | null,
+    hovered: number | null,
     selectionCount: number,
     addSelection: (selection: Selection) => void,
     setSphere: (sphere: Sphere | null) => void
 }
 
 const SphereSelect: FC<SphereSelectProps> = ({
-    data, selected, selectionCount, addSelection, setSphere
+    data, selected, hovered, selectionCount, addSelection, setSphere
 }) => {
     const [centerName, setCenterName] = useState<string | null>(null)
     const [center, setCenter] = useState<vec3>(DEFAULT_POSITION)
@@ -47,18 +48,16 @@ const SphereSelect: FC<SphereSelectProps> = ({
         })
     }
 
-    // set sphere center to current selected galaxy position
+    // set sphere center to current selected / hovered galaxy position
     // or [0, 0, 0] if none selected
     useEffect(() => {
-        if (selected !== null) {
-            const nameInd = data.headers.strHeaders['Object Name']
-            setCenterName(data.entries[selected].strValues[nameInd])
-            setCenter(data.entries[selected].position)
-        } else {
-            setCenterName(null)
-            setCenter(DEFAULT_POSITION)
-        }
-    }, [data, selected])
+        const ind = hovered !== null ? hovered : selected
+        if (ind === null) { return }
+
+        const nameInd = data.headers.strHeaders['Object Name']
+        setCenterName(data.entries[ind].strValues[nameInd])
+        setCenter(data.entries[ind].position)
+    }, [data, selected, hovered])
 
     // update sphere prop on internal state changes
     useEffect(() => {
