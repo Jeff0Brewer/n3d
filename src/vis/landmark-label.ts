@@ -9,6 +9,7 @@ const TEX_FPV = 2
 
 const TEXT_WIDTH = 800
 const TEXT_HEIGHT = 300
+const FONT_FILE = './TitilliumWeb-Regular.ttf'
 
 class LandmarkLabels {
     program: WebGLProgram
@@ -32,24 +33,8 @@ class LandmarkLabels {
     ) {
         this.program = initProgram(gl, vertSource, fragSource)
 
-        // get textures for each label
-        const textRenderer = new TextRenderer(TEXT_WIDTH, TEXT_HEIGHT)
         this.textures = []
-        for (const { name } of landmarks) {
-            const data = textRenderer.getTextImage(name)
-            this.textures.push(initTexture(gl))
-            gl.texImage2D(
-                gl.TEXTURE_2D,
-                0,
-                gl.RGBA,
-                TEXT_WIDTH,
-                TEXT_HEIGHT,
-                0,
-                gl.RGBA,
-                gl.UNSIGNED_BYTE,
-                data
-            )
-        }
+        this.getLabelTextures(gl, landmarks, FONT_FILE)
 
         const verts = getLabelVerts()
         this.buffer = initBuffer(gl)
@@ -87,6 +72,30 @@ class LandmarkLabels {
         this.setSize = (width: number): void => { gl.uniform2f(uSize, width, width * aspect) }
     }
 
+    // get textures with label text for each landmark name
+    async getLabelTextures (gl: WebGLRenderingContext, landmarks: Array<Landmark>, fontPath?: string): Promise<void> {
+        const textRenderer = new TextRenderer(TEXT_WIDTH, TEXT_HEIGHT)
+        if (fontPath) {
+            await textRenderer.addFont(fontPath)
+        }
+        this.textures = []
+        for (const { name } of landmarks) {
+            const data = textRenderer.getTextImage(name)
+            this.textures.push(initTexture(gl))
+            gl.texImage2D(
+                gl.TEXTURE_2D,
+                0,
+                gl.RGBA,
+                TEXT_WIDTH,
+                TEXT_HEIGHT,
+                0,
+                gl.RGBA,
+                gl.UNSIGNED_BYTE,
+                data
+            )
+        }
+    }
+
     draw (gl: WebGLRenderingContext, view: mat4, landmarks: Array<Landmark>): void {
         gl.useProgram(this.program)
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
@@ -98,6 +107,9 @@ class LandmarkLabels {
         const rotationQuat = quat.create()
         const rotation = mat4.create()
         for (let i = 0; i < landmarks.length; i++) {
+            // skip drawing if texture not yet initialized
+            if (!this.textures[i]) { continue }
+
             mat4.getRotation(rotationQuat, view)
             quat.invert(rotationQuat, rotationQuat)
             quat.normalize(rotationQuat, rotationQuat)
@@ -116,27 +128,11 @@ class LandmarkLabels {
     }
 }
 
-const getLabelVerts = (): Float32Array => {
-    const x = 0.5
-    const y = 0.5
-    // invert y tex coordinate to line up with
-    // image data from canvas rendering
-    return new Float32Array([
-        -x, -y,
-        0, 1,
-        -x, y,
-        0, 0,
-        x, -y,
-        1, 1,
-        x, y,
-        1, 0
-    ])
-}
-
 class TextRenderer {
     ctx: CanvasRenderingContext2D
     width: number
     height: number
+    fontFamily: string
 
     constructor (width: number, height: number) {
         const canvas = document.createElement('canvas')
@@ -153,6 +149,14 @@ class TextRenderer {
         this.ctx = ctx
         this.width = width
         this.height = height
+        this.fontFamily = 'sans-serif'
+    }
+
+    async addFont (fontPath: string): Promise<void> {
+        this.fontFamily = 'customFont'
+        const font = new FontFace(this.fontFamily, `url(${fontPath})`)
+        const loaded = await font.load()
+        document.fonts.add(loaded)
     }
 
     getTextImage (text: string): Uint8ClampedArray {
@@ -162,12 +166,29 @@ class TextRenderer {
         let fontSize = 300
         do {
             fontSize -= 5
-            this.ctx.font = `${fontSize}px sans-serif`
+            this.ctx.font = `${fontSize}px ${this.fontFamily}`
         } while (this.ctx.measureText(text).width > this.width)
 
         this.ctx.fillText(text, this.width * 0.5, this.height * 0.5, this.width)
         return this.ctx.getImageData(0, 0, this.width, this.height).data
     }
+}
+
+const getLabelVerts = (): Float32Array => {
+    const x = 0.5
+    const y = 0.5
+    // invert y tex coordinate to line up with
+    // image data from canvas rendering
+    return new Float32Array([
+        -x, -y,
+        0, 1,
+        -x, y,
+        0, 0,
+        x, -y,
+        1, 1,
+        x, y,
+        1, 0
+    ])
 }
 
 export default LandmarkLabels
