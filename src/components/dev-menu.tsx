@@ -13,7 +13,7 @@ const DevMenu: FC<DevMenuProps> = ({ setCameraPath }) => {
     const [p1, setP1] = useState<Point>({ x: 0, y: 0, z: 0 })
     const [p2, setP2] = useState<Point>({ x: 0, y: -5, z: 2 })
     const [focus, setFocus] = useState<Point | null>(null)
-    const [duration, setDuration] = useState<number>(1000)
+    const [duration, setDuration] = useState<number>(5)
 
     const inputDuration = (e: React.ChangeEvent): void => {
         const value = getInputValue(e)
@@ -52,6 +52,7 @@ const DevMenu: FC<DevMenuProps> = ({ setCameraPath }) => {
                     defaultValue={duration}
                     onChange={inputDuration}
                 />
+                <p>s</p>
             </span>
             { !focus
                 ? <button

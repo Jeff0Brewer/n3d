@@ -122,9 +122,9 @@ const Vis: FC<VisProps> = ({
 
     // start draw loop
     useEffect(() => {
-        const draw = (): void => {
+        const draw = (time: number): void => {
             if (!visRef.current) { return }
-            visRef.current.draw(landmarkData)
+            visRef.current.draw(landmarkData, time)
             frameIdRef.current = window.requestAnimationFrame(draw)
         }
         frameIdRef.current = window.requestAnimationFrame(draw)

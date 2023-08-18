@@ -11,11 +11,10 @@ class CameraPath {
     // Bezier.quadradicFromPoints has unexpected behavior in 3d
     pathXY: Bezier
     pathXZ: Bezier
-    step: number
-    maxStep: number
     focus: vec3 | null
+    duration: number
 
-    constructor (p0: Point, p1: Point, p2: Point, focus: Point | null, maxStep: number) {
+    constructor (p0: Point, p1: Point, p2: Point, focus: Point | null, duration: number) {
         if (p0.z === undefined || p1.z === undefined || p2.z === undefined) {
             throw new Error('2d paths unsupported')
         }
@@ -29,19 +28,18 @@ class CameraPath {
             { x: p1.x, y: p1.z },
             { x: p2.x, y: p2.z }
         )
-        this.step = 0
-        this.maxStep = maxStep
-
         if (focus && focus.z !== undefined) {
             this.focus = vec3.fromValues(focus.x, focus.y, focus.z)
         } else {
             this.focus = null
         }
+
+        this.duration = duration
     }
 
-    update (eye: vec3, focus: vec3): void {
-        const per = this.step / this.maxStep
-        this.step = (this.step + 1) % this.maxStep
+    update (eye: vec3, focus: vec3, time: number): void {
+        // get percentage of path from time / duration
+        const per = time / (1000 * this.duration) % 1
 
         // get xy from pathXY and z from pathXZ
         const { x, y } = this.pathXY.get(per)
@@ -81,9 +79,9 @@ class Camera {
         this.path = null
     }
 
-    update (): vec3 {
+    update (time: number): vec3 {
         if (this.path) {
-            this.path.update(this.eye, this.focus)
+            this.path.update(this.eye, this.focus, time)
         } else {
             vec3.scale(this.focus, this.focus, 1 - FOCUS_SPEED)
             vec3.scaleAndAdd(this.focus, this.focus, this.focusTarget, FOCUS_SPEED)
