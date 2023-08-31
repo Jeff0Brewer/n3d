@@ -4,8 +4,6 @@ import type { ColorField } from '../lib/color-map'
 import type { Selection } from '../components/select-menu'
 import type { Sphere } from '../vis/sphere-bounds'
 import type { Cone } from '../vis/cone-bounds'
-import { CameraPath } from '../lib/camera'
-import DevMenu from '../components/dev-menu'
 import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 
@@ -29,7 +27,6 @@ const Vis: FC<VisProps> = ({
     const [height, setHeight] = useState<number>(window.innerHeight)
     const [selecting, setSelecting] = useState<boolean>(false)
     const [drawLandmarks, setDrawLandmarks] = useState<boolean>(true)
-    const [cameraPath, setCameraPath] = useState<CameraPath | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const frameIdRef = useRef<number>(-1)
     const visRef = useRef<VisRenderer | null>(null)
@@ -119,12 +116,6 @@ const Vis: FC<VisProps> = ({
 
     useEffect(() => {
         if (visRef.current) {
-            visRef.current.setCameraPath(cameraPath)
-        }
-    }, [cameraPath])
-
-    useEffect(() => {
-        if (visRef.current) {
             visRef.current.setDrawLandmarks(drawLandmarks)
         }
     }, [drawLandmarks])
@@ -162,7 +153,6 @@ const Vis: FC<VisProps> = ({
                         reset camera
                     </button>
                 </span>
-                <DevMenu setCameraPath={setCameraPath} />
             </section>
         </div>
     )
