@@ -37,9 +37,9 @@ class Camera {
     update (time: number): vec3 {
         if (this.path) {
             const duration = 10000
-            const { pos } = this.path.get((time / duration) % 1)
-            vec3.copy(this.eye, pos)
-            // vec3.copy(this.focus, foc)
+            const { position, derivative } = this.path.get((time / duration) % 1)
+            vec3.copy(this.eye, position)
+            vec3.add(this.focus, position, derivative)
         } else {
             vec3.scale(this.focus, this.focus, 1 - FOCUS_SPEED)
             vec3.scaleAndAdd(this.focus, this.focus, this.focusTarget, FOCUS_SPEED)

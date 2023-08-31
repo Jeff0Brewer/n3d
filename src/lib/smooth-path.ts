@@ -34,17 +34,68 @@ class Point {
     }
 }
 
-const getTargetVector = (n: number, knots: Array<Point>): Array<Point> => {
-    const out: Array<Point> = []
+class SmoothPath {
+    beziers: Array<Bezier>
 
-    out.push(knots[0].add(knots[1], 2))
-    for (let i = 1; i < n - 1; i++) {
-        out.push(
-            knots[i].scale(2).add(knots[i + 1]).scale(2)
-        )
+    constructor (knots: Array<Point>) {
+        // don't need complex bezier calculation for < 3 points
+        // since linear interpolation works fine
+        if (knots.length < 3) {
+            throw new Error('Smooth path requires at least 3 points')
+        }
+
+        const n = knots.length - 1 // number of bezier curves in final path
+        const controlPoints = computeControlPoints(n, knots)
+
+        this.beziers = Array(n)
+        for (let i = 0; i < n; i++) {
+            this.beziers[i] = new Bezier(
+                knots[i],
+                controlPoints[i],
+                controlPoints[n + i],
+                knots[i + 1]
+            )
+        }
     }
-    out.push(knots[n - 1].scale(8).add(knots[n]))
 
+    get (t: number): {
+        position: [number, number, number],
+        derivative: [number, number, number]
+    } {
+        if (t < 0 || t > 1) {
+            throw new Error('Path only defined in range (0, 1)')
+        }
+
+        // get index of current bezier, and t value within that bezier
+        const per = t * this.beziers.length
+        const ind = Math.floor(per)
+        const bezierT = per - ind
+
+        const position = this.beziers[ind].get(bezierT)
+        const derivative = this.beziers[ind].derivative(bezierT)
+
+        if (position.z === undefined || derivative.z === undefined) {
+            throw new Error('Bezier curves must contain 3d coordinates')
+        }
+
+        return {
+            position: [position.x, position.y, position.z],
+            derivative: [derivative.x, derivative.y, derivative.z]
+        }
+    }
+}
+
+// helpers to calculate bezier control points using Thomas' tridiagonal matrix algorithm
+// number values for getVector fns from linear alg for calculating aligned control points
+// ported from: https://www.stkent.com/2015/07/03/building-smooth-paths-using-bezier-curves.html
+
+const getTargetVector = (n: number, knots: Array<Point>): Array<Point> => {
+    const out: Array<Point> = Array(n)
+    out[0] = knots[0].add(knots[1], 2)
+    for (let i = 1; i < n - 1; i++) {
+        out[i] = knots[i].scale(2).add(knots[i + 1]).scale(2)
+    }
+    out[n - 1] = knots[n - 1].scale(8).add(knots[n])
     return out
 }
 
@@ -111,51 +162,6 @@ const computeControlPoints = (n: number, knots: Array<Point>): Array<Point> => {
     out[2 * n - 1] = knots[n].add(out[n - 1]).scale(0.5)
 
     return out
-}
-
-class SmoothPath {
-    beziers: Array<Bezier>
-
-    constructor (knots: Array<Point>) {
-        if (knots.length < 3) {
-            throw new Error('Smooth path must pass through minimum of 3 points')
-        }
-        this.beziers = []
-
-        const n = knots.length - 1
-        const controlPoints = computeControlPoints(n, knots)
-        for (let i = 0; i < n; i++) {
-            this.appendBezier(
-                knots[i],
-                knots[i + 1],
-                controlPoints[i],
-                controlPoints[n + i]
-            )
-        }
-    }
-
-    appendBezier (start: Point, end: Point, control1: Point, control2: Point): void {
-        this.beziers.push(
-            new Bezier(start, control1, control2, end)
-        )
-    }
-
-    get (t: number): { pos: [number, number, number], foc: [number, number, number] } {
-        if (t < 0 || t > 1) {
-            throw new Error('Smooth path only defined in range (0, 1)')
-        }
-        const per = t * this.beziers.length
-        const ind = Math.floor(per)
-        const position = this.beziers[ind].get(per - ind)
-        const focus = this.beziers[ind].derivative(per - ind)
-        if (position.z === undefined || focus.z === undefined) {
-            throw new Error('Bezier does not contain 3d points')
-        }
-        return {
-            pos: [position.x, position.y, position.z],
-            foc: [focus.x, focus.y, focus.z]
-        }
-    }
 }
 
 export default SmoothPath
