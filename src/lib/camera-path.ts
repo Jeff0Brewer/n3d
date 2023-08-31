@@ -1,5 +1,16 @@
 import { Bezier } from 'bezier-js'
 
+type Vec3 = [number, number, number]
+
+type PathInstant = {
+    position: Vec3,
+    derivative: Vec3
+}
+
+interface PathType {
+    get: (t: number) => PathInstant
+}
+
 class Point {
     x: number
     y: number
@@ -34,15 +45,19 @@ class Point {
     }
 }
 
-class SmoothPath {
+class BezierPath implements PathType {
     beziers: Array<Bezier>
 
-    constructor (knots: Array<Point>) {
+    constructor (positions: Array<Vec3>) {
         // don't need complex bezier calculation for < 3 points
         // since linear interpolation works fine
-        if (knots.length < 3) {
-            throw new Error('Smooth path requires at least 3 points')
+        if (positions.length < 3) {
+            throw new Error('Bezier path requires at least 3 points')
         }
+
+        // move position vectors into point class for calculation
+        // and passing into bezier-js (requires x, y, z fields)
+        const knots = positions.map(p => new Point(...p))
 
         const n = knots.length - 1 // number of bezier curves in final path
         const controlPoints = computeControlPoints(n, knots)
@@ -58,10 +73,7 @@ class SmoothPath {
         }
     }
 
-    get (t: number): {
-        position: [number, number, number],
-        derivative: [number, number, number]
-    } {
+    get (t: number): PathInstant {
         if (t < 0 || t > 1) {
             throw new Error('Path only defined in range (0, 1)')
         }
@@ -82,6 +94,96 @@ class SmoothPath {
             position: [position.x, position.y, position.z],
             derivative: [derivative.x, derivative.y, derivative.z]
         }
+    }
+}
+
+class LinearPath implements PathType {
+    steps: Array<Vec3>
+
+    constructor (positions: Array<Vec3>) {
+        // prevent use of linear path for single point
+        if (positions.length < 2) {
+            throw new Error('Linear path requires at least 2 points')
+        }
+        this.steps = positions
+    }
+
+    get (t: number): PathInstant {
+        const per = (this.steps.length - 1) * t
+        const low = Math.floor(per)
+        const high = Math.ceil(per)
+
+        const a = this.steps[low]
+        const b = this.steps[high]
+        const subT = per - low
+
+        // linear interpolate between low and high steps for position
+        const position: Vec3 = [
+            a[0] + (b[0] - a[0]) * subT,
+            a[1] + (b[1] - a[1]) * subT,
+            a[2] + (b[2] - a[2]) * subT
+        ]
+
+        // since linear motion, derivative is in direction of low - high
+        const derivative: Vec3 = [
+            b[0] - a[0],
+            b[1] - a[1],
+            b[2] - a[2]
+        ]
+
+        return { position, derivative }
+    }
+}
+
+class StaticPath implements PathType {
+    position: Vec3
+    derivative: Vec3
+
+    constructor (position: Vec3) {
+        this.position = position
+        // derivative as negative of position so position + derivative yields origin
+        this.derivative = [
+            -position[0],
+            -position[1],
+            -position[2]
+        ]
+    }
+
+    get (): PathInstant {
+        return {
+            position: this.position,
+            derivative: this.derivative
+        }
+    }
+}
+
+class CameraPath {
+    path: BezierPath | LinearPath | StaticPath
+    duration: number
+
+    constructor (positions: Array<Vec3>, duration: number) {
+        if (positions.length === 0) {
+            throw new Error('Camera path requires > 0 positions')
+        }
+
+        // depending on number of positions, choose correct path type
+        switch (positions.length) {
+            case 1:
+                this.path = new StaticPath(positions[0])
+                break
+            case 2:
+                this.path = new LinearPath(positions)
+                break
+            default:
+                this.path = new BezierPath(positions)
+        }
+
+        this.duration = duration
+    }
+
+    get (time: number): PathInstant {
+        const t = (time / this.duration) % 1
+        return this.path.get(t)
     }
 }
 
@@ -164,5 +266,4 @@ const computeControlPoints = (n: number, knots: Array<Point>): Array<Point> => {
     return out
 }
 
-export default SmoothPath
-export { Point }
+export default CameraPath

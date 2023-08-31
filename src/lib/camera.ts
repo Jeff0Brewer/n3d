@@ -1,5 +1,5 @@
 import { mat4, vec3 } from 'gl-matrix'
-import SmoothPath, { Point } from '../lib/smooth-path'
+import CameraPath from '../lib/camera-path'
 
 const ROTATE_SPEED = 0.007
 const ZOOM_SPEED = 0.0005
@@ -14,7 +14,7 @@ class Camera {
     dragging: boolean
     defaultEye: vec3
     defaultFocus: vec3
-    path: SmoothPath | null
+    path: CameraPath | null
 
     constructor (view: mat4, eye: vec3, focus: vec3, up: vec3) {
         this.view = view
@@ -25,19 +25,18 @@ class Camera {
         this.dragging = false
         this.defaultEye = vec3.clone(eye)
         this.defaultFocus = vec3.clone(focus)
-        this.path = new SmoothPath([
-            new Point(10, 0, 0),
-            new Point(0, 0, 0),
-            new Point(0, 10, 0),
-            new Point(0, 1, 1),
-            new Point(0, 1, -1)
-        ])
+        this.path = new CameraPath([
+            [10, 0, 0],
+            [0, 0, 0],
+            [0, 10, 0],
+            [0, 1, 1],
+            [0, 1, -1]
+        ], 10000)
     }
 
     update (time: number): vec3 {
         if (this.path) {
-            const duration = 10000
-            const { position, derivative } = this.path.get((time / duration) % 1)
+            const { position, derivative } = this.path.get(time)
             vec3.copy(this.eye, position)
             vec3.add(this.focus, position, derivative)
         } else {
