@@ -4,6 +4,8 @@ import type { ColorField } from '../lib/color-map'
 import type { Selection } from '../components/select-menu'
 import type { Sphere } from '../vis/sphere-bounds'
 import type { Cone } from '../vis/cone-bounds'
+import CameraMenu from '../components/camera-menu'
+import CameraPath from '../lib/camera-path'
 import VisRenderer from '../vis/vis'
 import styles from '../styles/vis.module.css'
 
@@ -36,6 +38,20 @@ const Vis: FC<VisProps> = ({
             visRef.current.resetCamera(galaxyData)
             setSelected(null)
         }
+    }
+
+    const setCameraPath = (path: CameraPath | null): void => {
+        if (visRef.current) {
+            visRef.current.camera.path = path
+        }
+    }
+
+    const getCameraPosition = (): [number, number, number] => {
+        if (!visRef.current) {
+            throw new Error('Cannot get camera position before vis initialization')
+        }
+        const position = visRef.current.camera.eye
+        return [position[0], position[1], position[2]]
     }
 
     // init vis renderer
@@ -154,6 +170,7 @@ const Vis: FC<VisProps> = ({
                     </button>
                 </span>
             </section>
+            <CameraMenu setCameraPath={setCameraPath} getCameraPosition={getCameraPosition} />
         </div>
     )
 }

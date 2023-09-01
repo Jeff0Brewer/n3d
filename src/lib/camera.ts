@@ -1,18 +1,9 @@
 import { mat4, vec3 } from 'gl-matrix'
 import CameraPath from '../lib/camera-path'
-import type { CameraStep } from '../lib/camera-path'
 
 const ROTATE_SPEED = 0.007
 const ZOOM_SPEED = 0.0005
 const FOCUS_SPEED = 0.2
-
-const TEMP_PATH: Array<CameraStep> = [
-    { position: [10, 0, 0], focus: [0, 0, 10] },
-    { position: [0, 0, 0], focus: null },
-    { position: [0, 10, 0], focus: [0, 0, 0] },
-    { position: [0, 1, 1], focus: null },
-    { position: [0, 1, -1], focus: [5, 0, 0] }
-]
 
 class Camera {
     view: mat4
@@ -34,7 +25,7 @@ class Camera {
         this.dragging = false
         this.defaultEye = vec3.clone(eye)
         this.defaultFocus = vec3.clone(focus)
-        this.path = new CameraPath(TEMP_PATH, 10000)
+        this.path = null
     }
 
     update (time: number): vec3 {
