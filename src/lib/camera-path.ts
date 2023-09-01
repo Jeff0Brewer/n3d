@@ -11,6 +11,62 @@ interface PathType {
     get: (t: number) => PathInstant
 }
 
+class StaticPath implements PathType {
+    position: Vec3
+    derivative: Vec3
+
+    constructor (position: Vec3) {
+        this.position = position
+        // derivative as -position so position + derivative yields origin
+        this.derivative = [-position[0], -position[1], -position[2]]
+    }
+
+    get (): PathInstant {
+        return {
+            position: this.position,
+            derivative: this.derivative
+        }
+    }
+}
+
+class LinearPath implements PathType {
+    steps: Array<Vec3>
+
+    constructor (positions: Array<Vec3>) {
+        // prevent use of linear path for single point
+        if (positions.length < 2) {
+            throw new Error('Linear path requires at least 2 points')
+        }
+        this.steps = positions
+    }
+
+    get (t: number): PathInstant {
+        const per = (this.steps.length - 1) * t
+        const low = Math.floor(per)
+        const high = Math.ceil(per)
+
+        const a = this.steps[low]
+        const b = this.steps[high]
+        const subT = per - low
+
+        // linear interpolate between low and high steps for position
+        const position: Vec3 = [
+            a[0] + (b[0] - a[0]) * subT,
+            a[1] + (b[1] - a[1]) * subT,
+            a[2] + (b[2] - a[2]) * subT
+        ]
+
+        // since linear motion, derivative is in direction of low - high
+        const derivative: Vec3 = [
+            b[0] - a[0],
+            b[1] - a[1],
+            b[2] - a[2]
+        ]
+
+        return { position, derivative }
+    }
+}
+
 class Point {
     x: number
     y: number
@@ -97,96 +153,6 @@ class BezierPath implements PathType {
     }
 }
 
-class LinearPath implements PathType {
-    steps: Array<Vec3>
-
-    constructor (positions: Array<Vec3>) {
-        // prevent use of linear path for single point
-        if (positions.length < 2) {
-            throw new Error('Linear path requires at least 2 points')
-        }
-        this.steps = positions
-    }
-
-    get (t: number): PathInstant {
-        const per = (this.steps.length - 1) * t
-        const low = Math.floor(per)
-        const high = Math.ceil(per)
-
-        const a = this.steps[low]
-        const b = this.steps[high]
-        const subT = per - low
-
-        // linear interpolate between low and high steps for position
-        const position: Vec3 = [
-            a[0] + (b[0] - a[0]) * subT,
-            a[1] + (b[1] - a[1]) * subT,
-            a[2] + (b[2] - a[2]) * subT
-        ]
-
-        // since linear motion, derivative is in direction of low - high
-        const derivative: Vec3 = [
-            b[0] - a[0],
-            b[1] - a[1],
-            b[2] - a[2]
-        ]
-
-        return { position, derivative }
-    }
-}
-
-class StaticPath implements PathType {
-    position: Vec3
-    derivative: Vec3
-
-    constructor (position: Vec3) {
-        this.position = position
-        // derivative as negative of position so position + derivative yields origin
-        this.derivative = [
-            -position[0],
-            -position[1],
-            -position[2]
-        ]
-    }
-
-    get (): PathInstant {
-        return {
-            position: this.position,
-            derivative: this.derivative
-        }
-    }
-}
-
-class CameraPath {
-    path: BezierPath | LinearPath | StaticPath
-    duration: number
-
-    constructor (positions: Array<Vec3>, duration: number) {
-        if (positions.length === 0) {
-            throw new Error('Camera path requires > 0 positions')
-        }
-
-        // depending on number of positions, choose correct path type
-        switch (positions.length) {
-            case 1:
-                this.path = new StaticPath(positions[0])
-                break
-            case 2:
-                this.path = new LinearPath(positions)
-                break
-            default:
-                this.path = new BezierPath(positions)
-        }
-
-        this.duration = duration
-    }
-
-    get (time: number): PathInstant {
-        const t = (time / this.duration) % 1
-        return this.path.get(t)
-    }
-}
-
 // helpers to calculate bezier control points using Thomas' tridiagonal matrix algorithm
 // number values for getVector fns from linear alg for calculating aligned control points
 // ported from: https://www.stkent.com/2015/07/03/building-smooth-paths-using-bezier-curves.html
@@ -264,6 +230,36 @@ const computeControlPoints = (n: number, knots: Array<Point>): Array<Point> => {
     out[2 * n - 1] = knots[n].add(out[n - 1]).scale(0.5)
 
     return out
+}
+
+class CameraPath {
+    path: BezierPath | LinearPath | StaticPath
+    duration: number
+
+    constructor (positions: Array<Vec3>, duration: number) {
+        if (positions.length === 0) {
+            throw new Error('Camera path requires > 0 positions')
+        }
+
+        // depending on number of positions, choose correct path type
+        switch (positions.length) {
+            case 1:
+                this.path = new StaticPath(positions[0])
+                break
+            case 2:
+                this.path = new LinearPath(positions)
+                break
+            default:
+                this.path = new BezierPath(positions)
+        }
+
+        this.duration = duration
+    }
+
+    get (time: number): PathInstant {
+        const t = (time / this.duration) % 1
+        return this.path.get(t)
+    }
 }
 
 export default CameraPath
