@@ -232,15 +232,21 @@ const computeControlPoints = (n: number, knots: Array<Point>): Array<Point> => {
     return out
 }
 
+type CameraStep = {
+    position: Vec3,
+    focus: Vec3 | null
+}
+
 class CameraPath {
     path: BezierPath | LinearPath | StaticPath
     duration: number
 
-    constructor (positions: Array<Vec3>, duration: number) {
-        if (positions.length === 0) {
-            throw new Error('Camera path requires > 0 positions')
+    constructor (steps: Array<CameraStep>, duration: number) {
+        if (steps.length === 0) {
+            throw new Error('Camera path requires > 0 steps')
         }
 
+        const positions = steps.map(step => step.position)
         // depending on number of positions, choose correct path type
         switch (positions.length) {
             case 1:
@@ -263,3 +269,4 @@ class CameraPath {
 }
 
 export default CameraPath
+export type { CameraStep }
