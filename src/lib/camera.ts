@@ -7,11 +7,11 @@ const ZOOM_SPEED = 0.0005
 const FOCUS_SPEED = 0.2
 
 const TEMP_PATH: Array<CameraStep> = [
-    { position: [10, 0, 0], focus: null },
+    { position: [10, 0, 0], focus: [0, 0, 10] },
     { position: [0, 0, 0], focus: null },
-    { position: [0, 10, 0], focus: null },
+    { position: [0, 10, 0], focus: [0, 0, 0] },
     { position: [0, 1, 1], focus: null },
-    { position: [0, 1, -1], focus: null }
+    { position: [0, 1, -1], focus: [5, 0, 0] }
 ]
 
 class Camera {
@@ -39,9 +39,9 @@ class Camera {
 
     update (time: number): vec3 {
         if (this.path) {
-            const { position, derivative } = this.path.get(time)
+            const { position, focus } = this.path.get(time)
             vec3.copy(this.eye, position)
-            vec3.add(this.focus, position, derivative)
+            vec3.copy(this.focus, focus)
         } else {
             vec3.scale(this.focus, this.focus, 1 - FOCUS_SPEED)
             vec3.scaleAndAdd(this.focus, this.focus, this.focusTarget, FOCUS_SPEED)

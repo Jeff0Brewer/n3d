@@ -47,14 +47,10 @@ class LinearPath implements PathType {
 
         const a = this.steps[low]
         const b = this.steps[high]
-        const subT = per - low
+        const lerpT = per - low
 
         // linear interpolate between low and high steps for position
-        const position: Vec3 = [
-            a[0] + (b[0] - a[0]) * subT,
-            a[1] + (b[1] - a[1]) * subT,
-            a[2] + (b[2] - a[2]) * subT
-        ]
+        const position = lerpVec3(a, b, lerpT)
 
         // since linear motion, derivative is in direction of low - high
         const derivative: Vec3 = [
@@ -237,8 +233,14 @@ type CameraStep = {
     focus: Vec3 | null
 }
 
+type CameraInstant = {
+    position: Vec3,
+    focus: Vec3
+}
+
 class CameraPath {
     path: BezierPath | LinearPath | StaticPath
+    focuses: Array<Vec3 | null>
     duration: number
 
     constructor (steps: Array<CameraStep>, duration: number) {
@@ -259,13 +261,40 @@ class CameraPath {
                 this.path = new BezierPath(positions)
         }
 
+        this.focuses = steps.map(step => step.focus)
         this.duration = duration
     }
 
-    get (time: number): PathInstant {
+    get (time: number): CameraInstant {
         const t = (time / this.duration) % 1
-        return this.path.get(t)
+        const { position, derivative } = this.path.get(t)
+
+        const pathFocus: Vec3 = [
+            position[0] + derivative[0],
+            position[1] + derivative[1],
+            position[2] + derivative[2]
+        ]
+
+        const per = (this.focuses.length - 1) * t
+        const currInd = Math.floor(per)
+        const nextInd = Math.ceil(per)
+
+        // use step focus if defined, otherwise default to path focus
+        // interpolate between current and next step for smooth transition
+        const currFocus = this.focuses[currInd] || pathFocus
+        const nextFocus = this.focuses[nextInd] || pathFocus
+        const focus = lerpVec3(currFocus, nextFocus, per - currInd)
+
+        return { position, focus }
     }
+}
+
+const lerpVec3 = (a: Vec3, b: Vec3, t: number): Vec3 => {
+    return [
+        a[0] + (b[0] - a[0]) * t,
+        a[1] + (b[1] - a[1]) * t,
+        a[2] + (b[2] - a[2]) * t
+    ]
 }
 
 export default CameraPath
