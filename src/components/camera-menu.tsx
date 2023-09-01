@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react'
+import { HiMiniVideoCamera } from 'react-icons/hi2'
 import CameraPath from '../lib/camera-path'
 import type { CameraStep } from '../lib/camera-path'
 import styles from '../styles/camera-menu.module.css'
@@ -40,10 +41,12 @@ const CameraMenu: FC<CameraMenuProps> = ({ setCameraPath, getCameraPosition }) =
     return (
         <div className={styles.menu}>
             { steps.map((step: CameraStep, i: number) =>
-                <StepInput step={step} setStep={getStepSetter(i)} />
+                <StepInput step={step} setStep={getStepSetter(i)} key={i} />
             )}
-            <button onClick={appendStep}>+</button>
-            <button onClick={startCameraPath}>set</button>
+            <div className={styles.bottom}>
+                <button onClick={appendStep}>+</button>
+                <button onClick={startCameraPath}>set</button>
+            </div>
         </div>
     )
 }
@@ -69,8 +72,13 @@ const StepInput: FC<StepInputProps> = ({ step, setStep }) => {
     }
 
     return (
-        <div>
-            <PointInput point={step.position} setPoint={setPosition} />
+        <div className={styles.step}>
+            <span>
+                <div className={styles.icon}>
+                    <HiMiniVideoCamera />
+                </div>
+                <PointInput point={step.position} setPoint={setPosition} />
+            </span>
             { step.focus !== null &&
                 <PointInput point={step.focus} setPoint={setFocus} />
             }
@@ -99,21 +107,22 @@ const PointInput: FC<PointInputProps> = ({ point, setPoint }) => {
         }
     }
 
+    const DEFAULT_PRECISION = 2
     return (
         <div>
             <input
                 type={'text'}
-                defaultValue={point[0]}
+                defaultValue={point[0].toFixed(DEFAULT_PRECISION)}
                 onChange={getIndSetter(0)}
             />
             <input
                 type={'text'}
-                defaultValue={point[1]}
+                defaultValue={point[1].toFixed(DEFAULT_PRECISION)}
                 onChange={getIndSetter(1)}
             />
             <input
                 type={'text'}
-                defaultValue={point[2]}
+                defaultValue={point[2].toFixed(DEFAULT_PRECISION)}
                 onChange={getIndSetter(2)}
             />
         </div>

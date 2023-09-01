@@ -3,4 +3,31 @@
     top: 50px;
     right: 0;
     z-index: 100;
+    background-color: var(--color0);
+    font-size: 12px;
+}
+
+.menu input {
+    width: 50px;
+    height: 20px;
+    background-color: var(--color1);
+    font: inherit;
+}
+
+.step {
+    border-bottom: var(--border);
+}
+
+.bottom {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    background-color: var(--color1);
+    display: grid;
+    place-items: center;
 }
