@@ -16,7 +16,7 @@ const CameraMenu: FC<CameraMenuProps> = ({ setCameraPath, getCameraPosition }) =
     const getStepSetter = (ind: number): ((step: CameraStep) => void) => {
         return (step: CameraStep): void => {
             steps[ind] = step
-            setSteps({ ...steps })
+            setSteps([...steps])
         }
     }
 
