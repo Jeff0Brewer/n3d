@@ -54,6 +54,14 @@ const Vis: FC<VisProps> = ({
         return [position[0], position[1], position[2]]
     }
 
+    const getCameraFocus = (): [number, number, number] => {
+        if (!visRef.current) {
+            throw new Error('Cannot get camera focus before vis initialization')
+        }
+        const focus = visRef.current.camera.focus
+        return [focus[0], focus[1], focus[2]]
+    }
+
     // init vis renderer
     useEffect(() => {
         if (canvasRef.current) {
@@ -169,7 +177,11 @@ const Vis: FC<VisProps> = ({
                         reset camera
                     </button>
                 </span>
-                <CameraMenu setCameraPath={setCameraPath} getCameraPosition={getCameraPosition} />
+                <CameraMenu
+                    setCameraPath={setCameraPath}
+                    getCameraPosition={getCameraPosition}
+                    getCameraFocus={getCameraFocus}
+                />
             </section>
         </div>
     )
