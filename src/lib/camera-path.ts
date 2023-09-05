@@ -241,27 +241,28 @@ type CameraInstant = {
 class CameraPath {
     path: BezierPath | LinearPath | StaticPath
     focuses: Array<Vec3 | null>
+    currFocus: [number, number, number]
+    lastT: number
     duration: number
 
-    constructor (steps: Array<CameraStep>, duration: number) {
+    constructor (steps: Array<CameraStep>, duration: number, smooth?: boolean) {
         if (steps.length === 0) {
             throw new Error('Camera path requires > 0 steps')
         }
 
         const positions = steps.map(step => step.position)
         // depending on number of positions, choose correct path type
-        switch (positions.length) {
-            case 1:
-                this.path = new StaticPath(positions[0])
-                break
-            case 2:
-                this.path = new LinearPath(positions)
-                break
-            default:
-                this.path = new BezierPath(positions)
+        if (positions.length === 1) {
+            this.path = new StaticPath(positions[0])
+        } else if (positions.length >= 3 && smooth) {
+            this.path = new BezierPath(positions)
+        } else {
+            this.path = new LinearPath(positions)
         }
 
         this.focuses = steps.map(step => step.focus)
+        this.currFocus = this.focuses[0] || [0, 0, 0]
+        this.lastT = 0
         this.duration = duration
     }
 
@@ -269,23 +270,24 @@ class CameraPath {
         const t = (time / this.duration) % 1
         const { position, derivative } = this.path.get(t)
 
-        const pathFocus: Vec3 = [
+        const per = (this.focuses.length - 1) * t
+        const focus = this.focuses[Math.round(per)] || [
             position[0] + derivative[0],
             position[1] + derivative[1],
             position[2] + derivative[2]
         ]
 
-        const per = (this.focuses.length - 1) * t
-        const currInd = Math.floor(per)
-        const nextInd = Math.ceil(per)
+        if (this.lastT > t) {
+            this.currFocus = focus
+        } else {
+            this.currFocus = lerpVec3(this.currFocus, focus, 0.05)
+        }
+        this.lastT = t
 
-        // use step focus if defined, otherwise default to path focus
-        // interpolate between current and next step for smooth transition
-        const currFocus = this.focuses[currInd] || pathFocus
-        const nextFocus = this.focuses[nextInd] || pathFocus
-        const focus = lerpVec3(currFocus, nextFocus, per - currInd)
-
-        return { position, focus }
+        return {
+            position,
+            focus: this.currFocus
+        }
     }
 }
 
@@ -297,5 +299,51 @@ const lerpVec3 = (a: Vec3, b: Vec3, t: number): Vec3 => {
     ]
 }
 
+const serializeSteps = (steps: Array<CameraStep>): string => {
+    let out = ''
+    for (const step of steps) {
+        const { position, focus } = step
+        const [px, py, pz] = position
+        out += `${px}, ${py}, ${pz}, `
+        if (focus !== null) {
+            const [fx, fy, fz] = focus
+            out += `${fx}, ${fy}, ${fz}\n`
+        } else {
+            out += 'null\n'
+        }
+    }
+    return out
+}
+
+const deserializeSteps = (csv: string): Array<CameraStep> => {
+    const steps: Array<CameraStep> = []
+    const lines = csv.split('\n')
+    for (const line of lines) {
+        const row = line.split(',').map(v => v.trim())
+        // ignore incomplete lines
+        if (row.length < 4) { continue }
+        const step: CameraStep = {
+            position: [
+                parseFloat(row[0]),
+                parseFloat(row[1]),
+                parseFloat(row[2])
+            ],
+            focus: row[3] !== 'null'
+                ? [
+                    parseFloat(row[3]),
+                    parseFloat(row[4]),
+                    parseFloat(row[5])
+                ]
+                : null
+        }
+        steps.push(step)
+    }
+    return steps
+}
+
 export default CameraPath
 export type { CameraStep }
+export {
+    serializeSteps,
+    deserializeSteps
+}
