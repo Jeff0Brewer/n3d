@@ -169,8 +169,8 @@ const Vis: FC<VisProps> = ({
                         reset camera
                     </button>
                 </span>
+                <CameraMenu setCameraPath={setCameraPath} getCameraPosition={getCameraPosition} />
             </section>
-            <CameraMenu setCameraPath={setCameraPath} getCameraPosition={getCameraPosition} />
         </div>
     )
 }

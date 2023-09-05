@@ -1,10 +1,7 @@
 .menu {
-    position: absolute;
-    top: 50px;
-    right: 0;
-    z-index: 100;
     background-color: var(--color0);
     font-size: 12px;
+    width: 250px;
 }
 
 .menu input {
