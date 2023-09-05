@@ -95,16 +95,18 @@ const CameraMenu: FC<CameraMenuProps> = ({
     if (!visible) { return <></> }
     return (
         <div className={styles.menu}>
-            { steps.map((step: CameraStep, i: number) =>
-                <StepInput
-                    step={step}
-                    setStep={getStepSetter(i)}
-                    removeStep={getStepRemover(i)}
-                    getCameraPosition={getCameraPosition}
-                    getCameraFocus={getCameraFocus}
-                    key={i}
-                />
-            )}
+            <div className={styles.steps}>
+                { steps.map((step: CameraStep, i: number) =>
+                    <StepInput
+                        step={step}
+                        setStep={getStepSetter(i)}
+                        removeStep={getStepRemover(i)}
+                        getCameraPosition={getCameraPosition}
+                        getCameraFocus={getCameraFocus}
+                        key={i}
+                    />
+                )}
+            </div>
             <div className={styles.menuRow}>
                 <button
                     className={styles.addStep}

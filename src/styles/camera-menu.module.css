@@ -27,6 +27,12 @@
     font-size: 20px;
 }
 
+.steps {
+    max-height: 300px;
+    overflow-y: scroll;
+    border-bottom: var(--border);
+}
+
 .duration {
     display: flex;
     align-items: center;
@@ -40,6 +46,10 @@
     flex-direction: column;
     gap: var(--gap);
     margin-bottom: 4px;
+}
+
+.step:last-of-type {
+    border: none;
 }
 
 .stepRow {
