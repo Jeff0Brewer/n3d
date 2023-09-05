@@ -1,6 +1,10 @@
 import React, { FC, useState } from 'react'
-import { HiMiniVideoCamera, HiEye, HiMiniXMark } from 'react-icons/hi2'
-import CameraPath from '../lib/camera-path'
+import { HiMiniVideoCamera, HiEye, HiMiniXMark, HiMiniPlus } from 'react-icons/hi2'
+import { IoMdPlay } from 'react-icons/io'
+import { PiWaveSawtoothBold, PiWaveSineBold } from 'react-icons/pi'
+import { FaFileDownload, FaFileUpload } from 'react-icons/fa'
+import { downloadTxt } from '../lib/export'
+import CameraPath, { serializeSteps, deserializeSteps } from '../lib/camera-path'
 import type { CameraStep } from '../lib/camera-path'
 import styles from '../styles/camera-menu.module.css'
 
@@ -13,9 +17,10 @@ type CameraMenuProps = {
 const CameraMenu: FC<CameraMenuProps> = ({
     setCameraPath, getCameraPosition, getCameraFocus
 }) => {
-    const [visible, setVisible] = useState<boolean>(true)
     const [steps, setSteps] = useState<Array<CameraStep>>([])
-    const [duration, setDuration] = useState<number>(10000)
+    const [duration, setDuration] = useState<number>(10)
+    const [smooth, setSmooth] = useState<boolean>(true)
+    const [visible, setVisible] = useState<boolean>(true)
 
     const appendStep = (): void => {
         const step: CameraStep = {
@@ -53,8 +58,31 @@ const CameraMenu: FC<CameraMenuProps> = ({
         if (steps.length === 0) {
             setCameraPath(null)
         } else {
-            const path = new CameraPath(steps, duration)
+            const path = new CameraPath(steps, duration * 1000, smooth)
             setCameraPath(path)
+        }
+    }
+
+    const downloadPath = (): void => {
+        const csv = serializeSteps(steps)
+        downloadTxt('n3d_camera_path.csv', csv)
+    }
+
+    const uploadPath = (e: React.ChangeEvent): void => {
+        if (!(e.target instanceof HTMLInputElement) || !e.target.files) {
+            throw new Error('Cannot get file upload from non-input element')
+        }
+        const file = e.target.files[0]
+        if (file) {
+            const reader = new FileReader()
+            reader.onload = (e): void => {
+                const csv = e.target?.result
+                if (typeof csv === 'string') {
+                    const steps = deserializeSteps(csv)
+                    setSteps(steps)
+                }
+            }
+            reader.readAsText(file)
         }
     }
 
@@ -71,14 +99,43 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     key={i}
                 />
             )}
-            <input
-                type={'text'}
-                defaultValue={duration}
-                onChange={updateDuration}
-            />
-            <div className={styles.bottom}>
-                <button onClick={appendStep}>+</button>
-                <button onClick={startCameraPath}>set</button>
+            <div className={styles.menuRow}>
+                <button
+                    className={styles.addStep}
+                    onClick={appendStep}
+                >
+                    <HiMiniPlus />
+                </button>
+                <span className={styles.duration}>
+                    <input
+                        type={'text'}
+                        defaultValue={duration}
+                        onChange={updateDuration}
+                    />
+                    <p>sec</p>
+                </span>
+            </div>
+            <div className={styles.bottomControls}>
+                <button onClick={(): void => setSmooth(!smooth)}>
+                    { smooth
+                        ? <PiWaveSineBold />
+                        : <PiWaveSawtoothBold /> }
+                </button>
+                <div>
+                    <button onClick={downloadPath}>
+                        <FaFileDownload />
+                    </button>
+                    <label className={styles.upload}>
+                        <input
+                            type={'file'}
+                            onChange={uploadPath}
+                        />
+                        <FaFileUpload />
+                    </label>
+                </div>
+                <button onClick={startCameraPath}>
+                    <IoMdPlay />
+                </button>
             </div>
         </div>
     )

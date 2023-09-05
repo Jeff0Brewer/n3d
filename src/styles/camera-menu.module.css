@@ -12,7 +12,7 @@
     font: inherit;
 }
 
-.menu button:hover {
+.menu button:hover, .upload:hover {
     opacity: 0.6;
 }
 
@@ -68,4 +68,12 @@
     overflow: hidden;
     display: grid;
     place-items: center;
+}
+
+.upload {
+    cursor: pointer;
+}
+
+.upload input {
+    display: none;
 }
