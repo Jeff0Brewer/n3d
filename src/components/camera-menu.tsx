@@ -23,7 +23,6 @@ const CameraMenu: FC<CameraMenuProps> = ({
     const [visible, setVisible] = useState<boolean>(false)
     const durationRef = useRef<HTMLInputElement>(null)
 
-    // setup key event to toggle visibility on ctrl+m
     useEffect(() => {
         const onKey = (e: KeyboardEvent): void => {
             if (e.ctrlKey && e.key === 'm') {
@@ -123,10 +122,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                 </div>
             }
             <div className={styles.menuRow}>
-                <button
-                    className={styles.addStep}
-                    onClick={appendStep}
-                >
+                <button className={styles.addStep} onClick={appendStep}>
                     <HiMiniPlus />
                 </button>
                 <span className={styles.duration}>
@@ -145,7 +141,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                         ? <PiWaveSineBold />
                         : <PiWaveSawtoothBold /> }
                 </button>
-                <div>
+                <div className={styles.fileControls}>
                     <button onClick={downloadPath}>
                         <FaFileDownload />
                     </button>
@@ -202,19 +198,14 @@ const StepInput: FC<StepInputProps> = ({
     return (
         <div className={styles.step}>
             <div className={styles.stepRow}>
-                <button
-                    className={styles.icon}
-                    onClick={(): void => setPosition(getCameraPosition(), true)}
-                >
-                    <HiMiniVideoCamera />
-                </button>
-                <PointInput point={step.position} setPoint={setPosition} key={key} />
-                <button
-                    className={styles.icon}
-                    onClick={(): void => removeStep()}
-                >
-                    <HiMiniXMark />
-                </button>
+                <PointInput
+                    point={step.position}
+                    setPoint={setPosition}
+                    update={(): void => setPosition(getCameraPosition(), true)}
+                    clear={removeStep}
+                    icon={<HiMiniVideoCamera />}
+                    key={key}
+                />
                 { step.focus === null &&
                     <button
                         className={styles.icon}
@@ -225,19 +216,14 @@ const StepInput: FC<StepInputProps> = ({
             </div>
             { step.focus !== null &&
                 <div className={styles.stepRow}>
-                    <button
-                        className={styles.icon}
-                        onClick={(): void => setFocus(getCameraFocus(), true)}
-                    >
-                        <HiEye />
-                    </button>
-                    <PointInput point={step.focus} setPoint={setFocus} key={key + 1} />
-                    <button
-                        className={styles.icon}
-                        onClick={(): void => setFocus(null, true)}
-                    >
-                        <HiMiniXMark />
-                    </button>
+                    <PointInput
+                        point={step.focus}
+                        setPoint={setFocus}
+                        update={(): void => setFocus(getCameraFocus(), true)}
+                        clear={(): void => setFocus(null, true)}
+                        icon={<HiEye />}
+                        key={key + 1}
+                    />
                 </div>
             }
         </div>
@@ -246,10 +232,15 @@ const StepInput: FC<StepInputProps> = ({
 
 type PointInputProps = {
     point: [number, number, number],
-    setPoint: (point: [number, number, number]) => void
+    setPoint: (point: [number, number, number]) => void,
+    update: () => void,
+    clear: () => void,
+    icon: React.ReactElement
 }
 
-const PointInput: FC<PointInputProps> = ({ point, setPoint }) => {
+const PointInput: FC<PointInputProps> = ({
+    point, setPoint, update, clear, icon
+}) => {
     const getIndSetter = (ind: number): ((e: React.ChangeEvent) => void) => {
         return (e: React.ChangeEvent): void => {
             if (!(e.target instanceof HTMLInputElement)) {
@@ -268,6 +259,9 @@ const PointInput: FC<PointInputProps> = ({ point, setPoint }) => {
     const DEFAULT_PRECISION = 2
     return (
         <div className={styles.pointInput}>
+            <button onClick={update} className={styles.icon}>
+                { icon }
+            </button>
             <input
                 type={'text'}
                 defaultValue={point[0].toFixed(DEFAULT_PRECISION)}
@@ -283,6 +277,9 @@ const PointInput: FC<PointInputProps> = ({ point, setPoint }) => {
                 defaultValue={point[2].toFixed(DEFAULT_PRECISION)}
                 onChange={getIndSetter(2)}
             />
+            <button onClick={clear} className={styles.icon}>
+                <HiMiniXMark />
+            </button>
         </div>
     )
 }

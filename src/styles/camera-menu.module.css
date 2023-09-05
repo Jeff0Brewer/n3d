@@ -27,6 +27,12 @@
     font-size: 20px;
 }
 
+.fileControls {
+    font-size: 18px;
+    display: flex;
+    gap: var(--gap);
+}
+
 .steps {
     max-height: 300px;
     overflow-y: scroll;
