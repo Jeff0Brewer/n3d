@@ -1,4 +1,4 @@
-import React, { FC, useState, useRef } from 'react'
+import React, { FC, useState, useRef, useEffect } from 'react'
 import { HiMiniVideoCamera, HiEye, HiMiniXMark, HiMiniPlus } from 'react-icons/hi2'
 import { IoMdPlay } from 'react-icons/io'
 import { PiWaveSawtoothBold, PiWaveSineBold } from 'react-icons/pi'
@@ -22,6 +22,19 @@ const CameraMenu: FC<CameraMenuProps> = ({
     const [smooth, setSmooth] = useState<boolean>(true)
     const [visible, setVisible] = useState<boolean>(true)
     const durationRef = useRef<HTMLInputElement>(null)
+
+    // setup key event to toggle visibility on ctrl+m
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent): void => {
+            if (e.ctrlKey && e.key === 'm') {
+                setVisible(!visible)
+            }
+        }
+        window.addEventListener('keydown', onKey)
+        return (): void => {
+            window.removeEventListener('keydown', onKey)
+        }
+    }, [visible])
 
     const appendStep = (): void => {
         const step: CameraStep = {
@@ -95,18 +108,20 @@ const CameraMenu: FC<CameraMenuProps> = ({
     if (!visible) { return <></> }
     return (
         <div className={styles.menu}>
-            <div className={styles.steps}>
-                { steps.map((step: CameraStep, i: number) =>
-                    <StepInput
-                        step={step}
-                        setStep={getStepSetter(i)}
-                        removeStep={getStepRemover(i)}
-                        getCameraPosition={getCameraPosition}
-                        getCameraFocus={getCameraFocus}
-                        key={i}
-                    />
-                )}
-            </div>
+            { steps.length !== 0 &&
+                <div className={styles.steps}>
+                    { steps.map((step: CameraStep, i: number) =>
+                        <StepInput
+                            step={step}
+                            setStep={getStepSetter(i)}
+                            removeStep={getStepRemover(i)}
+                            getCameraPosition={getCameraPosition}
+                            getCameraFocus={getCameraFocus}
+                            key={i}
+                        />
+                    )}
+                </div>
+            }
             <div className={styles.menuRow}>
                 <button
                     className={styles.addStep}
