@@ -10,12 +10,14 @@ class CameraTrace {
     program: WebGLProgram
     pathBuffer: WebGLBuffer
     cameraBuffer: WebGLBuffer
+    focusBuffer: WebGLBuffer
     bindAttrib: () => void
     setModelMatrix: (mat: mat4) => void
     setViewMatrix: (mat: mat4) => void
     setProjMatrix: (mat: mat4) => void
     numPathVertex: number
-    numSteps: number
+    numCameraVerts: number
+    numFocusVerts: number
 
     constructor (
         gl: WebGLRenderingContext,
@@ -26,9 +28,11 @@ class CameraTrace {
         this.program = initProgram(gl, vertSource, fragSource)
         this.pathBuffer = initBuffer(gl)
         this.cameraBuffer = initBuffer(gl)
+        this.focusBuffer = initBuffer(gl)
         this.bindAttrib = initAttribute(gl, this.program, 'position', POS_FPV, POS_FPV, 0, gl.FLOAT)
         this.numPathVertex = 0
-        this.numSteps = 0
+        this.numCameraVerts = 0
+        this.numFocusVerts = 0
 
         const uModelMatrix = gl.getUniformLocation(this.program, 'modelMatrix')
         const uViewMatrix = gl.getUniformLocation(this.program, 'viewMatrix')
@@ -52,15 +56,24 @@ class CameraTrace {
         this.numPathVertex = pathVerts.length / POS_FPV
 
         const cameraVerts = path !== null
-            ? path.getCameraPositions()
+            ? path.getCameraPoints()
             : new Float32Array(0)
         gl.bindBuffer(gl.ARRAY_BUFFER, this.cameraBuffer)
         gl.bufferData(gl.ARRAY_BUFFER, cameraVerts, gl.STATIC_DRAW)
-        this.numSteps = cameraVerts.length / POS_FPV
+        this.numCameraVerts = cameraVerts.length / POS_FPV
+
+        const focusVerts = path !== null
+            ? path.getFocusLines()
+            : new Float32Array(0)
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.focusBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, focusVerts, gl.STATIC_DRAW)
+        this.numFocusVerts = focusVerts.length / POS_FPV
     }
 
     draw (gl: WebGLRenderingContext, view: mat4): void {
-        if (this.numSteps > 0) {
+        if (this.numCameraVerts > 0) {
+            gl.disable(gl.DEPTH_TEST)
+
             gl.useProgram(this.program)
             this.setViewMatrix(view)
 
@@ -68,9 +81,15 @@ class CameraTrace {
             this.bindAttrib()
             gl.drawArrays(gl.LINE_STRIP, 0, this.numPathVertex)
 
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.focusBuffer)
+            this.bindAttrib()
+            gl.drawArrays(gl.LINES, 0, this.numFocusVerts)
+
             gl.bindBuffer(gl.ARRAY_BUFFER, this.cameraBuffer)
             this.bindAttrib()
-            gl.drawArrays(gl.POINTS, 0, this.numSteps)
+            gl.drawArrays(gl.POINTS, 0, this.numCameraVerts)
+
+            gl.enable(gl.DEPTH_TEST)
         }
     }
 }

@@ -194,7 +194,6 @@ class VisRenderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
-        this.cameraTrace.draw(this.gl, this.view)
         this.points.draw(this.gl, this.view, inv, eye)
         this.highlight.draw(this.gl, this.view)
         this.sphereBounds.draw(this.gl, this.view)
@@ -202,6 +201,7 @@ class VisRenderer {
         if (this.drawLandmarks) {
             this.landmarks.draw(this.gl, this.view, landmarks, this.camera.eye)
         }
+        this.cameraTrace.draw(this.gl, this.view)
     }
 }
 

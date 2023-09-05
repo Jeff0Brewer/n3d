@@ -50,7 +50,7 @@ class LinearPath implements PathType {
         const lerpT = per - low
 
         // linear interpolate between low and high steps for position
-        const position = lerpVec3(a, b, lerpT)
+        const position = lerp(a, b, lerpT)
 
         // since linear motion, derivative is in direction of low - high
         const derivative: Vec3 = [
@@ -292,7 +292,7 @@ class CameraPath {
             // lerp t value from diff in per for consistency across
             // different durations / framerates
             const lerpT = (per - this.lastInd) * 10
-            this.currFocus = lerpVec3(this.currFocus, focus, lerpT)
+            this.currFocus = lerp(this.currFocus, focus, lerpT)
         }
         this.lastInd = per
 
@@ -312,21 +312,25 @@ class CameraPath {
         return new Float32Array(positions)
     }
 
-    getCameraPositions (): Float32Array {
+    getCameraPoints (): Float32Array {
         const positions = []
         for (const step of this.steps) {
             positions.push(...step.position)
         }
         return new Float32Array(positions)
     }
-}
 
-const lerpVec3 = (a: Vec3, b: Vec3, t: number): Vec3 => {
-    return [
-        a[0] + (b[0] - a[0]) * t,
-        a[1] + (b[1] - a[1]) * t,
-        a[2] + (b[2] - a[2]) * t
-    ]
+    getFocusLines (): Float32Array {
+        const lines = []
+        for (const step of this.steps) {
+            if (step.focus) {
+                const dir = scaleTo(sub(step.focus, step.position), 0.1)
+                const focusDir = add(step.position, dir)
+                lines.push(...step.position, ...focusDir)
+            }
+        }
+        return new Float32Array(lines)
+    }
 }
 
 const serializePath = (
@@ -389,6 +393,39 @@ const deserializePath = (csv: string): {
         duration,
         smooth
     }
+}
+
+const add = (a: Vec3, b: Vec3): Vec3 => {
+    return [
+        a[0] + b[0],
+        a[1] + b[1],
+        a[2] + b[2]
+    ]
+}
+
+const sub = (a: Vec3, b: Vec3): Vec3 => {
+    return [
+        a[0] - b[0],
+        a[1] - b[1],
+        a[2] - b[2]
+    ]
+}
+
+const scaleTo = (v: Vec3, length: number): Vec3 => {
+    const invMag = 1 / Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
+    return [
+        v[0] * invMag * length,
+        v[1] * invMag * length,
+        v[2] * invMag * length
+    ]
+}
+
+const lerp = (a: Vec3, b: Vec3, t: number): Vec3 => {
+    return [
+        a[0] + (b[0] - a[0]) * t,
+        a[1] + (b[1] - a[1]) * t,
+        a[2] + (b[2] - a[2]) * t
+    ]
 }
 
 export default CameraPath
