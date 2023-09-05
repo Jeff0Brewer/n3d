@@ -20,7 +20,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
     const [steps, setSteps] = useState<Array<CameraStep>>([])
     const [duration, setDuration] = useState<number>(10)
     const [smooth, setSmooth] = useState<boolean>(true)
-    const [visible, setVisible] = useState<boolean>(true)
+    const [visible, setVisible] = useState<boolean>(false)
     const durationRef = useRef<HTMLInputElement>(null)
 
     // setup key event to toggle visibility on ctrl+m
