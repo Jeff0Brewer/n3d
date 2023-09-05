@@ -299,8 +299,12 @@ const lerpVec3 = (a: Vec3, b: Vec3, t: number): Vec3 => {
     ]
 }
 
-const serializeSteps = (steps: Array<CameraStep>): string => {
-    let out = ''
+const serializePath = (
+    steps: Array<CameraStep>,
+    duration: number,
+    smooth: boolean
+): string => {
+    let out = `${duration}, ${smooth ? 'smooth' : 'linear'}\n`
     for (const step of steps) {
         const { position, focus } = step
         const [px, py, pz] = position
@@ -315,9 +319,20 @@ const serializeSteps = (steps: Array<CameraStep>): string => {
     return out
 }
 
-const deserializeSteps = (csv: string): Array<CameraStep> => {
-    const steps: Array<CameraStep> = []
+const deserializePath = (csv: string): {
+    steps: Array<CameraStep>,
+    duration: number,
+    smooth: boolean
+} => {
     const lines = csv.split('\n')
+    const meta = lines.shift()?.split(',').map(v => v.trim())
+    if (!meta) {
+        throw new Error('Incomplete path csv')
+    }
+    const duration = parseFloat(meta[0])
+    const smooth = meta[1] === 'smooth'
+
+    const steps: Array<CameraStep> = []
     for (const line of lines) {
         const row = line.split(',').map(v => v.trim())
         // ignore incomplete lines
@@ -338,12 +353,17 @@ const deserializeSteps = (csv: string): Array<CameraStep> => {
         }
         steps.push(step)
     }
-    return steps
+
+    return {
+        steps,
+        duration,
+        smooth
+    }
 }
 
 export default CameraPath
 export type { CameraStep }
 export {
-    serializeSteps,
-    deserializeSteps
+    serializePath,
+    deserializePath
 }

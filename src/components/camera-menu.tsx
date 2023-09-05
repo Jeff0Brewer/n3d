@@ -1,10 +1,10 @@
-import React, { FC, useState } from 'react'
+import React, { FC, useState, useRef } from 'react'
 import { HiMiniVideoCamera, HiEye, HiMiniXMark, HiMiniPlus } from 'react-icons/hi2'
 import { IoMdPlay } from 'react-icons/io'
 import { PiWaveSawtoothBold, PiWaveSineBold } from 'react-icons/pi'
 import { FaFileDownload, FaFileUpload } from 'react-icons/fa'
 import { downloadTxt } from '../lib/export'
-import CameraPath, { serializeSteps, deserializeSteps } from '../lib/camera-path'
+import CameraPath, { serializePath, deserializePath } from '../lib/camera-path'
 import type { CameraStep } from '../lib/camera-path'
 import styles from '../styles/camera-menu.module.css'
 
@@ -21,6 +21,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
     const [duration, setDuration] = useState<number>(10)
     const [smooth, setSmooth] = useState<boolean>(true)
     const [visible, setVisible] = useState<boolean>(true)
+    const durationRef = useRef<HTMLInputElement>(null)
 
     const appendStep = (): void => {
         const step: CameraStep = {
@@ -64,7 +65,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
     }
 
     const downloadPath = (): void => {
-        const csv = serializeSteps(steps)
+        const csv = serializePath(steps, duration, smooth)
         downloadTxt('n3d_camera_path.csv', csv)
     }
 
@@ -78,8 +79,13 @@ const CameraMenu: FC<CameraMenuProps> = ({
             reader.onload = (e): void => {
                 const csv = e.target?.result
                 if (typeof csv === 'string') {
-                    const steps = deserializeSteps(csv)
+                    const { steps, duration, smooth } = deserializePath(csv)
                     setSteps(steps)
+                    setSmooth(smooth)
+                    setDuration(duration)
+                    if (durationRef.current) {
+                        durationRef.current.value = duration.toString()
+                    }
                 }
             }
             reader.readAsText(file)
@@ -108,6 +114,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                 </button>
                 <span className={styles.duration}>
                     <input
+                        ref={durationRef}
                         type={'text'}
                         defaultValue={duration}
                         onChange={updateDuration}
