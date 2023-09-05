@@ -243,7 +243,7 @@ class CameraPath {
     focuses: Array<Vec3 | null>
     duration: number
     currFocus: [number, number, number]
-    lastT: number
+    lastInd: number
     startTime: number
 
     constructor (
@@ -269,8 +269,8 @@ class CameraPath {
         this.focuses = steps.map(step => step.focus)
         this.duration = duration
         this.currFocus = this.focuses[0] || [0, 0, 0]
-        this.lastT = Number.MAX_VALUE
         this.startTime = startTime
+        this.lastInd = Number.MAX_VALUE
     }
 
     get (time: number): CameraInstant {
@@ -284,12 +284,15 @@ class CameraPath {
             position[2] + derivative[2]
         ]
 
-        if (this.lastT > t) {
+        if (this.lastInd > per) {
             this.currFocus = focus
         } else {
-            this.currFocus = lerpVec3(this.currFocus, focus, 0.05)
+            // lerp t value from diff in per for consistency across
+            // different durations / framerates
+            const lerpT = (per - this.lastInd) * 10
+            this.currFocus = lerpVec3(this.currFocus, focus, lerpT)
         }
-        this.lastT = t
+        this.lastInd = per
 
         return {
             position,
