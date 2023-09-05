@@ -18,10 +18,10 @@ const selectionsToText = (data: GalaxyData, selections: Array<Selection>): strin
     return text
 }
 
-const downloadTxt = (contents: string): void => {
+const downloadTxt = (filename: string, contents: string): void => {
     const element: HTMLAnchorElement = document.createElement('a')
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(contents))
-    element.setAttribute('download', 'n3d_selections.txt')
+    element.setAttribute('download', filename)
     element.style.display = 'none'
 
     document.body.appendChild(element)

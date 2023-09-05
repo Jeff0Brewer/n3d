@@ -198,7 +198,7 @@ const ViewMenu: FC<ViewMenuProps> = ({
     }
 
     const exportSelections = (): void => {
-        downloadTxt(selectionsToText(data, selections))
+        downloadTxt('n3d_selections.txt', selectionsToText(data, selections))
     }
 
     if (selections.length === 0) { return <></> }
