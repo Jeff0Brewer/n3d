@@ -239,6 +239,7 @@ type CameraInstant = {
 }
 
 class CameraPath {
+    steps: Array<CameraStep>
     path: BezierPath | LinearPath | StaticPath
     focuses: Array<Vec3 | null>
     duration: number
@@ -255,6 +256,7 @@ class CameraPath {
         if (steps.length === 0) {
             throw new Error('Camera path requires > 0 steps')
         }
+        this.steps = steps
 
         const positions = steps.map(step => step.position)
         // depending on number of positions, choose correct path type
@@ -306,6 +308,14 @@ class CameraPath {
         for (let t = 0; t <= 1; t += tInc) {
             const { position } = this.path.get(t)
             positions.push(...position)
+        }
+        return new Float32Array(positions)
+    }
+
+    getCameraPositions (): Float32Array {
+        const positions = []
+        for (const step of this.steps) {
+            positions.push(...step.position)
         }
         return new Float32Array(positions)
     }

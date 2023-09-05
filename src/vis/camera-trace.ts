@@ -8,12 +8,14 @@ const POS_FPV = 3
 
 class CameraTrace {
     program: WebGLProgram
-    buffer: WebGLBuffer
+    pathBuffer: WebGLBuffer
+    cameraBuffer: WebGLBuffer
     bindAttrib: () => void
     setModelMatrix: (mat: mat4) => void
     setViewMatrix: (mat: mat4) => void
     setProjMatrix: (mat: mat4) => void
-    numVertex: number
+    numPathVertex: number
+    numSteps: number
 
     constructor (
         gl: WebGLRenderingContext,
@@ -22,9 +24,11 @@ class CameraTrace {
         proj: mat4
     ) {
         this.program = initProgram(gl, vertSource, fragSource)
-        this.buffer = initBuffer(gl)
+        this.pathBuffer = initBuffer(gl)
+        this.cameraBuffer = initBuffer(gl)
         this.bindAttrib = initAttribute(gl, this.program, 'position', POS_FPV, POS_FPV, 0, gl.FLOAT)
-        this.numVertex = 0
+        this.numPathVertex = 0
+        this.numSteps = 0
 
         const uModelMatrix = gl.getUniformLocation(this.program, 'modelMatrix')
         const uViewMatrix = gl.getUniformLocation(this.program, 'viewMatrix')
@@ -40,21 +44,33 @@ class CameraTrace {
     }
 
     setPath (gl: WebGLRenderingContext, path: CameraPath | null): void {
-        const verts = path !== null
+        const pathVerts = path !== null
             ? path.getPathTrace()
             : new Float32Array(0)
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
-        gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW)
-        this.numVertex = verts.length / POS_FPV
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.pathBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, pathVerts, gl.STATIC_DRAW)
+        this.numPathVertex = pathVerts.length / POS_FPV
+
+        const cameraVerts = path !== null
+            ? path.getCameraPositions()
+            : new Float32Array(0)
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.cameraBuffer)
+        gl.bufferData(gl.ARRAY_BUFFER, cameraVerts, gl.STATIC_DRAW)
+        this.numSteps = cameraVerts.length / POS_FPV
     }
 
     draw (gl: WebGLRenderingContext, view: mat4): void {
-        if (this.numVertex > 0) {
+        if (this.numSteps > 0) {
             gl.useProgram(this.program)
             this.setViewMatrix(view)
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer)
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.pathBuffer)
             this.bindAttrib()
-            gl.drawArrays(gl.LINE_STRIP, 0, this.numVertex)
+            gl.drawArrays(gl.LINE_STRIP, 0, this.numPathVertex)
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.cameraBuffer)
+            this.bindAttrib()
+            gl.drawArrays(gl.POINTS, 0, this.numSteps)
         }
     }
 }
