@@ -22,6 +22,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
     const [duration, setDuration] = useState<number>(10)
     const [smooth, setSmooth] = useState<boolean>(true)
     const [visible, setVisible] = useState<boolean>(false)
+    const [minKey, setMinKey] = useState<number>(0)
     const durationRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
@@ -100,9 +101,12 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     if (durationRef.current) {
                         durationRef.current.value = duration.toString()
                     }
+                    // increment keys to refresh input values
+                    setMinKey(minKey + 1)
                 }
             }
             reader.readAsText(file)
+            e.target.value = ''
         }
     }
 
@@ -118,6 +122,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                             removeStep={getStepRemover(i)}
                             getCameraPosition={getCameraPosition}
                             getCameraFocus={getCameraFocus}
+                            incKey={minKey}
                             key={i}
                         />
                     )}
@@ -168,13 +173,14 @@ type StepInputProps = {
     setStep: (step: CameraStep) => void,
     removeStep: () => void,
     getCameraPosition: () => [number, number, number],
-    getCameraFocus: () => [number, number, number]
+    getCameraFocus: () => [number, number, number],
+    incKey: number
 }
 
 const StepInput: FC<StepInputProps> = ({
-    step, setStep, removeStep, getCameraPosition, getCameraFocus
+    step, setStep, removeStep, getCameraPosition, getCameraFocus, incKey
 }) => {
-    const [key, setKey] = useState<number>(0)
+    const [currKey, setCurrKey] = useState<number>(0)
 
     const updateStep = (updateKey?: boolean): void => {
         // don't need object copy since steps state is copied
@@ -183,7 +189,7 @@ const StepInput: FC<StepInputProps> = ({
         if (updateKey) {
             // inc key state to update child point input
             // values on non-input state changes
-            setKey(key + 1)
+            setCurrKey(currKey + 1)
         }
     }
 
@@ -206,7 +212,7 @@ const StepInput: FC<StepInputProps> = ({
                     update={(): void => setPosition(getCameraPosition(), true)}
                     clear={removeStep}
                     icon={<HiMiniVideoCamera />}
-                    key={key}
+                    key={incKey + currKey}
                 />
                 { step.focus === null &&
                     <button
@@ -224,7 +230,7 @@ const StepInput: FC<StepInputProps> = ({
                         update={(): void => setFocus(getCameraFocus(), true)}
                         clear={(): void => setFocus(null, true)}
                         icon={<HiEye />}
-                        key={key + 1}
+                        key={incKey + currKey + 1}
                     />
                 </div>
             }
