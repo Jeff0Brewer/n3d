@@ -32,6 +32,7 @@ const Vis: FC<VisProps> = ({
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const frameIdRef = useRef<number>(-1)
     const visRef = useRef<VisRenderer | null>(null)
+    const timeRef = useRef<number>(0)
 
     const resetCamera = (): void => {
         if (visRef.current) {
@@ -60,6 +61,10 @@ const Vis: FC<VisProps> = ({
         }
         const focus = visRef.current.camera.focus
         return [focus[0], focus[1], focus[2]]
+    }
+
+    const getCurrTime = (): number => {
+        return timeRef.current
     }
 
     // init vis renderer
@@ -146,9 +151,16 @@ const Vis: FC<VisProps> = ({
 
     // start draw loop
     useEffect(() => {
-        const draw = (time: number): void => {
+        let lastT = Date.now()
+        const draw = (): void => {
             if (!visRef.current) { return }
-            visRef.current.draw(landmarkData, time)
+
+            const currT = Date.now()
+            const elapsed = currT - lastT
+            lastT = currT
+            timeRef.current += elapsed
+
+            visRef.current.draw(landmarkData, timeRef.current)
             frameIdRef.current = window.requestAnimationFrame(draw)
         }
         frameIdRef.current = window.requestAnimationFrame(draw)
@@ -181,6 +193,7 @@ const Vis: FC<VisProps> = ({
                     setCameraPath={setCameraPath}
                     getCameraPosition={getCameraPosition}
                     getCameraFocus={getCameraFocus}
+                    getCurrTime={getCurrTime}
                 />
             </section>
         </div>

@@ -11,11 +11,12 @@ import styles from '../styles/camera-menu.module.css'
 type CameraMenuProps = {
     setCameraPath: (path: CameraPath | null) => void,
     getCameraPosition: () => [number, number, number],
-    getCameraFocus: () => [number, number, number]
+    getCameraFocus: () => [number, number, number],
+    getCurrTime: () => number
 }
 
 const CameraMenu: FC<CameraMenuProps> = ({
-    setCameraPath, getCameraPosition, getCameraFocus
+    setCameraPath, getCameraPosition, getCameraFocus, getCurrTime
 }) => {
     const [steps, setSteps] = useState<Array<CameraStep>>([])
     const [duration, setDuration] = useState<number>(10)
@@ -71,7 +72,8 @@ const CameraMenu: FC<CameraMenuProps> = ({
         if (steps.length === 0) {
             setCameraPath(null)
         } else {
-            const path = new CameraPath(steps, duration * 1000, smooth)
+            const startTime = getCurrTime()
+            const path = new CameraPath(steps, duration * 1000, startTime, smooth)
             setCameraPath(path)
         }
     }

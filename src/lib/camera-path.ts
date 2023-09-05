@@ -241,11 +241,17 @@ type CameraInstant = {
 class CameraPath {
     path: BezierPath | LinearPath | StaticPath
     focuses: Array<Vec3 | null>
+    duration: number
     currFocus: [number, number, number]
     lastT: number
-    duration: number
+    startTime: number
 
-    constructor (steps: Array<CameraStep>, duration: number, smooth?: boolean) {
+    constructor (
+        steps: Array<CameraStep>,
+        duration: number,
+        startTime: number,
+        smooth?: boolean
+    ) {
         if (steps.length === 0) {
             throw new Error('Camera path requires > 0 steps')
         }
@@ -261,13 +267,14 @@ class CameraPath {
         }
 
         this.focuses = steps.map(step => step.focus)
-        this.currFocus = this.focuses[0] || [0, 0, 0]
-        this.lastT = 0
         this.duration = duration
+        this.currFocus = this.focuses[0] || [0, 0, 0]
+        this.lastT = Number.MAX_VALUE
+        this.startTime = startTime
     }
 
     get (time: number): CameraInstant {
-        const t = (time / this.duration) % 1
+        const t = ((time - this.startTime) / this.duration) % 1
         const { position, derivative } = this.path.get(t)
 
         const per = (this.focuses.length - 1) * t
