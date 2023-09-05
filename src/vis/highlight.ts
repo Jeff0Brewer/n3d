@@ -15,7 +15,6 @@ class Highlight {
     setProjMatrix: (mat: mat4) => void
     setDevicePixelRatio: (dpr: number) => void
     setPointSize: (size: number) => void
-
     numVertex: number
 
     constructor (
