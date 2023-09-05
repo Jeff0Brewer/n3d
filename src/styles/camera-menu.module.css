@@ -1,14 +1,36 @@
 .menu {
     background-color: var(--color0);
     font-size: 12px;
-    width: 250px;
+    min-width: 200px;
 }
 
 .menu input {
-    width: 50px;
-    height: 20px;
-    background-color: var(--color1);
+    width: 40px;
+    padding: 0 5px;
+    height: 15px;
+    background-color: var(--color2);
     font: inherit;
+}
+
+.menu button:hover {
+    opacity: 0.6;
+}
+
+.menuRow, .bottomControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--gap);
+}
+
+.bottomControls {
+    font-size: 20px;
+}
+
+.duration {
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
 }
 
 .step {
@@ -29,16 +51,21 @@
     gap: var(--gap);
 }
 
-.bottom {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
+.icon {
+    width: 15px;
+    height: 15px;
+    font-size: 10px;
+    background-color: var(--color1);
+    display: grid;
+    place-items: center;
 }
 
-.icon {
-    width: 20px;
-    height: 20px;
+.addStep {
     background-color: var(--color1);
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    overflow: hidden;
     display: grid;
     place-items: center;
 }
