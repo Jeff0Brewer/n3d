@@ -10,13 +10,14 @@ import styles from '../styles/camera-menu.module.css'
 
 type CameraMenuProps = {
     setCameraPath: (path: CameraPath | null) => void,
+    setTracePath: (path: CameraPath | null) => void,
     getCameraPosition: () => [number, number, number],
     getCameraFocus: () => [number, number, number],
     getCurrTime: () => number
 }
 
 const CameraMenu: FC<CameraMenuProps> = ({
-    setCameraPath, getCameraPosition, getCameraFocus, getCurrTime
+    setCameraPath, getCameraPosition, getCameraFocus, getCurrTime, setTracePath
 }) => {
     const [steps, setSteps] = useState<Array<CameraStep>>([])
     const [duration, setDuration] = useState<number>(10)
@@ -36,6 +37,16 @@ const CameraMenu: FC<CameraMenuProps> = ({
             window.removeEventListener('keydown', onKey)
         }
     }, [visible])
+
+    useEffect(() => {
+        if (steps.length >= 2 && visible) {
+            // fill duration / start time with arbitrary values,
+            // only need steps / smoothing for path motion
+            setTracePath(new CameraPath(steps, 1, 1, smooth))
+        } else {
+            setTracePath(null)
+        }
+    }, [steps, smooth, visible, setTracePath])
 
     const appendStep = (): void => {
         const step: CameraStep = {

@@ -43,7 +43,7 @@ const Vis: FC<VisProps> = ({
 
     const setCameraPath = (path: CameraPath | null): void => {
         if (visRef.current) {
-            visRef.current.camera.path = path
+            visRef.current.setCameraPath(path)
         }
     }
 
@@ -65,6 +65,12 @@ const Vis: FC<VisProps> = ({
 
     const getCurrTime = (): number => {
         return timeRef.current
+    }
+
+    const setTracePath = (path: CameraPath | null): void => {
+        if (visRef.current) {
+            visRef.current.setTracePath(path)
+        }
     }
 
     // init vis renderer
@@ -191,6 +197,7 @@ const Vis: FC<VisProps> = ({
                 </span>
                 <CameraMenu
                     setCameraPath={setCameraPath}
+                    setTracePath={setTracePath}
                     getCameraPosition={getCameraPosition}
                     getCameraFocus={getCameraFocus}
                     getCurrTime={getCurrTime}

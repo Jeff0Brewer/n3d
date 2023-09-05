@@ -1,12 +1,14 @@
 import { mat4, vec3 } from 'gl-matrix'
 import { initGl } from '../lib/gl-wrap'
 import { getInvMatrix } from '../lib/unproject'
-import Camera, { CameraPath } from '../lib/camera'
+import Camera from '../lib/camera'
 import Points from '../vis/points'
 import Landmarks from '../vis/landmarks'
 import Highlight from '../vis/highlight'
 import SphereBounds from '../vis/sphere-bounds'
 import ConeBounds from '../vis/cone-bounds'
+import CameraTrace from '../vis/camera-trace'
+import CameraPath from '../lib/camera-path'
 import type { GalaxyData, Landmark } from '../lib/data'
 import type { ColorField } from '../lib/color-map'
 import type { Selection } from '../components/select-menu'
@@ -31,6 +33,7 @@ class VisRenderer {
     highlight: Highlight
     sphereBounds: SphereBounds
     coneBounds: ConeBounds
+    cameraTrace: CameraTrace
     drawLandmarks: boolean
     pointSize: number
 
@@ -62,19 +65,24 @@ class VisRenderer {
         this.sphereBounds = new SphereBounds(this.gl, this.model, this.view, this.proj)
         this.coneBounds = new ConeBounds(this.gl, this.model, this.view, this.proj)
         this.landmarks = new Landmarks(this.gl, this.model, this.view, this.proj, landmarkData)
+        this.cameraTrace = new CameraTrace(this.gl, this.model, this.view, this.proj)
 
         this.drawLandmarks = true
 
         this.pointSize = DEFAULT_POINT_SIZE
     }
 
+    resetCamera (data: GalaxyData): void {
+        this.camera.reset()
+        this.setSelected(data, null)
+    }
+
     setCameraPath (path: CameraPath | null): void {
         this.camera.path = path
     }
 
-    resetCamera (data: GalaxyData): void {
-        this.camera.reset()
-        this.setSelected(data, null)
+    setTracePath (path: CameraPath | null): void {
+        this.cameraTrace.setPath(this.gl, path)
     }
 
     setDrawLandmarks (draw: boolean): void {
@@ -147,6 +155,9 @@ class VisRenderer {
 
             this.gl.useProgram(this.coneBounds.program)
             this.coneBounds.setProjMatrix(this.proj)
+
+            this.gl.useProgram(this.cameraTrace.program)
+            this.cameraTrace.setProjMatrix(this.proj)
         }
 
         const keyDown = (e: KeyboardEvent): void => {
@@ -183,6 +194,7 @@ class VisRenderer {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
 
         const inv = getInvMatrix([this.proj, this.view, this.model])
+        this.cameraTrace.draw(this.gl, this.view)
         this.points.draw(this.gl, this.view, inv, eye)
         this.highlight.draw(this.gl, this.view)
         this.sphereBounds.draw(this.gl, this.view)

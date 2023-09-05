@@ -299,6 +299,16 @@ class CameraPath {
             focus: this.currFocus
         }
     }
+
+    getPathTrace (): Float32Array {
+        const tInc = 1 / (this.focuses.length * 30)
+        const positions = []
+        for (let t = 0; t <= 1; t += tInc) {
+            const { position } = this.path.get(t)
+            positions.push(...position)
+        }
+        return new Float32Array(positions)
+    }
 }
 
 const lerpVec3 = (a: Vec3, b: Vec3, t: number): Vec3 => {
