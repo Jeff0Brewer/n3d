@@ -126,9 +126,9 @@ const CameraMenu: FC<CameraMenuProps> = ({
     if (!visible) { return <></> }
     return (
         <div className={styles.menu}>
-            { steps.length !== 0 &&
-                <div className={styles.steps}>
-                    { steps.map((step: CameraStep, i: number) =>
+            { steps.length !== 0 && <div className={styles.steps}>
+                { steps.map((step: CameraStep, i: number) =>
+                    <div key={i} className={styles.stepWrap}>
                         <StepInput
                             step={step}
                             setStep={getStepSetter(i)}
@@ -136,24 +136,22 @@ const CameraMenu: FC<CameraMenuProps> = ({
                             getCameraPosition={getCameraPosition}
                             getCameraFocus={getCameraFocus}
                             incKey={minKey}
-                            key={i}
                         />
-                    )}
-                </div>
-            }
+                        { i < steps.length - 1 &&
+                            <span className={styles.duration}>
+                                <input
+                                    type={'text'}
+                                    defaultValue={1}
+                                />
+                                <p>sec</p>
+                            </span> }
+                    </div>
+                )}
+            </div> }
             <div className={styles.menuRow}>
                 <button className={styles.addStep} onClick={appendStep}>
                     <HiMiniPlus />
                 </button>
-                <span className={styles.duration}>
-                    <input
-                        ref={durationRef}
-                        type={'text'}
-                        defaultValue={duration}
-                        onChange={updateDuration}
-                    />
-                    <p>sec</p>
-                </span>
             </div>
             <div className={styles.bottomControls}>
                 <button onClick={(): void => setSmooth(!smooth)}>

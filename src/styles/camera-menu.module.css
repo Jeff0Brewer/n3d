@@ -7,7 +7,7 @@
 .menu input {
     width: 40px;
     padding: 0 5px;
-    height: 15px;
+    height: 16px;
     background-color: var(--color2);
     font: inherit;
 }
@@ -16,51 +16,49 @@
     opacity: 0.6;
 }
 
-.menuRow, .bottomControls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--gap);
-}
-
-.bottomControls {
-    font-size: 20px;
-}
-
-.fileControls {
-    font-size: 18px;
-    display: flex;
-    gap: var(--gap);
-}
-
 .steps {
     max-height: 300px;
     overflow-y: scroll;
     border-bottom: var(--border);
 }
 
-.duration {
-    display: flex;
-    align-items: center;
-    gap: var(--gap);
+.stepWrap {
+    position: relative;
+}
+
+.stepWrap:last-of-type .step {
+    border: none;
 }
 
 .step {
-    border-bottom: var(--border);
-    padding: 5px;
+    padding: 15px 5px;
     display: flex;
     flex-direction: column;
     gap: var(--gap);
-    margin-bottom: 4px;
-}
-
-.step:last-of-type {
-    border: none;
+    border-bottom: var(--border);
 }
 
 .stepRow {
     display: flex;
     gap: var(--gap);
+}
+
+.duration {
+    position: absolute;
+    bottom: -8px;
+    right: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--gap);
+    padding: 0 var(--gap);
+    background-color: var(--color0);
+}
+
+.duration input {
+    position: relative;
+    text-align: right;
+    z-index: 100;
 }
 
 .pointInput {
@@ -93,4 +91,21 @@
 
 .upload input {
     display: none;
+}
+
+.menuRow, .bottomControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--gap);
+}
+
+.bottomControls {
+    font-size: 20px;
+}
+
+.fileControls {
+    font-size: 18px;
+    display: flex;
+    gap: var(--gap);
 }
