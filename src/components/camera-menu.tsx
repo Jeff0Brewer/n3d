@@ -8,6 +8,8 @@ import CameraPath, { serializePath, deserializePath } from '../lib/camera-path'
 import type { CameraStep } from '../lib/camera-path'
 import styles from '../styles/camera-menu.module.css'
 
+const INPUT_PRECISION = 2
+
 type CameraMenuProps = {
     setCameraPath: (path: CameraPath | null) => void,
     setTracePath: (path: CameraPath | null) => void,
@@ -275,7 +277,6 @@ const PointInput: FC<PointInputProps> = ({
         }
     }
 
-    const DEFAULT_PRECISION = 2
     return (
         <div className={styles.pointInput}>
             <button onClick={update} className={styles.icon}>
@@ -283,17 +284,17 @@ const PointInput: FC<PointInputProps> = ({
             </button>
             <input
                 type={'text'}
-                defaultValue={point[0].toFixed(DEFAULT_PRECISION)}
+                defaultValue={roundToPrecision(point[0], INPUT_PRECISION)}
                 onChange={getIndSetter(0)}
             />
             <input
                 type={'text'}
-                defaultValue={point[1].toFixed(DEFAULT_PRECISION)}
+                defaultValue={roundToPrecision(point[1], INPUT_PRECISION)}
                 onChange={getIndSetter(1)}
             />
             <input
                 type={'text'}
-                defaultValue={point[2].toFixed(DEFAULT_PRECISION)}
+                defaultValue={roundToPrecision(point[2], INPUT_PRECISION)}
                 onChange={getIndSetter(2)}
             />
             <button onClick={clear} className={styles.icon}>
@@ -301,6 +302,11 @@ const PointInput: FC<PointInputProps> = ({
             </button>
         </div>
     )
+}
+
+const roundToPrecision = (val: number, precision: number): number => {
+    const mul = Math.pow(10, precision)
+    return Math.round(val * mul) / mul
 }
 
 export default CameraMenu
