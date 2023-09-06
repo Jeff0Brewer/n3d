@@ -115,8 +115,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
     }
 
     const downloadPath = (): void => {
-        // TODO: fix duration
-        const csv = serializePath(steps, 0, smooth)
+        const csv = serializePath(steps, durations, smooth)
         downloadTxt('n3d_camera_path.csv', csv)
     }
 
@@ -130,14 +129,10 @@ const CameraMenu: FC<CameraMenuProps> = ({
             reader.onload = (e): void => {
                 const csv = e.target?.result
                 if (typeof csv === 'string') {
-                    const { steps, duration, smooth } = deserializePath(csv)
+                    const { steps, durations, smooth } = deserializePath(csv)
                     setSteps(steps)
                     setSmooth(smooth)
-                    // TODO: fix duration
-                    // setDuration(duration)
-                    if (durationRef.current) {
-                        durationRef.current.value = duration.toString()
-                    }
+                    setDurations(durations)
                     // increment keys to refresh input values
                     incKey()
                 }

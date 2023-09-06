@@ -374,42 +374,61 @@ class CameraPath {
 
 const serializePath = (
     steps: Array<CameraStep>,
-    duration: number,
+    durations: Array<number>,
     smooth: boolean
 ): string => {
-    let out = `${duration}, ${smooth ? 'smooth' : 'linear'}\n`
-    for (const step of steps) {
-        const { position, focus } = step
-        const [px, py, pz] = position
-        out += `${px}, ${py}, ${pz}, `
-        if (focus !== null) {
-            const [fx, fy, fz] = focus
-            out += `${fx}, ${fy}, ${fz}\n`
-        } else {
-            out += 'null\n'
+    // first line denotes path smoothing
+    let out = `${smooth ? 'smooth' : 'linear'}\n`
+
+    // second line contains all durations
+    for (let i = 0; i < durations.length; i++) {
+        out += durations[i]
+        if (i < durations.length - 1) {
+            out += ', '
         }
     }
+    out += '\n'
+
+    // remaining lines contain steps
+    for (let i = 0; i < steps.length; i++) {
+        const { position, focus } = steps[i]
+        const [px, py, pz] = position
+        out += `${px}, ${py}, ${pz}, `
+
+        if (focus !== null) {
+            const [fx, fy, fz] = focus
+            out += `${fx}, ${fy}, ${fz}`
+        } else {
+            out += 'null'
+        }
+        if (i < steps.length - 1) {
+            out += '\n'
+        }
+    }
+
     return out
 }
 
 const deserializePath = (csv: string): {
     steps: Array<CameraStep>,
-    duration: number,
+    durations: Array<number>,
     smooth: boolean
 } => {
     const lines = csv.split('\n')
-    const meta = lines.shift()?.split(',').map(v => v.trim())
-    if (!meta) {
+    if (lines.length < 3) {
         throw new Error('Incomplete path csv')
     }
-    const duration = parseFloat(meta[0])
-    const smooth = meta[1] === 'smooth'
+    // separate smoothing / duration / steps lines
+    const smoothingLine = lines[0]
+    const durationsLine = lines[1]
+    lines.splice(0, 2) // only steps remaining
+
+    const smooth = smoothingLine.trim() === 'smooth'
+    const durations = durationsLine.split(',').map(d => parseFloat(d))
 
     const steps: Array<CameraStep> = []
     for (const line of lines) {
         const row = line.split(',').map(v => v.trim())
-        // ignore incomplete lines
-        if (row.length < 4) { continue }
         const step: CameraStep = {
             position: [
                 parseFloat(row[0]),
@@ -429,7 +448,7 @@ const deserializePath = (csv: string): {
 
     return {
         steps,
-        duration,
+        durations,
         smooth
     }
 }
