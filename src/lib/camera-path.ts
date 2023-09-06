@@ -264,6 +264,22 @@ class DurationList {
 
         return (ind + stepT) / (this.durations.length - 1)
     }
+
+    getPrevStepTime (time: number): number {
+        let ind = this.durations.length - 1
+        while (ind > 0 && time <= this.durations[ind]) {
+            ind--
+        }
+        return this.durations[ind]
+    }
+
+    getNextStepTime (time: number): number {
+        let ind = 0
+        while (ind < this.durations.length - 1 && time >= this.durations[ind]) {
+            ind++
+        }
+        return this.durations[ind]
+    }
 }
 
 type CameraStep = {
@@ -282,6 +298,7 @@ class CameraPath {
     focuses: Array<Vec3 | null>
     duration: DurationList
     currTime: number
+    paused: boolean
     transitionDist: number
 
     constructor (
@@ -296,6 +313,7 @@ class CameraPath {
         this.focuses = steps.map(step => step.focus)
         this.duration = new DurationList(durations)
         this.currTime = 0
+        this.paused = false
         this.transitionDist = 1
 
         const positions = steps.map(step => step.position)
@@ -321,7 +339,9 @@ class CameraPath {
     }
 
     get (elapsed: number): CameraInstant {
-        this.currTime = (this.currTime + elapsed) % this.duration.total
+        if (!this.paused) {
+            this.currTime = (this.currTime + elapsed) % this.duration.total
+        }
         const t = this.duration.getT(this.currTime)
         const { position, derivative } = this.path.get(t)
 
@@ -336,6 +356,14 @@ class CameraPath {
         const focus = lerp(startFocus, endFocus, lerpT)
 
         return { position, focus }
+    }
+
+    prevStep (): void {
+        this.currTime = this.duration.getPrevStepTime(this.currTime)
+    }
+
+    nextStep (): void {
+        this.currTime = this.duration.getNextStepTime(this.currTime)
     }
 
     getPathTrace (): Float32Array {

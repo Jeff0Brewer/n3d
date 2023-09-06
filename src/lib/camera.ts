@@ -46,8 +46,6 @@ class Camera {
         this.focus = vec3.clone(this.defaultFocus)
         this.focusTarget = vec3.clone(this.defaultFocus)
         mat4.lookAt(this.view, this.eye, this.focus, this.up)
-
-        this.path = null
     }
 
     setupHandlers (element: HTMLElement): (() => void) {

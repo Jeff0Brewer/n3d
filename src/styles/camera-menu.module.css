@@ -104,8 +104,30 @@
     font-size: 20px;
 }
 
+.playControls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(2px);
+    font-size: 15px;
+}
+
+.playControls button {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+}
+
 .fileControls {
     font-size: 18px;
     display: flex;
     gap: var(--gap);
+}
+
+.startButton {
+    background-color: var(--color1);
+    padding: 0 5px;
+    height: 15px;
+    line-height: 15px;
 }

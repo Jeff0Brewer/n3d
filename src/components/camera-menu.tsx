@@ -1,6 +1,7 @@
-import React, { FC, useState, useEffect } from 'react'
+import React, { FC, useState, useEffect, useRef } from 'react'
 import { HiMiniVideoCamera, HiEye, HiMiniXMark, HiMiniPlus } from 'react-icons/hi2'
-import { IoMdPlay } from 'react-icons/io'
+import { IoMdPlay, IoMdPause, IoMdRewind, IoMdFastforward } from 'react-icons/io'
+import { IoStopSharp } from 'react-icons/io5'
 import { PiWaveSawtoothBold, PiWaveSineBold } from 'react-icons/pi'
 import { FaFileDownload, FaFileUpload } from 'react-icons/fa'
 import { downloadTxt } from '../lib/export'
@@ -26,6 +27,8 @@ const CameraMenu: FC<CameraMenuProps> = ({
     const [smooth, setSmooth] = useState<boolean>(true)
     const [visible, setVisible] = useState<boolean>(false)
     const [minKey, setMinKey] = useState<number>(0)
+    const [paused, setPaused] = useState<boolean>(true)
+    const pathRef = useRef<CameraPath | null>(null)
 
     useEffect(() => {
         const onKey = (e: KeyboardEvent): void => {
@@ -103,11 +106,37 @@ const CameraMenu: FC<CameraMenuProps> = ({
     }
 
     const startCameraPath = (): void => {
-        if (steps.length === 0) {
-            setCameraPath(null)
+        pathRef.current = steps.length !== 0
+            ? new CameraPath(steps, durations, smooth)
+            : null
+        setCameraPath(pathRef.current)
+        setPaused(false)
+    }
+
+    const prevStep = (): void => {
+        if (pathRef.current !== null) {
+            pathRef.current.prevStep()
+        }
+    }
+
+    const nextStep = (): void => {
+        if (pathRef.current !== null) {
+            pathRef.current.nextStep()
+        }
+    }
+
+    const stopPath = (): void => {
+        pathRef.current = null
+        setCameraPath(pathRef.current)
+        setPaused(true)
+    }
+
+    const playPause = (): void => {
+        if (pathRef.current === null) {
+            startCameraPath()
         } else {
-            const path = new CameraPath(steps, durations, smooth)
-            setCameraPath(path)
+            pathRef.current.paused = !paused
+            setPaused(pathRef.current.paused)
         }
     }
 
@@ -168,6 +197,9 @@ const CameraMenu: FC<CameraMenuProps> = ({
                 <button className={styles.addStep} onClick={appendStep}>
                     <HiMiniPlus />
                 </button>
+                <button className={styles.startButton} onClick={startCameraPath}>
+                    set path
+                </button>
             </div>
             <div className={styles.bottomControls}>
                 <button onClick={(): void => setSmooth(!smooth)}>
@@ -175,6 +207,22 @@ const CameraMenu: FC<CameraMenuProps> = ({
                         ? <PiWaveSineBold />
                         : <PiWaveSawtoothBold /> }
                 </button>
+                <div className={styles.playControls}>
+                    <button onClick={prevStep}>
+                        <IoMdRewind />
+                    </button>
+                    <button onClick={stopPath}>
+                        <IoStopSharp />
+                    </button>
+                    <button onClick={playPause}>
+                        { paused
+                            ? <IoMdPlay />
+                            : <IoMdPause /> }
+                    </button>
+                    <button onClick={nextStep}>
+                        <IoMdFastforward />
+                    </button>
+                </div>
                 <div className={styles.fileControls}>
                     <button onClick={downloadPath}>
                         <FaFileDownload />
@@ -187,9 +235,6 @@ const CameraMenu: FC<CameraMenuProps> = ({
                         <FaFileUpload />
                     </label>
                 </div>
-                <button onClick={startCameraPath}>
-                    <IoMdPlay />
-                </button>
             </div>
         </div>
     )
