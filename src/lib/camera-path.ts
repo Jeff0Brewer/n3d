@@ -282,6 +282,7 @@ class CameraPath {
     focuses: Array<Vec3 | null>
     duration: DurationList
     currTime: number
+    transitionDist: number
 
     constructor (
         steps: Array<CameraStep>,
@@ -292,6 +293,10 @@ class CameraPath {
             throw new Error('Camera path requires > 0 steps')
         }
         this.steps = steps
+        this.focuses = steps.map(step => step.focus)
+        this.duration = new DurationList(durations)
+        this.currTime = 0
+        this.transitionDist = 1
 
         const positions = steps.map(step => step.position)
         // depending on number of positions, choose correct path type
@@ -301,11 +306,18 @@ class CameraPath {
             this.path = new BezierPath(positions)
         } else {
             this.path = new LinearPath(positions)
+            // fill out empty focuses with linear directions
+            // for easy interpolation on get
+            this.focuses = this.focuses.map((focus, i) => {
+                if (focus !== null) { return focus }
+                const t = Math.min((i + 1) / (this.focuses.length - 1), 1)
+                const { position, derivative } = this.path.get(t)
+                return add(position, derivative)
+            })
+            // lower transition dist for linear so most
+            // of time is spent at static focuses
+            this.transitionDist = 0.33
         }
-
-        this.focuses = steps.map(step => step.focus)
-        this.duration = new DurationList(durations)
-        this.currTime = 0
     }
 
     get (elapsed: number): CameraInstant {
@@ -318,7 +330,9 @@ class CameraPath {
         const startFocus = this.focuses[Math.floor(per)] || pathFocus
         const endFocus = this.focuses[Math.ceil(per)] || pathFocus
 
-        const lerpT = ease(per - Math.floor(per))
+        const subPer = per - Math.floor(per)
+        const transitionPer = (subPer - (1 - this.transitionDist)) / this.transitionDist
+        const lerpT = ease(Math.max(transitionPer, 0))
         const focus = lerp(startFocus, endFocus, lerpT)
 
         return { position, focus }
