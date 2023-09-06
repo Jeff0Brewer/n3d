@@ -283,12 +283,11 @@ class CameraPath {
     duration: DurationList
     currFocus: [number, number, number]
     lastInd: number
-    startTime: number
+    currTime: number
 
     constructor (
         steps: Array<CameraStep>,
         durations: Array<number>,
-        startTime: number,
         smooth?: boolean
     ) {
         if (steps.length === 0) {
@@ -309,13 +308,13 @@ class CameraPath {
         this.focuses = steps.map(step => step.focus)
         this.duration = new DurationList(durations)
         this.currFocus = this.focuses[0] || [0, 0, 0]
-        this.startTime = startTime
         this.lastInd = Number.MAX_VALUE
+        this.currTime = 0
     }
 
-    get (time: number): CameraInstant {
-        const pathTime = (time - this.startTime) % this.duration.total
-        const t = this.duration.getT(pathTime)
+    get (elapsed: number): CameraInstant {
+        this.currTime = (this.currTime + elapsed) % this.duration.total
+        const t = this.duration.getT(this.currTime)
         const { position, derivative } = this.path.get(t)
 
         const per = (this.focuses.length - 1) * t

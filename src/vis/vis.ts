@@ -189,8 +189,8 @@ class VisRenderer {
         this.coneBounds.updateCone(this.gl, cone)
     }
 
-    draw (landmarks: Array<Landmark>, time: number): void {
-        const eye = this.camera.update(time)
+    draw (landmarks: Array<Landmark>, elapsed: number): void {
+        const eye = this.camera.update(elapsed)
         this.gl.clear(this.gl.COLOR_BUFFER_BIT || this.gl.DEPTH_BUFFER_BIT)
 
         const inv = getInvMatrix([this.proj, this.view, this.model])

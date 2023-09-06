@@ -1,4 +1,4 @@
-import React, { FC, useState, useRef, useEffect } from 'react'
+import React, { FC, useState, useEffect } from 'react'
 import { HiMiniVideoCamera, HiEye, HiMiniXMark, HiMiniPlus } from 'react-icons/hi2'
 import { IoMdPlay } from 'react-icons/io'
 import { PiWaveSawtoothBold, PiWaveSineBold } from 'react-icons/pi'
@@ -15,19 +15,17 @@ type CameraMenuProps = {
     setCameraPath: (path: CameraPath | null) => void,
     setTracePath: (path: CameraPath | null) => void,
     getCameraPosition: () => [number, number, number],
-    getCameraFocus: () => [number, number, number],
-    getCurrTime: () => number
+    getCameraFocus: () => [number, number, number]
 }
 
 const CameraMenu: FC<CameraMenuProps> = ({
-    setCameraPath, getCameraPosition, getCameraFocus, getCurrTime, setTracePath
+    setCameraPath, getCameraPosition, getCameraFocus, setTracePath
 }) => {
     const [steps, setSteps] = useState<Array<CameraStep>>([])
     const [durations, setDurations] = useState<Array<number>>([])
     const [smooth, setSmooth] = useState<boolean>(true)
     const [visible, setVisible] = useState<boolean>(false)
     const [minKey, setMinKey] = useState<number>(0)
-    const durationRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
         const onKey = (e: KeyboardEvent): void => {
@@ -45,7 +43,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
         if (steps.length >= 2 && visible) {
             // fill duration / start time with arbitrary values,
             // only need steps / smoothing for path motion
-            setTracePath(new CameraPath(steps, [1], 1, smooth))
+            setTracePath(new CameraPath(steps, [1], smooth))
         } else {
             setTracePath(null)
         }
@@ -108,8 +106,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
         if (steps.length === 0) {
             setCameraPath(null)
         } else {
-            const startTime = getCurrTime()
-            const path = new CameraPath(steps, durations, startTime, smooth)
+            const path = new CameraPath(steps, durations, smooth)
             setCameraPath(path)
         }
     }
