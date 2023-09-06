@@ -28,9 +28,9 @@ class Camera {
         this.path = null
     }
 
-    update (time: number): vec3 {
+    update (elapsed: number): vec3 {
         if (this.path) {
-            const { position, focus } = this.path.get(time)
+            const { position, focus } = this.path.get(elapsed)
             vec3.copy(this.eye, position)
             vec3.copy(this.focus, focus)
         } else {
