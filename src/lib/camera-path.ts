@@ -281,8 +281,6 @@ class CameraPath {
     path: BezierPath | LinearPath | StaticPath
     focuses: Array<Vec3 | null>
     duration: DurationList
-    currFocus: [number, number, number]
-    lastInd: number
     currTime: number
 
     constructor (
@@ -307,8 +305,6 @@ class CameraPath {
 
         this.focuses = steps.map(step => step.focus)
         this.duration = new DurationList(durations)
-        this.currFocus = this.focuses[0] || [0, 0, 0]
-        this.lastInd = Number.MAX_VALUE
         this.currTime = 0
     }
 
@@ -318,26 +314,14 @@ class CameraPath {
         const { position, derivative } = this.path.get(t)
 
         const per = (this.focuses.length - 1) * t
-        const focus = this.focuses[Math.round(per)] || [
-            position[0] + derivative[0],
-            position[1] + derivative[1],
-            position[2] + derivative[2]
-        ]
+        const pathFocus = add(position, derivative)
+        const startFocus = this.focuses[Math.floor(per)] || pathFocus
+        const endFocus = this.focuses[Math.ceil(per)] || pathFocus
 
-        if (this.lastInd > per) {
-            this.currFocus = focus
-        } else {
-            // lerp t value from diff in per for consistency across
-            // different durations / framerates
-            const lerpT = (per - this.lastInd) * 10
-            this.currFocus = lerp(this.currFocus, focus, lerpT)
-        }
-        this.lastInd = per
+        const lerpT = ease(per - Math.floor(per))
+        const focus = lerp(startFocus, endFocus, lerpT)
 
-        return {
-            position,
-            focus: this.currFocus
-        }
+        return { position, focus }
     }
 
     getPathTrace (): Float32Array {
@@ -483,6 +467,10 @@ const lerp = (a: Vec3, b: Vec3, t: number): Vec3 => {
         a[1] + (b[1] - a[1]) * t,
         a[2] + (b[2] - a[2]) * t
     ]
+}
+
+const ease = (x: number): number => {
+    return (Math.cos(Math.PI * (1 - x)) + 1) / 2
 }
 
 export default CameraPath
