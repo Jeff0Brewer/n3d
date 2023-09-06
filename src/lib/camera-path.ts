@@ -228,6 +228,44 @@ const computeControlPoints = (n: number, knots: Array<Point>): Array<Point> => {
     return out
 }
 
+class DurationList {
+    durations: Array<number>
+    total: number
+
+    constructor (durations: Array<number>) {
+        // map individual durations to list of total
+        // durations for fast index search
+        let total = 0
+        this.durations = durations.map(duration => {
+            total += duration
+            return total
+        })
+        this.durations.unshift(0)
+        this.total = total
+    }
+
+    getT (time: number): number {
+        if (time > this.total) {
+            throw new Error(`Time must be in range of total duration ${this.total}`)
+        }
+
+        if (this.durations.length < 2) {
+            return 0
+        }
+
+        let ind = 0
+        while (time > this.durations[ind + 1]) {
+            ind++
+        }
+
+        const low = this.durations[ind]
+        const high = this.durations[ind + 1]
+        const stepT = (time - low) / (high - low)
+
+        return (ind + stepT) / (this.durations.length - 1)
+    }
+}
+
 type CameraStep = {
     position: Vec3,
     focus: Vec3 | null
@@ -242,14 +280,14 @@ class CameraPath {
     steps: Array<CameraStep>
     path: BezierPath | LinearPath | StaticPath
     focuses: Array<Vec3 | null>
-    duration: number
+    duration: DurationList
     currFocus: [number, number, number]
     lastInd: number
     startTime: number
 
     constructor (
         steps: Array<CameraStep>,
-        duration: number,
+        durations: Array<number>,
         startTime: number,
         smooth?: boolean
     ) {
@@ -269,14 +307,15 @@ class CameraPath {
         }
 
         this.focuses = steps.map(step => step.focus)
-        this.duration = duration
+        this.duration = new DurationList(durations)
         this.currFocus = this.focuses[0] || [0, 0, 0]
         this.startTime = startTime
         this.lastInd = Number.MAX_VALUE
     }
 
     get (time: number): CameraInstant {
-        const t = ((time - this.startTime) / this.duration) % 1
+        const pathTime = (time - this.startTime) % this.duration.total
+        const t = this.duration.getT(pathTime)
         const { position, derivative } = this.path.get(t)
 
         const per = (this.focuses.length - 1) * t

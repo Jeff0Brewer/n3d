@@ -8,7 +8,8 @@ import CameraPath, { serializePath, deserializePath } from '../lib/camera-path'
 import type { CameraStep } from '../lib/camera-path'
 import styles from '../styles/camera-menu.module.css'
 
-const INPUT_PRECISION = 2
+const INPUT_PRECISION = 2 // decimals
+const DEFAULT_DURATION = 1000 // ms
 
 type CameraMenuProps = {
     setCameraPath: (path: CameraPath | null) => void,
@@ -22,7 +23,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
     setCameraPath, getCameraPosition, getCameraFocus, getCurrTime, setTracePath
 }) => {
     const [steps, setSteps] = useState<Array<CameraStep>>([])
-    const [duration, setDuration] = useState<number>(10)
+    const [durations, setDurations] = useState<Array<number>>([])
     const [smooth, setSmooth] = useState<boolean>(true)
     const [visible, setVisible] = useState<boolean>(false)
     const [minKey, setMinKey] = useState<number>(0)
@@ -44,18 +45,27 @@ const CameraMenu: FC<CameraMenuProps> = ({
         if (steps.length >= 2 && visible) {
             // fill duration / start time with arbitrary values,
             // only need steps / smoothing for path motion
-            setTracePath(new CameraPath(steps, 1, 1, smooth))
+            setTracePath(new CameraPath(steps, [1], 1, smooth))
         } else {
             setTracePath(null)
         }
     }, [steps, smooth, visible, setTracePath])
 
+    const incKey = (): void => {
+        // increment key to update input values from state
+        // increment by large value for no overlap with prior keys
+        setMinKey((minKey + 1000) % 100000)
+    }
+
     const appendStep = (): void => {
-        const step: CameraStep = {
+        // add new duration if not first step
+        if (steps.length > 0) {
+            setDurations([...durations, DEFAULT_DURATION])
+        }
+        setSteps([...steps, {
             position: getCameraPosition(),
             focus: null
-        }
-        setSteps([...steps, step])
+        }])
     }
 
     const getStepSetter = (ind: number): ((step: CameraStep) => void) => {
@@ -67,18 +77,30 @@ const CameraMenu: FC<CameraMenuProps> = ({
 
     const getStepRemover = (ind: number): (() => void) => {
         return (): void => {
+            if (ind + 1 < steps.length) {
+                durations.splice(ind, 1)
+                setDurations([...durations])
+            } else if (ind - 1 > 0) {
+                durations.splice(ind - 1, 1)
+                setDurations([...durations])
+            }
             steps.splice(ind, 1)
             setSteps([...steps])
+            // increment keys to refresh input values
+            incKey()
         }
     }
 
-    const updateDuration = (e: React.ChangeEvent): void => {
-        if (!(e.target instanceof HTMLInputElement)) {
-            throw new Error('Cannot get value from non-input element')
-        }
-        const value = parseFloat(e.target.value)
-        if (!Number.isNaN(value)) {
-            setDuration(value)
+    const getDurationSetter = (ind: number): ((e: React.ChangeEvent) => void) => {
+        return (e: React.ChangeEvent): void => {
+            if (!(e.target instanceof HTMLInputElement)) {
+                throw new Error('Cannot get value from non-input element')
+            }
+            const value = parseFloat(e.target.value)
+            if (!Number.isNaN(value)) {
+                durations[ind] = value * 1000
+                setDurations([...durations])
+            }
         }
     }
 
@@ -87,13 +109,14 @@ const CameraMenu: FC<CameraMenuProps> = ({
             setCameraPath(null)
         } else {
             const startTime = getCurrTime()
-            const path = new CameraPath(steps, duration * 1000, startTime, smooth)
+            const path = new CameraPath(steps, durations, startTime, smooth)
             setCameraPath(path)
         }
     }
 
     const downloadPath = (): void => {
-        const csv = serializePath(steps, duration, smooth)
+        // TODO: fix duration
+        const csv = serializePath(steps, 0, smooth)
         downloadTxt('n3d_camera_path.csv', csv)
     }
 
@@ -110,12 +133,13 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     const { steps, duration, smooth } = deserializePath(csv)
                     setSteps(steps)
                     setSmooth(smooth)
-                    setDuration(duration)
+                    // TODO: fix duration
+                    // setDuration(duration)
                     if (durationRef.current) {
                         durationRef.current.value = duration.toString()
                     }
                     // increment keys to refresh input values
-                    setMinKey(minKey + 1)
+                    incKey()
                 }
             }
             reader.readAsText(file)
@@ -128,20 +152,20 @@ const CameraMenu: FC<CameraMenuProps> = ({
         <div className={styles.menu}>
             { steps.length !== 0 && <div className={styles.steps}>
                 { steps.map((step: CameraStep, i: number) =>
-                    <div key={i} className={styles.stepWrap}>
+                    <div key={i + minKey} className={styles.stepWrap}>
                         <StepInput
                             step={step}
                             setStep={getStepSetter(i)}
                             removeStep={getStepRemover(i)}
                             getCameraPosition={getCameraPosition}
                             getCameraFocus={getCameraFocus}
-                            incKey={minKey}
                         />
                         { i < steps.length - 1 &&
                             <span className={styles.duration}>
                                 <input
                                     type={'text'}
-                                    defaultValue={1}
+                                    defaultValue={durations[i] / 1000}
+                                    onChange={getDurationSetter(i)}
                                 />
                                 <p>sec</p>
                             </span> }
@@ -185,11 +209,10 @@ type StepInputProps = {
     removeStep: () => void,
     getCameraPosition: () => [number, number, number],
     getCameraFocus: () => [number, number, number],
-    incKey: number
 }
 
 const StepInput: FC<StepInputProps> = ({
-    step, setStep, removeStep, getCameraPosition, getCameraFocus, incKey
+    step, setStep, removeStep, getCameraPosition, getCameraFocus
 }) => {
     const [currKey, setCurrKey] = useState<number>(0)
 
@@ -198,8 +221,6 @@ const StepInput: FC<StepInputProps> = ({
         // in camera menu on setStep
         setStep(step)
         if (updateKey) {
-            // inc key state to update child point input
-            // values on non-input state changes
             setCurrKey(currKey + 1)
         }
     }
@@ -223,7 +244,7 @@ const StepInput: FC<StepInputProps> = ({
                     update={(): void => setPosition(getCameraPosition(), true)}
                     clear={removeStep}
                     icon={<HiMiniVideoCamera />}
-                    key={incKey + currKey}
+                    key={currKey}
                 />
                 { step.focus === null &&
                     <button
@@ -241,7 +262,7 @@ const StepInput: FC<StepInputProps> = ({
                         update={(): void => setFocus(getCameraFocus(), true)}
                         clear={(): void => setFocus(null, true)}
                         icon={<HiEye />}
-                        key={incKey + currKey + 1}
+                        key={currKey + 1}
                     />
                 </div>
             }
