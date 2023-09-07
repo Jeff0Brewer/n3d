@@ -12,6 +12,10 @@
     font: inherit;
 }
 
+.menu button[data-active="false"] {
+    opacity: 0.5;
+}
+
 .menu button:hover, .upload:hover {
     opacity: 0.6;
 }
@@ -102,6 +106,7 @@
 
 .bottomControls {
     font-size: 20px;
+    margin-bottom: 5px;
 }
 
 .playControls {
@@ -112,14 +117,14 @@
     font-size: 15px;
 }
 
-.playControls button {
+.bottomControls button, .bottomControls label {
     display: grid;
     place-items: center;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
-.fileControls {
+.sideControls {
     font-size: 18px;
     display: flex;
     gap: var(--gap);

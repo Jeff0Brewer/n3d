@@ -4,6 +4,7 @@ import { IoMdPlay, IoMdPause, IoMdRewind, IoMdFastforward } from 'react-icons/io
 import { IoStopSharp } from 'react-icons/io5'
 import { PiWaveSawtoothBold, PiWaveSineBold } from 'react-icons/pi'
 import { FaFileDownload, FaFileUpload } from 'react-icons/fa'
+import { SlGraph } from 'react-icons/sl'
 import { downloadTxt } from '../lib/export'
 import CameraPath, { serializePath, deserializePath } from '../lib/camera-path'
 import type { CameraStep } from '../lib/camera-path'
@@ -27,6 +28,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
     const [smooth, setSmooth] = useState<boolean>(true)
     const [visible, setVisible] = useState<boolean>(false)
     const [minKey, setMinKey] = useState<number>(0)
+    const [drawPath, setDrawPath] = useState<boolean>(true)
     const [paused, setPaused] = useState<boolean>(true)
     const pathRef = useRef<CameraPath | null>(null)
 
@@ -43,14 +45,14 @@ const CameraMenu: FC<CameraMenuProps> = ({
     }, [visible])
 
     useEffect(() => {
-        if (steps.length >= 2 && visible) {
+        if (steps.length >= 2 && drawPath) {
             // fill duration / start time with arbitrary values,
             // only need steps / smoothing for path motion
             setTracePath(new CameraPath(steps, [1], smooth))
         } else {
             setTracePath(null)
         }
-    }, [steps, smooth, visible, setTracePath])
+    }, [steps, smooth, drawPath, setTracePath])
 
     const incKey = (): void => {
         // increment key to update input values from state
@@ -202,11 +204,16 @@ const CameraMenu: FC<CameraMenuProps> = ({
                 </button>
             </div>
             <div className={styles.bottomControls}>
-                <button onClick={(): void => setSmooth(!smooth)}>
-                    { smooth
-                        ? <PiWaveSineBold />
-                        : <PiWaveSawtoothBold /> }
-                </button>
+                <div className={styles.sideControls}>
+                    <button onClick={(): void => setSmooth(!smooth)}>
+                        { smooth
+                            ? <PiWaveSineBold />
+                            : <PiWaveSawtoothBold /> }
+                    </button>
+                    <button data-active={drawPath} onClick={(): void => setDrawPath(!drawPath)}>
+                        <SlGraph />
+                    </button>
+                </div>
                 <div className={styles.playControls}>
                     <button onClick={prevStep}>
                         <IoMdRewind />
@@ -223,7 +230,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                         <IoMdFastforward />
                     </button>
                 </div>
-                <div className={styles.fileControls}>
+                <div className={styles.sideControls}>
                     <button onClick={downloadPath}>
                         <FaFileDownload />
                     </button>
