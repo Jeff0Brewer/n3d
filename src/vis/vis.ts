@@ -78,7 +78,7 @@ class VisRenderer {
     }
 
     setCameraPath (path: CameraPath | null): void {
-        this.camera.path = path
+        this.camera.setPath(path)
     }
 
     setTracePath (path: CameraPath | null): void {

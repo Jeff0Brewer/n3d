@@ -15,6 +15,7 @@ class Camera {
     defaultEye: vec3
     defaultFocus: vec3
     path: CameraPath | null
+    autoRotate: boolean
 
     constructor (view: mat4, eye: vec3, focus: vec3, up: vec3) {
         this.view = view
@@ -26,9 +27,13 @@ class Camera {
         this.defaultEye = vec3.clone(eye)
         this.defaultFocus = vec3.clone(focus)
         this.path = null
+        this.autoRotate = false
     }
 
     update (elapsed: number): vec3 {
+        if (this.autoRotate) {
+            this.mouseRotate(0.05 * elapsed, 0)
+        }
         if (this.path) {
             const { position, focus } = this.path.get(elapsed)
             vec3.copy(this.eye, position)
@@ -48,6 +53,11 @@ class Camera {
         mat4.lookAt(this.view, this.eye, this.focus, this.up)
     }
 
+    setPath (path: CameraPath | null): void {
+        this.path = path
+        this.autoRotate = false
+    }
+
     setupHandlers (element: HTMLElement): (() => void) {
         const dragTrue = (): void => { this.dragging = true }
         const dragFalse = (): void => { this.dragging = false }
@@ -60,12 +70,18 @@ class Camera {
             e.preventDefault()
             this.scrollZoom(e.deltaY)
         }
+        const autoRotate = (e: KeyboardEvent): void => {
+            if (e.ctrlKey && e.key === 'r') {
+                this.autoRotate = !this.autoRotate
+            }
+        }
 
         element.addEventListener('mousedown', dragTrue)
         element.addEventListener('mouseup', dragFalse)
         element.addEventListener('mouseleave', dragFalse)
         element.addEventListener('mousemove', rotate)
         element.addEventListener('wheel', zoom)
+        window.addEventListener('keydown', autoRotate)
 
         return (): void => {
             element.removeEventListener('mousedown', dragTrue)
@@ -73,6 +89,7 @@ class Camera {
             element.removeEventListener('mouseleave', dragFalse)
             element.removeEventListener('mousemove', rotate)
             element.removeEventListener('wheel', zoom)
+            window.removeEventListener('keydown', autoRotate)
         }
     }
 
