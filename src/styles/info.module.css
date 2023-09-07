@@ -4,7 +4,8 @@
     left: 0;
     top: 0;
     background-color: #111;
-    padding: 10px; font-size: 12px;
+    padding: 10px;
+    font-size: 12px;
 }
 
 .info .wrap {
@@ -24,6 +25,11 @@
     width: 1em;
     height: 1em;
     margin-left: 5px;
+}
+
+.name {
+    display: flex;
+    align-items: center;
 }
 
 .nameLink {
