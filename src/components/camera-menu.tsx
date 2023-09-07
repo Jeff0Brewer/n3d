@@ -195,12 +195,12 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     </div>
                 )}
             </div> }
-            <div className={styles.menuRow}>
+            <div className={styles.middleRow}>
                 <button className={styles.addStep} onClick={appendStep}>
                     <HiMiniPlus />
                 </button>
                 <button className={styles.startButton} onClick={startCameraPath}>
-                    set path
+                    update path
                 </button>
             </div>
             <div className={styles.bottomControls}>

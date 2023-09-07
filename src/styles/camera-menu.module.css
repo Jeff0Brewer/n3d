@@ -97,11 +97,15 @@
     display: none;
 }
 
-.menuRow, .bottomControls {
+.middleRow, .bottomControls {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: var(--gap);
+}
+
+.middleRow {
+    margin-bottom: 5px;
 }
 
 .bottomControls {
