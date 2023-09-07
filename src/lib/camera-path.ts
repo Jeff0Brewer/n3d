@@ -131,7 +131,8 @@ class BezierPath implements PathType {
         }
 
         // get index of current bezier, and t value within that bezier
-        const per = t * this.beziers.length
+        // cap t below 1 to prevent out of bound indices
+        const per = Math.min(t, 0.99999) * this.beziers.length
         const ind = Math.floor(per)
         const bezierT = per - ind
 
@@ -256,6 +257,10 @@ class DurationList {
         let ind = 0
         while (time > this.durations[ind + 1]) {
             ind++
+        }
+
+        if (ind === this.durations.length - 1) {
+            return 1
         }
 
         const low = this.durations[ind]
