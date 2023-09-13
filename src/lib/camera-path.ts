@@ -266,20 +266,20 @@ class DurationList {
         return (ind + stepT) / (this.durations.length - 1)
     }
 
-    getPrevStepTime (time: number): number {
+    getPrevStep (time: number): { ind: number, time: number } {
         let ind = this.durations.length - 1
         while (ind > 0 && time <= this.durations[ind]) {
             ind--
         }
-        return this.durations[ind]
+        return { ind, time: this.durations[ind] }
     }
 
-    getNextStepTime (time: number): number {
+    getNextStep (time: number): { ind: number, time: number } {
         let ind = 0
         while (ind < this.durations.length - 1 && time >= this.durations[ind]) {
             ind++
         }
-        return this.durations[ind]
+        return { ind, time: this.durations[ind] }
     }
 }
 
@@ -359,12 +359,16 @@ class CameraPath {
         return { position, focus }
     }
 
-    prevStep (): void {
-        this.currTime = this.duration.getPrevStepTime(this.currTime)
+    prevStep (): number | null {
+        const { ind, time } = this.duration.getPrevStep(this.currTime)
+        this.currTime = time
+        return this.paused ? ind : null
     }
 
-    nextStep (): void {
-        this.currTime = this.duration.getNextStepTime(this.currTime)
+    nextStep (): number | null {
+        const { ind, time } = this.duration.getNextStep(this.currTime)
+        this.currTime = time
+        return this.paused ? ind : null
     }
 
     getPathTrace (): Float32Array {
