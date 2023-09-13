@@ -16,6 +16,7 @@ class Camera {
     defaultFocus: vec3
     path: CameraPath | null
     autoRotate: boolean
+    autoRotateSpeed: number
 
     constructor (view: mat4, eye: vec3, focus: vec3, up: vec3) {
         this.view = view
@@ -28,11 +29,12 @@ class Camera {
         this.defaultFocus = vec3.clone(focus)
         this.path = null
         this.autoRotate = false
+        this.autoRotateSpeed = 0.05
     }
 
     update (elapsed: number): vec3 {
         if (this.autoRotate) {
-            this.mouseRotate(0.05 * elapsed, 0)
+            this.mouseRotate(this.autoRotateSpeed * elapsed, 0)
         }
         if (this.path) {
             const { position, focus } = this.path.get(elapsed)
@@ -70,9 +72,14 @@ class Camera {
             e.preventDefault()
             this.scrollZoom(e.deltaY)
         }
-        const autoRotate = (e: KeyboardEvent): void => {
+        const ROTATE_INC = 0.03
+        const autoRotateKeys = (e: KeyboardEvent): void => {
             if (e.ctrlKey && e.key === 'r') {
                 this.autoRotate = !this.autoRotate
+            } else if (e.ctrlKey && e.key === ',') {
+                this.autoRotateSpeed -= ROTATE_INC
+            } else if (e.ctrlKey && e.key === '.') {
+                this.autoRotateSpeed += ROTATE_INC
             }
         }
 
@@ -81,7 +88,7 @@ class Camera {
         element.addEventListener('mouseleave', dragFalse)
         element.addEventListener('mousemove', rotate)
         element.addEventListener('wheel', zoom)
-        window.addEventListener('keydown', autoRotate)
+        window.addEventListener('keydown', autoRotateKeys)
 
         return (): void => {
             element.removeEventListener('mousedown', dragTrue)
@@ -89,7 +96,7 @@ class Camera {
             element.removeEventListener('mouseleave', dragFalse)
             element.removeEventListener('mousemove', rotate)
             element.removeEventListener('wheel', zoom)
-            window.removeEventListener('keydown', autoRotate)
+            window.removeEventListener('keydown', autoRotateKeys)
         }
     }
 
