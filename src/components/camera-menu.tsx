@@ -1,8 +1,8 @@
 import React, { FC, useState, useEffect, useRef } from 'react'
 import { HiMiniVideoCamera, HiEye, HiMiniXMark, HiMiniPlus } from 'react-icons/hi2'
 import { IoMdPlay, IoMdPause, IoMdRewind, IoMdFastforward } from 'react-icons/io'
-import { IoStopSharp } from 'react-icons/io5'
 import { PiWaveSawtoothBold, PiWaveSineBold } from 'react-icons/pi'
+import { IoStopSharp } from 'react-icons/io5'
 import { FaFileDownload, FaFileUpload } from 'react-icons/fa'
 import { SlGraph } from 'react-icons/sl'
 import { downloadTxt } from '../lib/export'
@@ -210,7 +210,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                 </button>
             </div>
             <div className={styles.bottomControls}>
-                <div className={styles.sideControls}>
+                <div className={styles.pathControls}>
                     <button onClick={(): void => setSmooth(!smooth)}>
                         { smooth
                             ? <PiWaveSineBold />
@@ -236,7 +236,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                         <IoMdFastforward />
                     </button>
                 </div>
-                <div className={styles.sideControls}>
+                <div className={styles.fileControls}>
                     <button onClick={downloadPath}>
                         <FaFileDownload />
                     </button>

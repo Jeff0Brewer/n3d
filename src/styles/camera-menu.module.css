@@ -118,21 +118,29 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(2px);
-    font-size: 15px;
+    font-size: 14px;
+}
+
+.playControls button {
+    width: 16px;
+    height: 16px;
 }
 
 .bottomControls button, .bottomControls label {
     display: grid;
     place-items: center;
-    width: 18px;
-    height: 18px;
 }
 
-.sideControls {
-    font-size: 18px;
+.pathControls {
     display: flex;
-    gap: var(--gap);
+    gap: 5px;
+    font-size: 18px;
+}
+
+.fileControls {
+    display: flex;
+    gap: 2px;
+    font-size: 16px;
 }
 
 .startButton {
