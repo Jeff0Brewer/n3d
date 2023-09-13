@@ -131,6 +131,20 @@ const CameraMenu: FC<CameraMenuProps> = ({
         }
     }
 
+    const firstStep = (): void => {
+        if (pathRef.current !== null) {
+            const stepInd = pathRef.current.firstStep()
+            setCurrStep(stepInd)
+        }
+    }
+
+    const lastStep = (): void => {
+        if (pathRef.current !== null) {
+            const stepInd = pathRef.current.lastStep()
+            setCurrStep(stepInd)
+        }
+    }
+
     const stopPath = (): void => {
         pathRef.current = null
         setCameraPath(pathRef.current)
@@ -221,7 +235,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     </button>
                 </div>
                 <div className={styles.playControls}>
-                    <button className={styles.skipIcon}>
+                    <button onClick={firstStep} className={styles.skipIcon}>
                         <IoIosSkipBackward />
                     </button>
                     <button onClick={prevStep}>
@@ -238,7 +252,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     <button onClick={nextStep}>
                         <IoMdFastforward />
                     </button>
-                    <button className={styles.skipIcon}>
+                    <button onClick={lastStep} className={styles.skipIcon}>
                         <IoIosSkipForward />
                     </button>
                 </div>

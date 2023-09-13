@@ -281,6 +281,18 @@ class DurationList {
         }
         return { ind, time: this.durations[ind] }
     }
+
+    getFirstStep (): { ind: number, time: number } {
+        const ind = 0
+        const time = this.durations[ind]
+        return { ind, time }
+    }
+
+    getLastStep (): { ind: number, time: number } {
+        const ind = this.durations.length - 1
+        const time = this.durations[ind]
+        return { ind, time }
+    }
 }
 
 type CameraStep = {
@@ -367,6 +379,18 @@ class CameraPath {
 
     nextStep (): number | null {
         const { ind, time } = this.duration.getNextStep(this.currTime)
+        this.currTime = time
+        return this.paused ? ind : null
+    }
+
+    firstStep (): number | null {
+        const { ind, time } = this.duration.getFirstStep()
+        this.currTime = time
+        return this.paused ? ind : null
+    }
+
+    lastStep (): number | null {
+        const { ind, time } = this.duration.getLastStep()
         this.currTime = time
         return this.paused ? ind : null
     }
