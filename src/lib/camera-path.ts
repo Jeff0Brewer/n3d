@@ -42,22 +42,18 @@ class LinearPath implements PathType {
 
     get (t: number): PathInstant {
         const per = (this.steps.length - 1) * t
-        const low = Math.floor(per)
-        const high = Math.ceil(per)
+        const lowInd = Math.floor(per)
+        const highInd = Math.ceil(per)
 
-        const a = this.steps[low]
-        const b = this.steps[high]
-        const lerpT = per - low
+        const low = this.steps[lowInd]
+        const high = this.steps[highInd]
+        const lerpT = per - lowInd
 
         // linear interpolate between low and high steps for position
-        const position = lerp(a, b, lerpT)
+        const position = lerp(low, high, lerpT)
 
         // since linear motion, derivative is in direction of low - high
-        const derivative: Vec3 = [
-            b[0] - a[0],
-            b[1] - a[1],
-            b[2] - a[2]
-        ]
+        const derivative: Vec3 = sub(high, low)
 
         return { position, derivative }
     }
