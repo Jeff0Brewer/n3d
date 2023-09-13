@@ -1,6 +1,6 @@
 import React, { FC, useState, useEffect, useRef } from 'react'
 import { HiMiniVideoCamera, HiEye, HiMiniXMark, HiMiniPlus } from 'react-icons/hi2'
-import { IoMdPlay, IoMdPause, IoMdRewind, IoMdFastforward } from 'react-icons/io'
+import { IoMdPlay, IoMdPause, IoMdRewind, IoMdFastforward, IoIosSkipBackward, IoIosSkipForward } from 'react-icons/io'
 import { PiWaveSawtoothBold, PiWaveSineBold } from 'react-icons/pi'
 import { IoStopSharp } from 'react-icons/io5'
 import { FaFileDownload, FaFileUpload } from 'react-icons/fa'
@@ -221,6 +221,9 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     </button>
                 </div>
                 <div className={styles.playControls}>
+                    <button className={styles.skipIcon}>
+                        <IoIosSkipBackward />
+                    </button>
                     <button onClick={prevStep}>
                         <IoMdRewind />
                     </button>
@@ -234,6 +237,9 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     </button>
                     <button onClick={nextStep}>
                         <IoMdFastforward />
+                    </button>
+                    <button className={styles.skipIcon}>
+                        <IoIosSkipForward />
                     </button>
                 </div>
                 <div className={styles.fileControls}>

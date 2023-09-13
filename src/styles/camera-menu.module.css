@@ -1,11 +1,11 @@
 .menu {
     background-color: var(--color0);
     font-size: 12px;
-    min-width: 200px;
+    min-width: 230px;
 }
 
 .menu input {
-    width: 40px;
+    width: 50px;
     padding: 0 5px;
     height: 16px;
     background-color: var(--color2);
@@ -124,6 +124,12 @@
 .playControls button {
     width: 16px;
     height: 16px;
+}
+
+.playControls .skipIcon {
+    font-size: 12px;
+    width: 14px;
+    height: 14px;
 }
 
 .bottomControls button, .bottomControls label {
