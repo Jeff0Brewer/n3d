@@ -30,6 +30,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
     const [minKey, setMinKey] = useState<number>(0)
     const [drawPath, setDrawPath] = useState<boolean>(true)
     const [paused, setPaused] = useState<boolean>(true)
+    const [currStep, setCurrStep] = useState<number | null>(null)
     const pathRef = useRef<CameraPath | null>(null)
 
     useEffect(() => {
@@ -113,17 +114,20 @@ const CameraMenu: FC<CameraMenuProps> = ({
             : null
         setCameraPath(pathRef.current)
         setPaused(false)
+        setCurrStep(null)
     }
 
     const prevStep = (): void => {
         if (pathRef.current !== null) {
-            pathRef.current.prevStep()
+            const stepInd = pathRef.current.prevStep()
+            setCurrStep(stepInd)
         }
     }
 
     const nextStep = (): void => {
         if (pathRef.current !== null) {
-            pathRef.current.nextStep()
+            const stepInd = pathRef.current.nextStep()
+            setCurrStep(stepInd)
         }
     }
 
@@ -131,6 +135,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
         pathRef.current = null
         setCameraPath(pathRef.current)
         setPaused(true)
+        setCurrStep(null)
     }
 
     const playPause = (): void => {
@@ -140,6 +145,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
             pathRef.current.paused = !paused
             setPaused(pathRef.current.paused)
         }
+        setCurrStep(null)
     }
 
     const downloadPath = (): void => {
@@ -218,7 +224,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     <button onClick={prevStep}>
                         <IoMdRewind />
                     </button>
-                    <button onClick={stopPath}>
+                    <button className={styles.stopButton} onClick={stopPath}>
                         <IoStopSharp />
                     </button>
                     <button onClick={playPause}>
@@ -242,6 +248,10 @@ const CameraMenu: FC<CameraMenuProps> = ({
                         <FaFileUpload />
                     </label>
                 </div>
+                { currStep !== null &&
+                    <p className={styles.stepCount}>
+                        step: {currStep}
+                    </p> }
             </div>
         </div>
     )
