@@ -46,6 +46,18 @@ const Vis: FC<VisProps> = ({
         }
     }
 
+    const setTracePath = (path: CameraPath | null): void => {
+        if (visRef.current) {
+            visRef.current.setTracePath(path)
+        }
+    }
+
+    const setTraceAxisPosition = (pos: [number, number, number] | null): void => {
+        if (visRef.current) {
+            visRef.current.setAxisPosition(pos)
+        }
+    }
+
     const getCameraPosition = (): [number, number, number] => {
         if (!visRef.current) {
             throw new Error('Cannot get camera position before vis initialization')
@@ -60,12 +72,6 @@ const Vis: FC<VisProps> = ({
         }
         const focus = visRef.current.camera.focus
         return [focus[0], focus[1], focus[2]]
-    }
-
-    const setTracePath = (path: CameraPath | null): void => {
-        if (visRef.current) {
-            visRef.current.setTracePath(path)
-        }
     }
 
     // init vis renderer
@@ -192,6 +198,7 @@ const Vis: FC<VisProps> = ({
                 <CameraMenu
                     setCameraPath={setCameraPath}
                     setTracePath={setTracePath}
+                    setAxisPosition={setTraceAxisPosition}
                     getCameraPosition={getCameraPosition}
                     getCameraFocus={getCameraFocus}
                 />

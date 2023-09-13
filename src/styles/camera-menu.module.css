@@ -34,12 +34,32 @@
     border: none;
 }
 
-.step {
+.step, .stepHighlight {
     padding: 15px 5px;
     display: flex;
     flex-direction: column;
     gap: var(--gap);
     border-bottom: var(--border);
+}
+
+.stepHighlight {
+    background: linear-gradient(
+        to right,
+        var(--color1),
+        var(--color0) 60%
+    );
+}
+
+.stepHighlight .xInput {
+    color: #fbb;
+}
+
+.stepHighlight .yInput {
+    color: #bfb;
+}
+
+.stepHighlight .zInput {
+    color: #bbf;
 }
 
 .stepRow {
@@ -49,6 +69,7 @@
 
 .duration {
     position: absolute;
+    z-index: 100;
     bottom: -8px;
     right: 0px;
     display: flex;

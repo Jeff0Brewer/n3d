@@ -16,12 +16,14 @@ const DEFAULT_DURATION = 1000 // ms
 type CameraMenuProps = {
     setCameraPath: (path: CameraPath | null) => void,
     setTracePath: (path: CameraPath | null) => void,
+    setAxisPosition: (pos: [number, number, number] | null) => void,
     getCameraPosition: () => [number, number, number],
     getCameraFocus: () => [number, number, number]
 }
 
 const CameraMenu: FC<CameraMenuProps> = ({
-    setCameraPath, getCameraPosition, getCameraFocus, setTracePath
+    setCameraPath, setTracePath, setAxisPosition,
+    getCameraPosition, getCameraFocus
 }) => {
     const [steps, setSteps] = useState<Array<CameraStep>>([])
     const [durations, setDurations] = useState<Array<number>>([])
@@ -193,17 +195,23 @@ const CameraMenu: FC<CameraMenuProps> = ({
     if (!visible) { return <></> }
     return (
         <div className={styles.menu}>
-            { steps.length !== 0 && <div className={styles.steps}>
-                { steps.map((step: CameraStep, i: number) =>
-                    <div key={i + minKey} className={styles.stepWrap}>
-                        <StepInput
-                            step={step}
-                            setStep={getStepSetter(i)}
-                            removeStep={getStepRemover(i)}
-                            getCameraPosition={getCameraPosition}
-                            getCameraFocus={getCameraFocus}
-                        />
-                        { i < steps.length - 1 &&
+            { steps.length !== 0 &&
+                <div
+                    className={styles.steps}
+                    onMouseLeave={(): void => setAxisPosition(null)}
+                >
+                    { steps.map((step: CameraStep, i: number) =>
+                        <div key={i + minKey} className={styles.stepWrap}>
+                            <StepInput
+                                step={step}
+                                setStep={getStepSetter(i)}
+                                removeStep={getStepRemover(i)}
+                                getCameraPosition={getCameraPosition}
+                                getCameraFocus={getCameraFocus}
+                                setAxisPosition={setAxisPosition}
+                                drawingPath={drawPath}
+                            />
+                            { i < steps.length - 1 &&
                             <span className={styles.duration}>
                                 <input
                                     type={'text'}
@@ -212,9 +220,9 @@ const CameraMenu: FC<CameraMenuProps> = ({
                                 />
                                 <p>sec</p>
                             </span> }
-                    </div>
-                )}
-            </div> }
+                        </div>
+                    )}
+                </div> }
             <div className={styles.middleRow}>
                 <button className={styles.addStep} onClick={appendStep}>
                     <HiMiniPlus />
@@ -283,12 +291,22 @@ type StepInputProps = {
     removeStep: () => void,
     getCameraPosition: () => [number, number, number],
     getCameraFocus: () => [number, number, number],
+    setAxisPosition: (pos: [number, number, number] | null) => void,
+    drawingPath: boolean
 }
 
 const StepInput: FC<StepInputProps> = ({
-    step, setStep, removeStep, getCameraPosition, getCameraFocus
+    step, setStep, removeStep, getCameraPosition,
+    getCameraFocus, setAxisPosition, drawingPath
 }) => {
     const [currKey, setCurrKey] = useState<number>(0)
+    const [hovered, setHovered] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (hovered && drawingPath) {
+            setAxisPosition(step.position)
+        }
+    }, [hovered, drawingPath, step, setAxisPosition])
 
     const updateStep = (updateKey?: boolean): void => {
         // don't need object copy since steps state is copied
@@ -301,6 +319,9 @@ const StepInput: FC<StepInputProps> = ({
 
     const setPosition = (point: [number, number, number], updateKey?: boolean): void => {
         step.position = point
+        if (hovered) {
+            setAxisPosition(point)
+        }
         updateStep(updateKey)
     }
 
@@ -310,7 +331,11 @@ const StepInput: FC<StepInputProps> = ({
     }
 
     return (
-        <div className={styles.step}>
+        <div
+            className={hovered && drawingPath ? styles.stepHighlight : styles.step}
+            onMouseEnter={(): void => setHovered(true)}
+            onMouseLeave={(): void => setHovered(false)}
+        >
             <div className={styles.stepRow}>
                 <PointInput
                     point={step.position}
@@ -376,16 +401,19 @@ const PointInput: FC<PointInputProps> = ({
                 { icon }
             </button>
             <input
+                className={styles.xInput}
                 type={'text'}
                 defaultValue={roundToPrecision(point[0], INPUT_PRECISION)}
                 onChange={getIndSetter(0)}
             />
             <input
+                className={styles.yInput}
                 type={'text'}
                 defaultValue={roundToPrecision(point[1], INPUT_PRECISION)}
                 onChange={getIndSetter(1)}
             />
             <input
+                className={styles.zInput}
                 type={'text'}
                 defaultValue={roundToPrecision(point[2], INPUT_PRECISION)}
                 onChange={getIndSetter(2)}
