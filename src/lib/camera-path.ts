@@ -2,61 +2,37 @@ import { Bezier } from 'bezier-js'
 
 type Vec3 = [number, number, number]
 
-type PathInstant = {
-    position: Vec3,
-    derivative: Vec3
+const add = (a: Vec3, b: Vec3): Vec3 => {
+    return [
+        a[0] + b[0],
+        a[1] + b[1],
+        a[2] + b[2]
+    ]
 }
 
-interface PathType {
-    get: (t: number) => PathInstant
+const sub = (a: Vec3, b: Vec3): Vec3 => {
+    return [
+        a[0] - b[0],
+        a[1] - b[1],
+        a[2] - b[2]
+    ]
 }
 
-class StaticPath implements PathType {
-    position: Vec3
-    derivative: Vec3
-
-    constructor (position: Vec3) {
-        this.position = position
-        // derivative as -position so position + derivative yields origin
-        this.derivative = [-position[0], -position[1], -position[2]]
-    }
-
-    get (): PathInstant {
-        return {
-            position: this.position,
-            derivative: this.derivative
-        }
-    }
+const scaleTo = (v: Vec3, length: number): Vec3 => {
+    const invMag = 1 / Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
+    return [
+        v[0] * invMag * length,
+        v[1] * invMag * length,
+        v[2] * invMag * length
+    ]
 }
 
-class LinearPath implements PathType {
-    steps: Array<Vec3>
-
-    constructor (positions: Array<Vec3>) {
-        // prevent use of linear path for single point
-        if (positions.length < 2) {
-            throw new Error('Linear path requires at least 2 points')
-        }
-        this.steps = positions
-    }
-
-    get (t: number): PathInstant {
-        const per = (this.steps.length - 1) * t
-        const lowInd = Math.floor(per)
-        const highInd = Math.ceil(per)
-
-        const low = this.steps[lowInd]
-        const high = this.steps[highInd]
-        const lerpT = per - lowInd
-
-        // linear interpolate between low and high steps for position
-        const position = lerp(low, high, lerpT)
-
-        // since linear motion, derivative is in direction of low - high
-        const derivative: Vec3 = sub(high, low)
-
-        return { position, derivative }
-    }
+const lerp = (a: Vec3, b: Vec3, t: number): Vec3 => {
+    return [
+        a[0] + (b[0] - a[0]) * t,
+        a[1] + (b[1] - a[1]) * t,
+        a[2] + (b[2] - a[2]) * t
+    ]
 }
 
 class Point {
@@ -90,59 +66,6 @@ class Point {
             this.y * factor,
             this.z * factor
         )
-    }
-}
-
-class BezierPath implements PathType {
-    beziers: Array<Bezier>
-
-    constructor (positions: Array<Vec3>) {
-        // don't need complex bezier calculation for < 3 points
-        // since linear interpolation works fine
-        if (positions.length < 3) {
-            throw new Error('Bezier path requires at least 3 points')
-        }
-
-        // move position vectors into point class for calculation
-        // and passing into bezier-js (requires x, y, z fields)
-        const knots = positions.map(p => new Point(...p))
-
-        const n = knots.length - 1 // number of bezier curves in final path
-        const controlPoints = computeControlPoints(n, knots)
-
-        this.beziers = Array(n)
-        for (let i = 0; i < n; i++) {
-            this.beziers[i] = new Bezier(
-                knots[i],
-                controlPoints[i],
-                controlPoints[n + i],
-                knots[i + 1]
-            )
-        }
-    }
-
-    get (t: number): PathInstant {
-        if (t < 0 || t > 1) {
-            throw new Error('Path only defined in range (0, 1)')
-        }
-
-        // get index of current bezier, and t value within that bezier
-        // cap t below 1 to prevent out of bound indices
-        const per = Math.min(t, 0.99999) * this.beziers.length
-        const ind = Math.floor(per)
-        const bezierT = per - ind
-
-        const position = this.beziers[ind].get(bezierT)
-        const derivative = this.beziers[ind].derivative(bezierT)
-
-        if (position.z === undefined || derivative.z === undefined) {
-            throw new Error('Bezier curves must contain 3d coordinates')
-        }
-
-        return {
-            position: [position.x, position.y, position.z],
-            derivative: [derivative.x, derivative.y, derivative.z]
-        }
     }
 }
 
@@ -225,13 +148,123 @@ const computeControlPoints = (n: number, knots: Array<Point>): Array<Point> => {
     return out
 }
 
+type PathInstant = {
+    position: Vec3,
+    derivative: Vec3
+}
+
+interface PathType {
+    get: (t: number) => PathInstant
+}
+
+class StaticPath implements PathType {
+    position: Vec3
+    derivative: Vec3
+
+    constructor (position: Vec3) {
+        this.position = position
+        // derivative as -position so position + derivative yields origin
+        this.derivative = [-position[0], -position[1], -position[2]]
+    }
+
+    get (): PathInstant {
+        return {
+            position: this.position,
+            derivative: this.derivative
+        }
+    }
+}
+
+class LinearPath implements PathType {
+    steps: Array<Vec3>
+
+    constructor (positions: Array<Vec3>) {
+        // prevent use of linear path for single point
+        if (positions.length < 2) {
+            throw new Error('Linear path requires at least 2 points')
+        }
+        this.steps = positions
+    }
+
+    get (t: number): PathInstant {
+        const per = (this.steps.length - 1) * t
+        const lowInd = Math.floor(per)
+        const highInd = Math.ceil(per)
+
+        const low = this.steps[lowInd]
+        const high = this.steps[highInd]
+        const lerpT = per - lowInd
+
+        // linear interpolate between low and high steps for position
+        const position = lerp(low, high, lerpT)
+
+        // since linear motion, derivative is in direction of low - high
+        const derivative: Vec3 = sub(high, low)
+
+        return { position, derivative }
+    }
+}
+
+class BezierPath implements PathType {
+    beziers: Array<Bezier>
+
+    constructor (positions: Array<Vec3>) {
+        // don't need complex bezier calculation for < 3 points
+        // since linear interpolation works fine
+        if (positions.length < 3) {
+            throw new Error('Bezier path requires at least 3 points')
+        }
+
+        // move position vectors into point class for calculation
+        // and passing into bezier-js (requires x, y, z fields)
+        const knots = positions.map(p => new Point(...p))
+
+        const n = knots.length - 1 // number of bezier curves in final path
+        const controlPoints = computeControlPoints(n, knots)
+
+        this.beziers = Array(n)
+        for (let i = 0; i < n; i++) {
+            this.beziers[i] = new Bezier(
+                knots[i],
+                controlPoints[i],
+                controlPoints[n + i],
+                knots[i + 1]
+            )
+        }
+    }
+
+    get (t: number): PathInstant {
+        if (t < 0 || t > 1) {
+            throw new Error('Path only defined in range (0, 1)')
+        }
+
+        // get index of current bezier, and t value within that bezier
+        // cap t below 1 to prevent out of bound indices
+        const per = Math.min(t, 0.99999) * this.beziers.length
+        const ind = Math.floor(per)
+        const bezierT = per - ind
+
+        const position = this.beziers[ind].get(bezierT)
+        const derivative = this.beziers[ind].derivative(bezierT)
+
+        if (position.z === undefined || derivative.z === undefined) {
+            throw new Error('Bezier curves must contain 3d coordinates')
+        }
+
+        return {
+            position: [position.x, position.y, position.z],
+            derivative: [derivative.x, derivative.y, derivative.z]
+        }
+    }
+}
+
 class DurationList {
     durations: Array<number>
     total: number
 
     constructor (durations: Array<number>) {
-        // map individual durations to list of total
-        // durations for fast index search
+        // map time between steps to total time at
+        // each step for fast index search
         let total = 0
         this.durations = durations.map(duration => {
             total += duration
@@ -246,15 +279,19 @@ class DurationList {
             throw new Error(`Time must be in range of total duration ${this.total}`)
         }
 
+        // always 0 if only one step
         if (this.durations.length < 2) {
             return 0
         }
 
+        // get index of last duration less than passed in time
+        // don't need to check index in bounds since time <= max duration
         let ind = 0
         while (time > this.durations[ind + 1]) {
             ind++
         }
 
+        // don't need to interpolate if at last index
         if (ind === this.durations.length - 1) {
             return 1
         }
@@ -284,14 +321,12 @@ class DurationList {
 
     getFirstStep (): { ind: number, time: number } {
         const ind = 0
-        const time = this.durations[ind]
-        return { ind, time }
+        return { ind, time: this.durations[ind] }
     }
 
     getLastStep (): { ind: number, time: number } {
         const ind = this.durations.length - 1
-        const time = this.durations[ind]
-        return { ind, time }
+        return { ind, time: this.durations[ind] }
     }
 }
 
@@ -395,6 +430,7 @@ class CameraPath {
         return this.paused ? ind : null
     }
 
+    // get path geometry for rendering
     getPathTrace (): Float32Array {
         const tInc = 1 / (this.focuses.length * 30)
         const positions = []
@@ -405,6 +441,7 @@ class CameraPath {
         return new Float32Array(positions)
     }
 
+    // get camera positions for rendering
     getCameraPoints (): Float32Array {
         const positions = []
         for (const step of this.steps) {
@@ -413,6 +450,7 @@ class CameraPath {
         return new Float32Array(positions)
     }
 
+    // get focus directions for rendering
     getFocusLines (): Float32Array {
         const lines = []
         for (const step of this.steps) {
@@ -505,43 +543,6 @@ const deserializePath = (csv: string): {
         durations,
         smooth
     }
-}
-
-const add = (a: Vec3, b: Vec3): Vec3 => {
-    return [
-        a[0] + b[0],
-        a[1] + b[1],
-        a[2] + b[2]
-    ]
-}
-
-const sub = (a: Vec3, b: Vec3): Vec3 => {
-    return [
-        a[0] - b[0],
-        a[1] - b[1],
-        a[2] - b[2]
-    ]
-}
-
-const scaleTo = (v: Vec3, length: number): Vec3 => {
-    const invMag = 1 / Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
-    return [
-        v[0] * invMag * length,
-        v[1] * invMag * length,
-        v[2] * invMag * length
-    ]
-}
-
-const lerp = (a: Vec3, b: Vec3, t: number): Vec3 => {
-    return [
-        a[0] + (b[0] - a[0]) * t,
-        a[1] + (b[1] - a[1]) * t,
-        a[2] + (b[2] - a[2]) * t
-    ]
-}
-
-const ease = (x: number): number => {
-    return (Math.cos(Math.PI * (1 - x)) + 1) / 2
 }
 
 export default CameraPath
