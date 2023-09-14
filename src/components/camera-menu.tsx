@@ -18,12 +18,13 @@ type CameraMenuProps = {
     setTracePath: (path: CameraPath | null) => void,
     setAxisPosition: (pos: [number, number, number] | null) => void,
     getCameraPosition: () => [number, number, number],
-    getCameraFocus: () => [number, number, number]
+    getCameraFocus: () => [number, number, number],
+    setDrawCameraPath: (draw: boolean) => void
 }
 
 const CameraMenu: FC<CameraMenuProps> = ({
     setCameraPath, setTracePath, setAxisPosition,
-    getCameraPosition, getCameraFocus
+    getCameraPosition, getCameraFocus, setDrawCameraPath
 }) => {
     const [steps, setSteps] = useState<Array<CameraStep>>([])
     const [durations, setDurations] = useState<Array<number>>([])
@@ -48,14 +49,18 @@ const CameraMenu: FC<CameraMenuProps> = ({
     }, [visible])
 
     useEffect(() => {
-        if (steps.length >= 2 && drawPath) {
-            // fill duration / start time with arbitrary values,
+        setDrawCameraPath(drawPath)
+    }, [drawPath, setDrawCameraPath])
+
+    useEffect(() => {
+        if (steps.length > 0) {
+            // fill duration with arbitrary values,
             // only need steps / smoothing for path motion
             setTracePath(new CameraPath(steps, [1], smooth))
         } else {
             setTracePath(null)
         }
-    }, [steps, smooth, drawPath, setTracePath])
+    }, [steps, smooth, setTracePath])
 
     const incKey = (): void => {
         // increment key to update input values from state
@@ -303,10 +308,10 @@ const StepInput: FC<StepInputProps> = ({
     const [hovered, setHovered] = useState<boolean>(false)
 
     useEffect(() => {
-        if (hovered && drawingPath) {
+        if (hovered) {
             setAxisPosition(step.position)
         }
-    }, [hovered, drawingPath, step, setAxisPosition])
+    }, [hovered, step, setAxisPosition])
 
     const updateStep = (updateKey?: boolean): void => {
         // don't need object copy since steps state is copied

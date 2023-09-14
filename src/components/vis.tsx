@@ -40,6 +40,12 @@ const Vis: FC<VisProps> = ({
         }
     }
 
+    const setDrawCameraPath = (draw: boolean): void => {
+        if (visRef.current) {
+            visRef.current.setDrawCameraPath(draw)
+        }
+    }
+
     const setCameraPath = (path: CameraPath | null): void => {
         if (visRef.current) {
             visRef.current.setCameraPath(path)
@@ -201,6 +207,7 @@ const Vis: FC<VisProps> = ({
                     setAxisPosition={setTraceAxisPosition}
                     getCameraPosition={getCameraPosition}
                     getCameraFocus={getCameraFocus}
+                    setDrawCameraPath={setDrawCameraPath}
                 />
             </section>
         </div>

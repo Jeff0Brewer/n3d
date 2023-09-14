@@ -37,6 +37,7 @@ class VisRenderer {
     cameraTrace: CameraTrace
     cameraAxis: CameraAxis
     drawLandmarks: boolean
+    drawCameraPath: boolean
     pointSize: number
 
     constructor (
@@ -71,6 +72,7 @@ class VisRenderer {
         this.cameraAxis = new CameraAxis(this.gl, this.model, this.view, this.proj)
 
         this.drawLandmarks = true
+        this.drawCameraPath = true
 
         this.pointSize = DEFAULT_POINT_SIZE
     }
@@ -94,6 +96,10 @@ class VisRenderer {
 
     setDrawLandmarks (draw: boolean): void {
         this.drawLandmarks = draw
+    }
+
+    setDrawCameraPath (draw: boolean): void {
+        this.drawCameraPath = draw
     }
 
     colorMapField (data: GalaxyData, field: ColorField | null): void {
@@ -211,8 +217,10 @@ class VisRenderer {
         if (this.drawLandmarks) {
             this.landmarks.draw(this.gl, this.view, landmarks, this.camera.eye)
         }
-        this.cameraAxis.draw(this.gl, this.view)
-        this.cameraTrace.draw(this.gl, this.view)
+        if (this.drawCameraPath) {
+            this.cameraAxis.draw(this.gl, this.view)
+            this.cameraTrace.draw(this.gl, this.view)
+        }
     }
 }
 
