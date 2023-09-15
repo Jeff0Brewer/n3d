@@ -1,5 +1,9 @@
 import { Bezier } from 'bezier-js'
 
+const ease = (x: number): number => {
+    return (Math.cos(Math.PI * (1 - x)) + 1) / 2
+}
+
 type Vec3 = [number, number, number]
 
 const add = (a: Vec3, b: Vec3): Vec3 => {
