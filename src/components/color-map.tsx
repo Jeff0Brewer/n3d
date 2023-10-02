@@ -83,7 +83,7 @@ const ColorBounds: FC<ColorBoundsProps> = ({ min, max, setMin, setMax, colorFiel
     const leftRef = useRef<HTMLAnchorElement>(null)
     const rightRef = useRef<HTMLAnchorElement>(null)
 
-    const handleWidth = 10
+    const handleWidth = 8
 
     useEffect(() => {
         const left = leftRef.current
