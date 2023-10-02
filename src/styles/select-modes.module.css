@@ -16,7 +16,7 @@
     margin-top: 5px;
 }
 
-.sphereCenter, .sphereRadius, .angleValue {
+.sphereCenter, .sphereRadius, .angleValue, .currFilter {
     color: var(--text0);
 }
 
@@ -46,16 +46,12 @@
     width: 150px;
 }
 
-.filterLabel {
-    text-transform: uppercase;
-    color: var(--text0);
-}
-
 .filterOptions {
     display: flex;
     flex-direction: column;
     max-height: 200px;
     overflow-y: scroll;
+    color: var(--text0);
 }
 
 .filterOption {

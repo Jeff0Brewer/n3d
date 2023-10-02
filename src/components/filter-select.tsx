@@ -157,7 +157,7 @@ const FilterOption: FC<FilterOptionProps> = ({ label, option, values, setOption 
         <div>
             <span>
                 <a
-                    className={styles.filterLabel}
+                    className={styles.header}
                     onClick={(): void => setOpen(!open)}
                 >{label}</a>
                 { option && <a
@@ -175,7 +175,9 @@ const FilterOption: FC<FilterOptionProps> = ({ label, option, values, setOption 
                         > {value} </a>
                     )}
                 </div>
-                : <p>{option || 'all'}</p> }
+                : <p className={styles.currFilter}>{
+                    option || 'all'
+                }</p> }
         </div>
     )
 }
