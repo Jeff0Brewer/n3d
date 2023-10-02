@@ -157,7 +157,7 @@ const FilterOption: FC<FilterOptionProps> = ({ label, option, values, setOption 
         <div>
             <span>
                 <a
-                    className={styles.header}
+                    className={`${styles.header} ${styles.filterLabel}`}
                     onClick={(): void => setOpen(!open)}
                 >{label}</a>
                 { option && <a
