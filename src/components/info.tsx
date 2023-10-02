@@ -33,7 +33,7 @@ const GalaxyInfo: FC<GalaxyInfoProps> = ({ headers, entry, colorField }) => {
 
     return (
         <div className={styles.info}>
-            <div className={styles.wrap}>
+            <div>
                 <p className={styles.label}>name</p>
                 <span className={styles.name}>
                     <a
