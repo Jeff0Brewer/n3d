@@ -8,6 +8,7 @@ import Highlight from '../vis/highlight'
 import SphereBounds from '../vis/sphere-bounds'
 import ConeBounds from '../vis/cone-bounds'
 import CameraTrace from '../vis/camera-trace'
+import CameraAxis from '../vis/camera-axis'
 import CameraPath from '../lib/camera-path'
 import type { GalaxyData, Landmark } from '../lib/data'
 import type { ColorField } from '../lib/color-map'
@@ -34,7 +35,9 @@ class VisRenderer {
     sphereBounds: SphereBounds
     coneBounds: ConeBounds
     cameraTrace: CameraTrace
+    cameraAxis: CameraAxis
     drawLandmarks: boolean
+    drawCameraPath: boolean
     pointSize: number
 
     constructor (
@@ -66,8 +69,10 @@ class VisRenderer {
         this.coneBounds = new ConeBounds(this.gl, this.model, this.view, this.proj)
         this.landmarks = new Landmarks(this.gl, this.model, this.view, this.proj, landmarkData)
         this.cameraTrace = new CameraTrace(this.gl, this.model, this.view, this.proj)
+        this.cameraAxis = new CameraAxis(this.gl, this.model, this.view, this.proj)
 
         this.drawLandmarks = true
+        this.drawCameraPath = true
 
         this.pointSize = DEFAULT_POINT_SIZE
     }
@@ -85,8 +90,16 @@ class VisRenderer {
         this.cameraTrace.setPath(this.gl, path)
     }
 
+    setAxisPosition (pos: [number, number, number] | null): void {
+        this.cameraAxis.setPosition(this.gl, pos)
+    }
+
     setDrawLandmarks (draw: boolean): void {
         this.drawLandmarks = draw
+    }
+
+    setDrawCameraPath (draw: boolean): void {
+        this.drawCameraPath = draw
     }
 
     colorMapField (data: GalaxyData, field: ColorField | null): void {
@@ -158,6 +171,9 @@ class VisRenderer {
 
             this.gl.useProgram(this.cameraTrace.program)
             this.cameraTrace.setProjMatrix(this.proj)
+
+            this.gl.useProgram(this.cameraAxis.program)
+            this.cameraAxis.setProjMatrix(this.proj)
         }
 
         const keyDown = (e: KeyboardEvent): void => {
@@ -201,7 +217,10 @@ class VisRenderer {
         if (this.drawLandmarks) {
             this.landmarks.draw(this.gl, this.view, landmarks, this.camera.eye)
         }
-        this.cameraTrace.draw(this.gl, this.view)
+        if (this.drawCameraPath) {
+            this.cameraAxis.draw(this.gl, this.view)
+            this.cameraTrace.draw(this.gl, this.view)
+        }
     }
 }
 

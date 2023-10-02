@@ -40,9 +40,27 @@ const Vis: FC<VisProps> = ({
         }
     }
 
+    const setDrawCameraPath = (draw: boolean): void => {
+        if (visRef.current) {
+            visRef.current.setDrawCameraPath(draw)
+        }
+    }
+
     const setCameraPath = (path: CameraPath | null): void => {
         if (visRef.current) {
             visRef.current.setCameraPath(path)
+        }
+    }
+
+    const setTracePath = (path: CameraPath | null): void => {
+        if (visRef.current) {
+            visRef.current.setTracePath(path)
+        }
+    }
+
+    const setTraceAxisPosition = (pos: [number, number, number] | null): void => {
+        if (visRef.current) {
+            visRef.current.setAxisPosition(pos)
         }
     }
 
@@ -60,12 +78,6 @@ const Vis: FC<VisProps> = ({
         }
         const focus = visRef.current.camera.focus
         return [focus[0], focus[1], focus[2]]
-    }
-
-    const setTracePath = (path: CameraPath | null): void => {
-        if (visRef.current) {
-            visRef.current.setTracePath(path)
-        }
     }
 
     // init vis renderer
@@ -192,8 +204,10 @@ const Vis: FC<VisProps> = ({
                 <CameraMenu
                     setCameraPath={setCameraPath}
                     setTracePath={setTracePath}
+                    setAxisPosition={setTraceAxisPosition}
                     getCameraPosition={getCameraPosition}
                     getCameraFocus={getCameraFocus}
+                    setDrawCameraPath={setDrawCameraPath}
                 />
             </section>
         </div>

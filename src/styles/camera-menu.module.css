@@ -1,11 +1,11 @@
 .menu {
     background-color: var(--color0);
     font-size: 12px;
-    min-width: 200px;
+    min-width: 230px;
 }
 
 .menu input {
-    width: 40px;
+    width: 50px;
     padding: 0 5px;
     height: 16px;
     background-color: var(--color2);
@@ -34,12 +34,32 @@
     border: none;
 }
 
-.step {
+.step, .stepHighlight {
     padding: 15px 5px;
     display: flex;
     flex-direction: column;
     gap: var(--gap);
     border-bottom: var(--border);
+}
+
+.stepHighlight {
+    background: linear-gradient(
+        to right,
+        var(--color1),
+        var(--color0) 60%
+    );
+}
+
+.stepHighlight .xInput {
+    color: #fbb;
+}
+
+.stepHighlight .yInput {
+    color: #bfb;
+}
+
+.stepHighlight .zInput {
+    color: #bbf;
 }
 
 .stepRow {
@@ -49,6 +69,7 @@
 
 .duration {
     position: absolute;
+    z-index: 100;
     bottom: -8px;
     right: 0px;
     display: flex;
@@ -111,27 +132,42 @@
 .bottomControls {
     font-size: 20px;
     margin-bottom: 5px;
+    position: relative;
 }
 
 .playControls {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(2px);
-    font-size: 15px;
+    font-size: 14px;
+}
+
+.playControls button {
+    width: 16px;
+    height: 16px;
+}
+
+.playControls .skipIcon {
+    font-size: 12px;
+    width: 14px;
+    height: 14px;
 }
 
 .bottomControls button, .bottomControls label {
     display: grid;
     place-items: center;
-    width: 18px;
-    height: 18px;
 }
 
-.sideControls {
-    font-size: 18px;
+.pathControls {
     display: flex;
-    gap: var(--gap);
+    gap: 5px;
+    font-size: 18px;
+}
+
+.fileControls {
+    display: flex;
+    gap: 2px;
+    font-size: 16px;
 }
 
 .startButton {
@@ -139,4 +175,14 @@
     padding: 0 5px;
     height: 15px;
     line-height: 15px;
+}
+
+.stepCount {
+    position: absolute;
+    font-size: 12px;
+    left: 0;
+    right: 0;
+    bottom: 20px;
+    display: flex;
+    justify-content: center;
 }

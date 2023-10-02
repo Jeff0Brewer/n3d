@@ -33,9 +33,9 @@ const GalaxyInfo: FC<GalaxyInfoProps> = ({ headers, entry, colorField }) => {
 
     return (
         <div className={styles.info}>
-            <div className={styles.wrap}>
+            <div>
                 <p className={styles.label}>name</p>
-                <span>
+                <span className={styles.name}>
                     <a
                         className={styles.nameLink}
                         href={galaxyNameToIpacLink(name)}
@@ -56,7 +56,7 @@ const GalaxyInfo: FC<GalaxyInfoProps> = ({ headers, entry, colorField }) => {
                 return (
                     <div className={value ? styles.wrap : styles.hidden} key={i}>
                         <p className={styles.label}>{key}</p>
-                        <p>{value}</p>
+                        <p className={styles.value}>{value}</p>
                     </div>
                 )
             }

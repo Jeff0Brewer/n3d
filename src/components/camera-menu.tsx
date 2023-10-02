@@ -1,8 +1,8 @@
 import React, { FC, useState, useEffect, useRef } from 'react'
 import { HiMiniVideoCamera, HiEye, HiMiniXMark, HiMiniPlus } from 'react-icons/hi2'
-import { IoMdPlay, IoMdPause, IoMdRewind, IoMdFastforward } from 'react-icons/io'
-import { IoStopSharp } from 'react-icons/io5'
+import { IoMdPlay, IoMdPause, IoMdRewind, IoMdFastforward, IoIosSkipBackward, IoIosSkipForward } from 'react-icons/io'
 import { PiWaveSawtoothBold, PiWaveSineBold } from 'react-icons/pi'
+import { IoStopSharp } from 'react-icons/io5'
 import { FaFileDownload, FaFileUpload } from 'react-icons/fa'
 import { SlGraph } from 'react-icons/sl'
 import { downloadTxt } from '../lib/export'
@@ -16,12 +16,15 @@ const DEFAULT_DURATION = 1000 // ms
 type CameraMenuProps = {
     setCameraPath: (path: CameraPath | null) => void,
     setTracePath: (path: CameraPath | null) => void,
+    setAxisPosition: (pos: [number, number, number] | null) => void,
     getCameraPosition: () => [number, number, number],
-    getCameraFocus: () => [number, number, number]
+    getCameraFocus: () => [number, number, number],
+    setDrawCameraPath: (draw: boolean) => void
 }
 
 const CameraMenu: FC<CameraMenuProps> = ({
-    setCameraPath, getCameraPosition, getCameraFocus, setTracePath
+    setCameraPath, setTracePath, setAxisPosition,
+    getCameraPosition, getCameraFocus, setDrawCameraPath
 }) => {
     const [steps, setSteps] = useState<Array<CameraStep>>([])
     const [durations, setDurations] = useState<Array<number>>([])
@@ -30,6 +33,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
     const [minKey, setMinKey] = useState<number>(0)
     const [drawPath, setDrawPath] = useState<boolean>(true)
     const [paused, setPaused] = useState<boolean>(true)
+    const [currStep, setCurrStep] = useState<number | null>(null)
     const pathRef = useRef<CameraPath | null>(null)
 
     useEffect(() => {
@@ -45,14 +49,18 @@ const CameraMenu: FC<CameraMenuProps> = ({
     }, [visible])
 
     useEffect(() => {
-        if (steps.length >= 2 && drawPath) {
-            // fill duration / start time with arbitrary values,
+        setDrawCameraPath(drawPath)
+    }, [drawPath, setDrawCameraPath])
+
+    useEffect(() => {
+        if (steps.length > 0) {
+            // fill duration with arbitrary values,
             // only need steps / smoothing for path motion
             setTracePath(new CameraPath(steps, [1], smooth))
         } else {
             setTracePath(null)
         }
-    }, [steps, smooth, drawPath, setTracePath])
+    }, [steps, smooth, setTracePath])
 
     const incKey = (): void => {
         // increment key to update input values from state
@@ -113,17 +121,34 @@ const CameraMenu: FC<CameraMenuProps> = ({
             : null
         setCameraPath(pathRef.current)
         setPaused(false)
+        setCurrStep(null)
     }
 
     const prevStep = (): void => {
         if (pathRef.current !== null) {
-            pathRef.current.prevStep()
+            const stepInd = pathRef.current.prevStep()
+            setCurrStep(stepInd)
         }
     }
 
     const nextStep = (): void => {
         if (pathRef.current !== null) {
-            pathRef.current.nextStep()
+            const stepInd = pathRef.current.nextStep()
+            setCurrStep(stepInd)
+        }
+    }
+
+    const firstStep = (): void => {
+        if (pathRef.current !== null) {
+            const stepInd = pathRef.current.firstStep()
+            setCurrStep(stepInd)
+        }
+    }
+
+    const lastStep = (): void => {
+        if (pathRef.current !== null) {
+            const stepInd = pathRef.current.lastStep()
+            setCurrStep(stepInd)
         }
     }
 
@@ -131,6 +156,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
         pathRef.current = null
         setCameraPath(pathRef.current)
         setPaused(true)
+        setCurrStep(null)
     }
 
     const playPause = (): void => {
@@ -140,6 +166,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
             pathRef.current.paused = !paused
             setPaused(pathRef.current.paused)
         }
+        setCurrStep(null)
     }
 
     const downloadPath = (): void => {
@@ -173,17 +200,23 @@ const CameraMenu: FC<CameraMenuProps> = ({
     if (!visible) { return <></> }
     return (
         <div className={styles.menu}>
-            { steps.length !== 0 && <div className={styles.steps}>
-                { steps.map((step: CameraStep, i: number) =>
-                    <div key={i + minKey} className={styles.stepWrap}>
-                        <StepInput
-                            step={step}
-                            setStep={getStepSetter(i)}
-                            removeStep={getStepRemover(i)}
-                            getCameraPosition={getCameraPosition}
-                            getCameraFocus={getCameraFocus}
-                        />
-                        { i < steps.length - 1 &&
+            { steps.length !== 0 &&
+                <div
+                    className={styles.steps}
+                    onMouseLeave={(): void => setAxisPosition(null)}
+                >
+                    { steps.map((step: CameraStep, i: number) =>
+                        <div key={i + minKey} className={styles.stepWrap}>
+                            <StepInput
+                                step={step}
+                                setStep={getStepSetter(i)}
+                                removeStep={getStepRemover(i)}
+                                getCameraPosition={getCameraPosition}
+                                getCameraFocus={getCameraFocus}
+                                setAxisPosition={setAxisPosition}
+                                drawingPath={drawPath}
+                            />
+                            { i < steps.length - 1 &&
                             <span className={styles.duration}>
                                 <input
                                     type={'text'}
@@ -192,9 +225,9 @@ const CameraMenu: FC<CameraMenuProps> = ({
                                 />
                                 <p>sec</p>
                             </span> }
-                    </div>
-                )}
-            </div> }
+                        </div>
+                    )}
+                </div> }
             <div className={styles.middleRow}>
                 <button className={styles.addStep} onClick={appendStep}>
                     <HiMiniPlus />
@@ -204,7 +237,7 @@ const CameraMenu: FC<CameraMenuProps> = ({
                 </button>
             </div>
             <div className={styles.bottomControls}>
-                <div className={styles.sideControls}>
+                <div className={styles.pathControls}>
                     <button onClick={(): void => setSmooth(!smooth)}>
                         { smooth
                             ? <PiWaveSineBold />
@@ -215,10 +248,13 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     </button>
                 </div>
                 <div className={styles.playControls}>
+                    <button onClick={firstStep} className={styles.skipIcon}>
+                        <IoIosSkipBackward />
+                    </button>
                     <button onClick={prevStep}>
                         <IoMdRewind />
                     </button>
-                    <button onClick={stopPath}>
+                    <button className={styles.stopButton} onClick={stopPath}>
                         <IoStopSharp />
                     </button>
                     <button onClick={playPause}>
@@ -229,8 +265,11 @@ const CameraMenu: FC<CameraMenuProps> = ({
                     <button onClick={nextStep}>
                         <IoMdFastforward />
                     </button>
+                    <button onClick={lastStep} className={styles.skipIcon}>
+                        <IoIosSkipForward />
+                    </button>
                 </div>
-                <div className={styles.sideControls}>
+                <div className={styles.fileControls}>
                     <button onClick={downloadPath}>
                         <FaFileDownload />
                     </button>
@@ -242,6 +281,10 @@ const CameraMenu: FC<CameraMenuProps> = ({
                         <FaFileUpload />
                     </label>
                 </div>
+                { currStep !== null &&
+                    <p className={styles.stepCount}>
+                        step: {currStep}
+                    </p> }
             </div>
         </div>
     )
@@ -253,12 +296,22 @@ type StepInputProps = {
     removeStep: () => void,
     getCameraPosition: () => [number, number, number],
     getCameraFocus: () => [number, number, number],
+    setAxisPosition: (pos: [number, number, number] | null) => void,
+    drawingPath: boolean
 }
 
 const StepInput: FC<StepInputProps> = ({
-    step, setStep, removeStep, getCameraPosition, getCameraFocus
+    step, setStep, removeStep, getCameraPosition,
+    getCameraFocus, setAxisPosition, drawingPath
 }) => {
     const [currKey, setCurrKey] = useState<number>(0)
+    const [hovered, setHovered] = useState<boolean>(false)
+
+    useEffect(() => {
+        if (hovered) {
+            setAxisPosition(step.position)
+        }
+    }, [hovered, step, setAxisPosition])
 
     const updateStep = (updateKey?: boolean): void => {
         // don't need object copy since steps state is copied
@@ -271,6 +324,9 @@ const StepInput: FC<StepInputProps> = ({
 
     const setPosition = (point: [number, number, number], updateKey?: boolean): void => {
         step.position = point
+        if (hovered) {
+            setAxisPosition(point)
+        }
         updateStep(updateKey)
     }
 
@@ -280,7 +336,11 @@ const StepInput: FC<StepInputProps> = ({
     }
 
     return (
-        <div className={styles.step}>
+        <div
+            className={hovered && drawingPath ? styles.stepHighlight : styles.step}
+            onMouseEnter={(): void => setHovered(true)}
+            onMouseLeave={(): void => setHovered(false)}
+        >
             <div className={styles.stepRow}>
                 <PointInput
                     point={step.position}
@@ -346,16 +406,19 @@ const PointInput: FC<PointInputProps> = ({
                 { icon }
             </button>
             <input
+                className={styles.xInput}
                 type={'text'}
                 defaultValue={roundToPrecision(point[0], INPUT_PRECISION)}
                 onChange={getIndSetter(0)}
             />
             <input
+                className={styles.yInput}
                 type={'text'}
                 defaultValue={roundToPrecision(point[1], INPUT_PRECISION)}
                 onChange={getIndSetter(1)}
             />
             <input
+                className={styles.zInput}
                 type={'text'}
                 defaultValue={roundToPrecision(point[2], INPUT_PRECISION)}
                 onChange={getIndSetter(2)}

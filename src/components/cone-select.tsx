@@ -92,43 +92,45 @@ const ConeSelect: FC<ConeSelectProps> = ({
 
     return (
         <div className={styles.wrap}>
-            <p className={styles.header}>lat</p>
-            <div className={styles.angleValue}>
-                <p>{`${lat.toFixed(2)}°`}</p>
-                <input
-                    ref={latInputRef}
-                    type={'range'}
-                    min={-90}
-                    max={90}
-                    step={0.01}
-                    defaultValue={lat}
-                    onChange={setFromInput(setLat)}
-                />
-            </div>
-            <p className={styles.header}>lng</p>
-            <div className={styles.angleValue}>
-                <p>{`${lng.toFixed(2)}°`}</p>
-                <input
-                    ref={lngInputRef}
-                    type={'range'}
-                    min={0}
-                    max={360}
-                    step={0.01}
-                    defaultValue={lng}
-                    onChange={setFromInput(setLng)}
-                />
-            </div>
-            <p className={styles.header}>arc</p>
-            <div className={styles.angleValue}>
-                <p>{`${arc.toFixed(2)}°`}</p>
-                <input
-                    type={'range'}
-                    min={0}
-                    max={90}
-                    step={0.01}
-                    defaultValue={arc}
-                    onChange={setFromInput(setArc)}
-                />
+            <div className={styles.inner}>
+                <p className={styles.header}>lat</p>
+                <div className={styles.angleValue}>
+                    <p>{`${lat.toFixed(2)}°`}</p>
+                    <input
+                        ref={latInputRef}
+                        type={'range'}
+                        min={-90}
+                        max={90}
+                        step={0.01}
+                        defaultValue={lat}
+                        onChange={setFromInput(setLat)}
+                    />
+                </div>
+                <p className={styles.header}>lng</p>
+                <div className={styles.angleValue}>
+                    <p>{`${lng.toFixed(2)}°`}</p>
+                    <input
+                        ref={lngInputRef}
+                        type={'range'}
+                        min={0}
+                        max={360}
+                        step={0.01}
+                        defaultValue={lng}
+                        onChange={setFromInput(setLng)}
+                    />
+                </div>
+                <p className={styles.header}>arc</p>
+                <div className={styles.angleValue}>
+                    <p>{`${arc.toFixed(2)}°`}</p>
+                    <input
+                        type={'range'}
+                        min={0}
+                        max={90}
+                        step={0.01}
+                        defaultValue={arc}
+                        onChange={setFromInput(setArc)}
+                    />
+                </div>
             </div>
             <button
                 className={styles.createButton}

@@ -4,16 +4,24 @@
     left: 0;
     top: 0;
     background-color: #111;
-    padding: 10px; font-size: 12px;
+    padding: 10px;
+    font-size: 12px;
 }
 
-.info .wrap {
-    margin: 5px;
+.wrap:not(:first-of-type) {
+    margin-top: 5px;
 }
 
-.info .label {
+.label {
     text-transform: uppercase;
-    color: #888;
+}
+
+.label, .value, .name {
+    line-height: 14px;
+}
+
+.value {
+    color: var(--text0);
 }
 
 .hidden {
@@ -26,7 +34,12 @@
     margin-left: 5px;
 }
 
+.name {
+    display: flex;
+    align-items: center;
+}
+
 .nameLink {
     text-decoration: none;
-    color: #eef;
+    color: #99a;
 }
