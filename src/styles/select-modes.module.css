@@ -33,10 +33,7 @@
 
 .sphereCoords {
     display: flex;
-}
-
-.sphereCoords > * {
-    margin-right: 10px;
+    gap: 8px;
 }
 
 .angleValue, .sphereRadius {
