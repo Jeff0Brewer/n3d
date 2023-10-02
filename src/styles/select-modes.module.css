@@ -1,10 +1,13 @@
 .wrap {
     position: relative;
     padding-bottom: var(--create-button-height);
+    border-top: var(--border);
 }
 
 .inner {
     padding: 5px;
+    border-bottom: var(--border);
+    min-width: 210px;
 }
 
 .header {
@@ -46,6 +49,10 @@
     width: 150px;
 }
 
+.filterLabel:hover {
+    opacity: 0.8;
+}
+
 .filterOptions {
     display: flex;
     flex-direction: column;
@@ -69,5 +76,8 @@
     width: 100%;
     height: var(--create-button-height);
     background-color: var(--color1);
-    border-top: var(--border);
+}
+
+.createButton:hover {
+    background-color: var(--color0);
 }
