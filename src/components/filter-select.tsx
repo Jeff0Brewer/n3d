@@ -99,30 +99,32 @@ const FilterSelect: FC<FilterSelectProps> = ({ data, selectionCount, addSelectio
 
     return (
         <div className={styles.wrap}>
-            <FilterOption
-                label={'Luminosity Class'}
-                option={options.luminosity}
-                values={filterValues.luminosity}
-                setOption={setLuminosity}
-            />
-            <FilterOption
-                label={'Hierarchy'}
-                option={options.hierarchy}
-                values={filterValues.hierarchy}
-                setOption={setHierarchy}
-            />
-            <FilterOption
-                label={'Morphology'}
-                option={options.morphology}
-                values={filterValues.morphology}
-                setOption={setMorphology}
-            />
-            <FilterOption
-                label={'Activity Type'}
-                option={options.activity}
-                values={filterValues.activity}
-                setOption={setActivity}
-            />
+            <div className={styles.inner}>
+                <FilterOption
+                    label={'Luminosity Class'}
+                    option={options.luminosity}
+                    values={filterValues.luminosity}
+                    setOption={setLuminosity}
+                />
+                <FilterOption
+                    label={'Hierarchy'}
+                    option={options.hierarchy}
+                    values={filterValues.hierarchy}
+                    setOption={setHierarchy}
+                />
+                <FilterOption
+                    label={'Morphology'}
+                    option={options.morphology}
+                    values={filterValues.morphology}
+                    setOption={setMorphology}
+                />
+                <FilterOption
+                    label={'Activity Type'}
+                    option={options.activity}
+                    values={filterValues.activity}
+                    setOption={setActivity}
+                />
+            </div>
             <button
                 className={styles.createButton}
                 onClick={filterSelect}
@@ -152,7 +154,7 @@ const FilterOption: FC<FilterOptionProps> = ({ label, option, values, setOption 
     }
 
     return (
-        <div className={styles.filterDropdown}>
+        <div>
             <span>
                 <a
                     className={styles.filterLabel}

@@ -66,27 +66,29 @@ const SphereSelect: FC<SphereSelectProps> = ({
 
     return (
         <div className={styles.wrap}>
-            <p className={styles.header}>center</p>
-            <div className={styles.sphereCenter}>
-                {centerName !== null &&
+            <div className={styles.inner}>
+                <p className={styles.header}>center</p>
+                <div className={styles.sphereCenter}>
+                    {centerName !== null &&
                     <p>{centerName}</p>}
-                <span className={styles.sphereCoords}>
-                    <p>{`x: ${center[0].toFixed(2)}`}</p>
-                    <p>{`y: ${center[1].toFixed(2)}`}</p>
-                    <p>{`z: ${center[2].toFixed(2)}`}</p>
-                </span>
-            </div>
-            <p className={styles.header}>radius</p>
-            <div className={styles.sphereRadius}>
-                <p>{radius.toFixed(2)}</p>
-                <input
-                    type={'range'}
-                    min={0}
-                    max={2}
-                    step={0.01}
-                    defaultValue={radius}
-                    onChange={inputRadius}
-                />
+                    <span className={styles.sphereCoords}>
+                        <p>{`x: ${center[0].toFixed(2)}`}</p>
+                        <p>{`y: ${center[1].toFixed(2)}`}</p>
+                        <p>{`z: ${center[2].toFixed(2)}`}</p>
+                    </span>
+                </div>
+                <p className={styles.header}>radius</p>
+                <div className={styles.sphereRadius}>
+                    <p>{radius.toFixed(2)}</p>
+                    <input
+                        type={'range'}
+                        min={0}
+                        max={2}
+                        step={0.01}
+                        defaultValue={radius}
+                        onChange={inputRadius}
+                    />
+                </div>
             </div>
             <button
                 className={styles.createButton}

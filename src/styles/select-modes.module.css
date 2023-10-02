@@ -3,9 +3,17 @@
     padding-bottom: var(--create-button-height);
 }
 
+.inner {
+    padding: 5px;
+}
+
 .header {
-    margin-top: 5px;
     text-transform: uppercase;
+    height: 15px;
+}
+
+.header:not(:first-of-type) {
+    margin-top: 5px;
 }
 
 .sphereCenter, .sphereRadius, .angleValue {
@@ -36,10 +44,6 @@
 
 .angleValue > input, .sphereRadius > input {
     width: 150px;
-}
-
-.filterDropdown {
-    padding: 5px;
 }
 
 .filterLabel {
