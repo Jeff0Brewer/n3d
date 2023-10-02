@@ -8,9 +8,20 @@
     font-size: 12px;
 }
 
-.info .label {
+.wrap:not(:first-of-type) {
+    margin-top: 5px;
+}
+
+.label {
     text-transform: uppercase;
-    color: #888;
+}
+
+.label, .value, .name {
+    line-height: 14px;
+}
+
+.value {
+    color: var(--text0);
 }
 
 .hidden {
@@ -30,5 +41,5 @@
 
 .nameLink {
     text-decoration: none;
-    color: #eef;
+    color: #99a;
 }
