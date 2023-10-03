@@ -1,4 +1,5 @@
 import { vec3 } from 'gl-matrix'
+import { BlobReader, TextWriter, ZipReader } from '@zip.js/zip.js'
 import Papa from 'papaparse'
 import type { ParseConfig } from 'papaparse'
 
@@ -143,10 +144,30 @@ const calcGalaxyPositions = (data: GalaxyData): void => {
     }
 }
 
-const loadDataset = async (path: string): Promise<Dataset> => {
+const unzipData = async (path: string): Promise<string> => {
     const res = await fetch(path)
-    const csvString = await res.text()
-    const { data } = Papa.parse(csvString, csvParseConfig)
+    const blob = await res.blob()
+    const reader = new ZipReader(new BlobReader(blob))
+    const entries = await reader.getEntries()
+    await reader.close()
+
+    const csvEntry = entries.filter(entry => entry.filename.match(/\.csv/))[0]
+    if (csvEntry === undefined) {
+        throw new Error('No csv found in data zip file')
+    }
+    if (csvEntry.getData === undefined) {
+        throw new Error('Zip reader has no getData field')
+    }
+
+    const textWriter = new TextWriter()
+    const csv = await csvEntry.getData(textWriter)
+
+    return csv
+}
+
+const loadDataset = async (path: string): Promise<Dataset> => {
+    const csv = await unzipData(path)
+    const { data } = Papa.parse(csv, csvParseConfig)
 
     const galaxies = parseGalaxyData(data)
     const landmarks = parseLandmarkData(data)

@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/bezier-js": "^4.1.0",
     "@types/papaparse": "^5.3.7",
+    "@zip.js/zip.js": "^2.7.29",
     "bezier-js": "^6.1.4",
     "gl-matrix": "^3.4.3",
     "papaparse": "^5.4.1",

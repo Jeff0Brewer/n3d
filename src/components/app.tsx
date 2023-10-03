@@ -22,7 +22,7 @@ const App: FC = () => {
     const [cone, setCone] = useState<Cone | null>(null)
 
     const getData = async (): Promise<void> => {
-        const { galaxies, landmarks } = await loadDataset('./data/data.csv')
+        const { galaxies, landmarks } = await loadDataset('./data/data.zip')
         setGalaxyData(galaxies)
         setLandmarkData(landmarks)
 
