@@ -1,9 +1,17 @@
-# Installation
-- unzip dataset (`public/data.zip`)
-- `npm install` to install dependencies
-- build:
-    - `npm run dev` to start a development server
-    - or `npm run build` to generate a `dist` directory, containing the bundled distribution build
-- to host distribution build locally, the `dist` directory must be served with an http server
-    - a workable command line http server can be found [here](https://www.npmjs.com/package/http-server)
-    - to host locally, simply run `http-server dist`
+## Installation
+First install dependencies:
+```
+npm install
+```
+
+Then start a development server:
+```
+npm run dev
+```
+
+Or build distribution app:
+```
+npm run build
+```
+Build output is located in `n3d/dist/` directory, and can be hosted locally with
+an [http server](https://www.npmjs.com/package/http-server)
