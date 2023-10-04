@@ -10,6 +10,7 @@ import GalaxyInfo from '../components/info'
 import ColorMapMenu from '../components/color-map'
 import SelectMenu from '../components/select-menu'
 import Vis from '../components/vis'
+import styles from '../styles/app.module.css'
 
 const App: FC = () => {
     const [galaxyData, setGalaxyData] = useState<GalaxyData | null>(null)
@@ -21,6 +22,10 @@ const App: FC = () => {
     const [sphere, setSphere] = useState<Sphere | null>(null)
     const [cone, setCone] = useState<Cone | null>(null)
 
+    useEffect(() => {
+        getData()
+    }, [])
+
     const getData = async (): Promise<void> => {
         const { galaxies, landmarks } = await loadDataset('./data/data.zip')
         setGalaxyData(galaxies)
@@ -30,45 +35,42 @@ const App: FC = () => {
         setColorField(getColorField(galaxies, '2MASS  K_s_total'))
     }
 
-    useEffect(() => {
-        getData()
-    }, [])
-
-    if (!galaxyData) { return <></> }
     return (
-        <main>
-            <SelectMenu
-                data={galaxyData}
-                selections={selections}
-                setSelections={setSelections}
-                selected={selected}
-                setSelected={setSelected}
-                hovered={hovered}
-                setSphere={setSphere}
-                setCone={setCone}
-            />
-            <ColorMapMenu
-                data={galaxyData}
-                colorField={colorField}
-                setColorField={setColorField}
-            />
-            { selected !== null &&
+        <main className={styles.fade} data-visible={!!galaxyData}>
+            { galaxyData && <>
+                <SelectMenu
+                    data={galaxyData}
+                    selections={selections}
+                    setSelections={setSelections}
+                    selected={selected}
+                    setSelected={setSelected}
+                    hovered={hovered}
+                    setSphere={setSphere}
+                    setCone={setCone}
+                />
+                <ColorMapMenu
+                    data={galaxyData}
+                    colorField={colorField}
+                    setColorField={setColorField}
+                />
+                { selected !== null &&
                 <GalaxyInfo
                     headers={galaxyData.headers}
                     entry={galaxyData.entries[selected]}
                     colorField={colorField}
                 /> }
-            <Vis
-                galaxyData={galaxyData}
-                landmarkData={landmarkData}
-                selected={selected}
-                setSelected={setSelected}
-                setHovered={setHovered}
-                colorField={colorField}
-                selections={selections}
-                sphere={sphere}
-                cone={cone}
-            />
+                <Vis
+                    galaxyData={galaxyData}
+                    landmarkData={landmarkData}
+                    selected={selected}
+                    setSelected={setSelected}
+                    setHovered={setHovered}
+                    colorField={colorField}
+                    selections={selections}
+                    sphere={sphere}
+                    cone={cone}
+                />
+            </> }
         </main>
     )
 }

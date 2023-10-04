@@ -1,0 +1,11 @@
+.fade {
+    transition: opacity 2s;
+}
+
+.fade[data-visible="false"] {
+    opacity: 0;
+}
+
+.fade[data-visible="true"] {
+    opacity: 1;
+}
